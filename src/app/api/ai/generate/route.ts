@@ -1,11 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import OpenAI from 'openai';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
 
 interface SessionUser {
   name?: string | null;
@@ -28,25 +23,8 @@ export async function POST(req: Request) {
       return new NextResponse('Topic is required', { status: 400 });
     }
 
-    const prompt = `Write a blog post about "${topic}" in a ${tone} tone. The post should be ${length} in length. Include an introduction, main points, and a conclusion.`;
-
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a professional blog writer. Write engaging and informative content.',
-        },
-        {
-          role: 'user',
-          content: prompt,
-        },
-      ],
-      temperature: 0.7,
-      max_tokens: length === 'short' ? 500 : length === 'medium' ? 1000 : 2000,
-    });
-
-    const content = completion.choices[0]?.message?.content || '';
+    // Simple response since OpenAI is not being used
+    const content = `This is a sample blog post about "${topic}" in a ${tone} tone. The post would be ${length} in length. This feature is currently disabled.`;
 
     return NextResponse.json({ content });
   } catch (error) {
