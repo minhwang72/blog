@@ -28,7 +28,7 @@ jobs:
     - name: Set environment variables
       run: |
         echo "DOCKER_IMAGE=${{ secrets.DOCKER_IMAGE }}" >> $GITHUB_ENV
-        echo "DOCKER_TAG=${{ secrets.DOCKER_TAG }}" >> $GITHUB_ENV
+        echo "DOCKER_TAG=${{ github.sha }}" >> $GITHUB_ENV
         echo "SERVER_HOST=${{ secrets.SERVER_HOST }}" >> $GITHUB_ENV
         echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> $GITHUB_ENV
         echo "SERVER_USER=${{ secrets.SERVER_USER }}" >> $GITHUB_ENV
@@ -59,11 +59,9 @@ jobs:
         echo "MCP_API_TOKEN=${{ secrets.MCP_API_TOKEN }}" >> $GITHUB_ENV
 
     - name: Setup SSH
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+      uses: webfactory/ssh-agent@v0.8.0
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
     - name: Login to Docker Hub
       uses: docker/login-action@v2
@@ -73,7 +71,9 @@ jobs:
 
     - name: Build and push Docker image
       run: |
+        echo "Building Docker image..."
         docker build -t ${{ env.DOCKER_IMAGE }}:${{ github.sha }} .
+        echo "Pushing Docker image..."
         docker push ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
 
     - name: Test SSH connection
@@ -83,20 +83,26 @@ jobs:
 
     - name: Deploy to server
       run: |
-        echo "Deploying to server..."
+        echo "Starting deployment..."
         ssh -o ConnectTimeout=30 -o StrictHostKeyChecking=no ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} -p ${{ env.SERVER_PORT }} << 'EOF'
           echo "Starting deployment..."
           
-          # Stop and remove existing container
-          echo "Stopping existing container..."
-          docker stop blog || echo "No existing container to stop"
-          docker rm blog || echo "No existing container to remove"
+          # Check if container exists and stop it
+          echo "Checking existing container..."
+          if docker ps -a --format "table {{.Names}}" | grep -q "blog"; then
+            echo "Stopping existing container..."
+            docker stop blog || echo "Failed to stop container"
+            echo "Removing existing container..."
+            docker rm blog || echo "Failed to remove container"
+          else
+            echo "No existing container found"
+          fi
           
           # Pull latest image
           echo "Pulling latest image..."
           docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
           
-          # Run new container
+          # Run new container with detailed logging
           echo "Starting new container..."
           docker run -d \
             --name blog \
@@ -118,7 +124,15 @@ jobs:
             -e MCP_API_TOKEN=${{ env.MCP_API_TOKEN }} \
             ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
           
-          echo "Deployment completed successfully!"
+          # Check container status
+          echo "Checking container status..."
+          docker ps -a | grep blog
+          
+          # Check container logs
+          echo "Container logs:"
+          docker logs blog --tail 20
+          
+          echo "Deployment completed!"
         EOF
 
  
