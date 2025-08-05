@@ -10,9 +10,7 @@ const nextConfig = {
     domains: ['images.unsplash.com'],
     formats: ['image/avif', 'image/webp'],
   },
-  distDir: 'dist',
   trailingSlash: true,
-  output: 'standalone',
   staticPageGenerationTimeout: 1000,
 };
 

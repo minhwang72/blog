@@ -20,11 +20,11 @@ WORKDIR /app
 
 # Copy necessary files
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/dist/standalone ./
-COPY --from=builder /app/dist/static ./dist/static
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/yarn.lock ./yarn.lock
 
-# Copy package files and install production dependencies
-COPY package.json yarn.lock ./
+# Install production dependencies
 RUN yarn install --production --frozen-lockfile
 
 # Set environment variables
@@ -35,4 +35,4 @@ ENV PORT=3001
 EXPOSE 3001
 
 # Start the application
-CMD ["node", "server.js"]
+CMD ["yarn", "start"]
