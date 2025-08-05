@@ -2,36 +2,39 @@ name: Deploy Blog
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-
+    
     steps:
-    - name: Checkout repository
+    - name: Checkout code
       uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
 
-    - name: Set up Node.js
+    - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: '18'
         cache: 'yarn'
 
-    - name: Load environment variables
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile --production=false
+
+    - name: Build application
+      run: yarn build
+
+    - name: Set environment variables
       run: |
-        echo "DOCKER_IMAGE=${{ secrets.DOCKER_IMAGE }}" >> $GITHUB_ENV
-        echo "DOCKER_TAG=${{ secrets.DOCKER_TAG }}" >> $GITHUB_ENV
-        echo "SERVER_HOST=${{ secrets.SERVER_HOST }}" >> $GITHUB_ENV
-        echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> $GITHUB_ENV
-        echo "SERVER_USER=${{ secrets.SERVER_USER }}" >> $GITHUB_ENV
+        echo "DOCKER_IMAGE=zxcyui6181/blog" >> $GITHUB_ENV
+        echo "DOCKER_TAG=${{ github.sha }}" >> $GITHUB_ENV
+        echo "SERVER_HOST=monsil-server" >> $GITHUB_ENV
+        echo "SERVER_PORT=22" >> $GITHUB_ENV
+        echo "SERVER_USER=min" >> $GITHUB_ENV
         echo "CONTAINER_NAME=blog" >> $GITHUB_ENV
-        echo "CONTAINER_PORT=3333" >> $GITHUB_ENV
-        echo "HOST_PORT=3333" >> $GITHUB_ENV
+        echo "CONTAINER_PORT=3001" >> $GITHUB_ENV
+        echo "HOST_PORT=3001" >> $GITHUB_ENV
         echo "HOST=0.0.0.0" >> $GITHUB_ENV
         echo "NODE_ENV=production" >> $GITHUB_ENV
         echo "NEXT_TELEMETRY_DISABLED=1" >> $GITHUB_ENV
@@ -55,83 +58,28 @@ jobs:
         # MCP API Configuration
         echo "MCP_API_TOKEN=${{ secrets.MCP_API_TOKEN }}" >> $GITHUB_ENV
 
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile --production=false
-
-    - name: Build
-      run: yarn build
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-      with:
-        driver-opts: |
-          image=moby/buildkit:latest
-          network=host
-
-    - name: Login to DockerHub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-
     - name: Build and push Docker image
-      uses: docker/build-push-action@v4
-      with:
-        context: .
-        push: true
-        tags: |
-          ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
-          ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
-        cache-from: type=registry,ref=${{ env.DOCKER_IMAGE }}:buildcache
-        cache-to: type=registry,ref=${{ env.DOCKER_IMAGE }}:buildcache,mode=max
-        platforms: linux/amd64
-        build-args: |
-          HOST=${{ env.HOST }}
-          NODE_ENV=${{ env.NODE_ENV }}
-          NEXT_TELEMETRY_DISABLED=${{ env.NEXT_TELEMETRY_DISABLED }}
-          SKIP_DATABASE_CONNECTION=${{ env.SKIP_DATABASE_CONNECTION }}
-          DB_HOST=${{ env.DB_HOST }}
-          DB_PORT=${{ env.DB_PORT }}
-          DB_NAME=${{ env.DB_NAME }}
-          DB_USER=${{ env.DB_USER }}
-          DB_PASSWORD=${{ env.DB_PASSWORD }}
-          NEXTAUTH_SECRET=${{ env.NEXTAUTH_SECRET }}
-          NEXTAUTH_URL=${{ env.NEXTAUTH_URL }}
-          GOOGLE_CLIENT_ID=${{ env.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET=${{ env.GOOGLE_CLIENT_SECRET }}
-          OPENAI_API_KEY=${{ env.OPENAI_API_KEY }}
-          CLOUDINARY_URL=${{ env.CLOUDINARY_URL }}
+      run: |
+        docker build -t ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }} .
+        docker push ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
 
-    - name: Deploy Blog to Personal Server via SSH
-      uses: appleboy/ssh-action@v0.1.10
-      with:
-        host: ${{ env.SERVER_HOST }}
-        port: ${{ env.SERVER_PORT }}
-        username: ${{ env.SERVER_USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          if docker ps -a | grep -q ${{ env.CONTAINER_NAME }}; then
-            echo "Stopping and removing previous blog container..."
-            docker stop ${{ env.CONTAINER_NAME }} || true
-            docker rm ${{ env.CONTAINER_NAME }} || true
-          fi
-
-          echo "Pulling new blog image..."
-          docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
-
-          echo "Starting new blog container..."
+    - name: Deploy to server
+      run: |
+        ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} << 'EOF'
+          # Stop and remove existing container
+          docker stop blog || true
+          docker rm blog || true
+          
+          # Pull latest image
+          docker pull ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+          
+          # Run new container
           docker run -d \
-            --name ${{ env.CONTAINER_NAME }} \
+            --name blog \
             --restart unless-stopped \
-            --health-cmd "curl -f http://localhost:${{ env.CONTAINER_PORT }} || exit 1" \
-            --health-interval 30s \
-            --health-timeout 3s \
-            --health-retries 3 \
             -p ${{ env.HOST_PORT }}:${{ env.CONTAINER_PORT }} \
-            -e HOST=${{ env.HOST }} \
             -e NODE_ENV=${{ env.NODE_ENV }} \
             -e NEXT_TELEMETRY_DISABLED=${{ env.NEXT_TELEMETRY_DISABLED }} \
-            -e SKIP_DATABASE_CONNECTION=${{ env.SKIP_DATABASE_CONNECTION }} \
             -e DB_HOST=${{ env.DB_HOST }} \
             -e DB_PORT=${{ env.DB_PORT }} \
             -e DB_NAME=${{ env.DB_NAME }} \
@@ -144,17 +92,7 @@ jobs:
             -e OPENAI_API_KEY=${{ env.OPENAI_API_KEY }} \
             -e CLOUDINARY_URL=${{ env.CLOUDINARY_URL }} \
             -e MCP_API_TOKEN=${{ env.MCP_API_TOKEN }} \
-            ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
-
-          echo "Checking blog deployment status..."
-          sleep 10
-          if docker ps | grep -q ${{ env.CONTAINER_NAME }}; then
-            echo "Blog deployment successful!"
-            docker logs ${{ env.CONTAINER_NAME }}
-          else
-            echo "Blog deployment failed!"
-            docker logs ${{ env.CONTAINER_NAME }}
-            exit 1
-          fi
+            ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+        EOF
 
  

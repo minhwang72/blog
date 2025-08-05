@@ -59,10 +59,10 @@ RUN yarn install --production --frozen-lockfile
 
 # Set environment variables
 ENV NODE_ENV=production
-ENV PORT=3333
+ENV PORT=3001
 
 # Expose port
-EXPOSE 3333
+EXPOSE 3001
 
 # Start the application
 CMD ["node", "server.js"]
