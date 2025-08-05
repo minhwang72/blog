@@ -69,17 +69,28 @@ jobs:
         docker build -t ${{ env.DOCKER_IMAGE }}:${{ github.sha }} .
         docker push ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
 
+    - name: Test SSH connection
+      run: |
+        echo "Testing SSH connection to ${{ env.SERVER_HOST }}:${{ env.SERVER_PORT }}"
+        timeout 30 ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} -p ${{ env.SERVER_PORT }} "echo 'SSH connection successful'"
+
     - name: Deploy to server
       run: |
-        ssh ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} << 'EOF'
+        echo "Deploying to server..."
+        ssh -o ConnectTimeout=30 -o StrictHostKeyChecking=no ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} -p ${{ env.SERVER_PORT }} << 'EOF'
+          echo "Starting deployment..."
+          
           # Stop and remove existing container
-          docker stop blog || true
-          docker rm blog || true
+          echo "Stopping existing container..."
+          docker stop blog || echo "No existing container to stop"
+          docker rm blog || echo "No existing container to remove"
           
           # Pull latest image
+          echo "Pulling latest image..."
           docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
           
           # Run new container
+          echo "Starting new container..."
           docker run -d \
             --name blog \
             --restart unless-stopped \
@@ -99,6 +110,8 @@ jobs:
             -e CLOUDINARY_URL=${{ env.CLOUDINARY_URL }} \
             -e MCP_API_TOKEN=${{ env.MCP_API_TOKEN }} \
             ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+          
+          echo "Deployment completed successfully!"
         EOF
 
  
