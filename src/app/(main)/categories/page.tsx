@@ -8,7 +8,15 @@ export const metadata = {
 };
 
 async function getAllCategories() {
-  return await db.query.categories.findMany();
+  try {
+    if (process.env.SKIP_DATABASE_CONNECTION === 'true') {
+      return [];
+    }
+    return await db.query.categories.findMany();
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return [];
+  }
 }
 
 export default async function CategoriesPage() {
