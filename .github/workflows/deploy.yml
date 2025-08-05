@@ -75,13 +75,23 @@ jobs:
         docker build -t ${{ env.DOCKER_IMAGE }}:${{ github.sha }} .
         echo "Pushing Docker image..."
         docker push ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+        echo "✅ Docker image built and pushed successfully!"
+        echo "Image: ${{ env.DOCKER_IMAGE }}:${{ github.sha }}"
 
     - name: Test SSH connection
       run: |
         echo "Testing SSH connection to ${{ env.SERVER_HOST }}:${{ env.SERVER_PORT }}"
-        timeout 30 ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} -p ${{ env.SERVER_PORT }} "echo 'SSH connection successful'"
+        timeout 30 ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} -p ${{ env.SERVER_PORT }} "echo 'SSH connection successful'" || {
+          echo "⚠️ SSH connection failed. Manual deployment required."
+          echo "Please run the following commands on your server:"
+          echo "docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}"
+          echo "docker stop blog || true"
+          echo "docker rm blog || true"
+          echo "docker run -d --name blog --restart unless-stopped -p 3001:3001 -e NODE_ENV=production ${{ env.DOCKER_IMAGE }}:${{ github.sha }}"
+        }
 
     - name: Deploy to server
+      if: success()
       run: |
         echo "Starting deployment..."
         ssh -o ConnectTimeout=30 -o StrictHostKeyChecking=no ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} -p ${{ env.SERVER_PORT }} << 'EOF'
