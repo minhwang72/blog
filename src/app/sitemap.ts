@@ -34,35 +34,41 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // 블로그 포스트들
-  const allPosts = await db
-    .select({
-      slug: posts.slug,
-      updatedAt: posts.updatedAt,
-    })
-    .from(posts)
-    .where(eq(posts.published, true));
+  try {
+    // 블로그 포스트들
+    const allPosts = await db
+      .select({
+        slug: posts.slug,
+        updatedAt: posts.updatedAt,
+      })
+      .from(posts)
+      .where(eq(posts.published, true));
 
-  const postPages = allPosts.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: post.updatedAt,
-    changeFrequency: 'monthly' as const,
-    priority: 0.6,
-  }));
+    const postPages = Array.isArray(allPosts) ? allPosts.map((post) => ({
+      url: `${baseUrl}/blog/${post.slug}`,
+      lastModified: post.updatedAt,
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    })) : [];
 
-  // 카테고리 페이지들
-  const allCategories = await db
-    .select({
-      slug: categories.slug,
-    })
-    .from(categories);
+    // 카테고리 페이지들
+    const allCategories = await db
+      .select({
+        slug: categories.slug,
+      })
+      .from(categories);
 
-  const categoryPages = allCategories.map((category) => ({
-    url: `${baseUrl}/category/${category.slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.5,
-  }));
+    const categoryPages = Array.isArray(allCategories) ? allCategories.map((category) => ({
+      url: `${baseUrl}/category/${category.slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.5,
+    })) : [];
 
-  return [...staticPages, ...postPages, ...categoryPages];
+    return [...staticPages, ...postPages, ...categoryPages];
+  } catch (error) {
+    console.error('Sitemap generation error:', error);
+    // 데이터베이스 연결 실패 시 정적 페이지만 반환
+    return staticPages;
+  }
 } 
