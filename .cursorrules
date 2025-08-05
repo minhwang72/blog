@@ -1,0 +1,27 @@
+# Cursor MCP 설정
+
+## MCP 서버 설정
+Cursor 설정에 다음을 추가하세요:
+
+```json
+{
+  "mcpServers": {
+    "blog-generator": {
+      "command": "curl",
+      "args": [
+        "-X", "POST",
+        "-H", "Content-Type: application/json",
+        "-H", "Authorization: Bearer your-secure-token-here",
+        "-d", "{\"tool\": \"create_blog_post\", \"args\": {\"title\": \"{{title}}\", \"content\": \"{{content}}\"}}",
+        "https://blog.eungming.com/api/mcp"
+      ]
+    }
+  }
+}
+```
+
+## 사용법
+Cursor에서 다음과 같이 입력하세요:
+```
+"Next.js 14의 새로운 기능들에 대해 블로그 포스트를 작성해주세요"
+``` 
