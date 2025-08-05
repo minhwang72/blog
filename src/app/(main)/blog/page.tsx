@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { db } from '@/lib/db';
-import { posts, categories } from '@/lib/db/schema';
+import { posts, categories, users } from '@/lib/db/schema';
 import { desc, eq } from 'drizzle-orm';
 
 export const dynamic = 'force-dynamic';
@@ -20,10 +20,12 @@ async function getPosts() {
         createdAt: posts.createdAt,
         updatedAt: posts.updatedAt,
         authorId: posts.authorId,
-        authorName: categories.name,
+        authorName: users.name,
+        categoryName: categories.name,
       })
       .from(posts)
-      .leftJoin(categories, eq(posts.authorId, categories.id))
+      .leftJoin(users, eq(posts.authorId, users.id))
+      .leftJoin(categories, eq(posts.categoryId, categories.id))
       .orderBy(desc(posts.createdAt));
     
     return Array.isArray(allPosts) ? allPosts : [];
@@ -48,7 +50,7 @@ export default async function BlogPage() {
       </div>
 
       <div className="grid gap-8">
-        {Array.isArray(posts) && posts.map((post) => (
+        {Array.isArray(posts) && posts.map((post: any) => (
           <article
             key={post.id}
             className="group relative rounded-lg border border-gray-200 dark:border-gray-800 p-6 hover:border-gray-300 dark:hover:border-gray-700 transition-colors"
@@ -70,6 +72,11 @@ export default async function BlogPage() {
                     day: 'numeric',
                   })}
                 </time>
+                {post.categoryName && (
+                  <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded">
+                    {post.categoryName}
+                  </span>
+                )}
                 {post.updatedAt && post.updatedAt > post.createdAt && (
                   <span className="text-xs">
                     (Updated: {new Date(post.updatedAt).toLocaleDateString('ko-KR')})

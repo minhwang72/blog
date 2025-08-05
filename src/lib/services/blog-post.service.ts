@@ -19,7 +19,7 @@ export class BlogPostService {
     const slug = this.generateSlug(data.title);
     
     // Create post
-    const [post] = await db.insert(posts).values({
+    const postResult = await db.insert(posts).values({
       title: data.title,
       slug,
       content: data.content,
@@ -32,7 +32,7 @@ export class BlogPostService {
 
     // Handle tags if provided
     if (data.tags && data.tags.length > 0) {
-      await this.handleTags(post.insertId, data.tags);
+      await this.handleTags(postResult.insertId, data.tags);
     }
 
     return {
@@ -56,14 +56,14 @@ export class BlogPostService {
 
     // Create new category
     const slug = this.generateSlug(name);
-    const [newCategory] = await db.insert(categories).values({
+    const newCategoryResult = await db.insert(categories).values({
       name,
       slug,
       description: `Posts about ${name}`,
     });
 
     return {
-      id: newCategory.insertId,
+      id: newCategoryResult.insertId,
       name,
       slug,
     };
@@ -83,11 +83,11 @@ export class BlogPostService {
         tagId = existing[0].id;
       } else {
         const slug = this.generateSlug(tagName);
-        const [newTag] = await db.insert(tags).values({
+        const newTagResult = await db.insert(tags).values({
           name: tagName,
           slug,
         });
-        tagId = newTag.insertId;
+        tagId = newTagResult.insertId;
       }
 
       // Create post-tag relationship
