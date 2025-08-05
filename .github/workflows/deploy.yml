@@ -27,11 +27,11 @@ jobs:
 
     - name: Set environment variables
       run: |
-        echo "DOCKER_IMAGE=zxcyui6181/blog" >> $GITHUB_ENV
-        echo "DOCKER_TAG=${{ github.sha }}" >> $GITHUB_ENV
-        echo "SERVER_HOST=monsil-server" >> $GITHUB_ENV
-        echo "SERVER_PORT=22" >> $GITHUB_ENV
-        echo "SERVER_USER=min" >> $GITHUB_ENV
+        echo "DOCKER_IMAGE=${{ secrets.DOCKER_IMAGE }}" >> $GITHUB_ENV
+        echo "DOCKER_TAG=${{ secrets.DOCKER_TAG }}" >> $GITHUB_ENV
+        echo "SERVER_HOST=${{ secrets.SERVER_HOST }}" >> $GITHUB_ENV
+        echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> $GITHUB_ENV
+        echo "SERVER_USER=${{ secrets.SERVER_USER }}" >> $GITHUB_ENV
         echo "CONTAINER_NAME=blog" >> $GITHUB_ENV
         echo "CONTAINER_PORT=3001" >> $GITHUB_ENV
         echo "HOST_PORT=3001" >> $GITHUB_ENV
@@ -60,8 +60,8 @@ jobs:
 
     - name: Build and push Docker image
       run: |
-        docker build -t ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }} .
-        docker push ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+        docker build -t ${{ env.DOCKER_IMAGE }}:${{ github.sha }} .
+        docker push ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
 
     - name: Deploy to server
       run: |
@@ -71,7 +71,7 @@ jobs:
           docker rm blog || true
           
           # Pull latest image
-          docker pull ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+          docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
           
           # Run new container
           docker run -d \
@@ -92,7 +92,7 @@ jobs:
             -e OPENAI_API_KEY=${{ env.OPENAI_API_KEY }} \
             -e CLOUDINARY_URL=${{ env.CLOUDINARY_URL }} \
             -e MCP_API_TOKEN=${{ env.MCP_API_TOKEN }} \
-            ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+            ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
         EOF
 
  
