@@ -68,16 +68,17 @@ export const posts = mysqlTable('posts', {
 export const comments = mysqlTable('comments', {
   id: int('id').autoincrement().primaryKey(),
   content: text('content').notNull(),
+  name: varchar('name', { length: 100 }).notNull(),
+  password: varchar('password', { length: 255 }).notNull(),
   postId: int('post_id').notNull(),
-  authorId: int('author_id').notNull(),
   parentId: int('parent_id'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow(),
 }, (table) => ({
   postIdx: index('idx_post_id').on(table.postId),
-  authorIdx: index('idx_author_id').on(table.authorId),
   parentIdx: index('idx_parent_id').on(table.parentId),
   postCreatedIdx: index('idx_post_created').on(table.postId, table.createdAt),
+  nameIdx: index('idx_name').on(table.name),
 }));
 
 // Tags table
@@ -154,11 +155,7 @@ export const postsRelations = relations(posts, ({ one, many }) => ({
   tags: many(postsToTags),
 }));
 
-export const commentsRelations = relations(comments, ({ one }) => ({
-  author: one(users, {
-    fields: [comments.authorId],
-    references: [users.id],
-  }),
+export const commentsRelations = relations(comments, ({ one, many }) => ({
   post: one(posts, {
     fields: [comments.postId],
     references: [posts.id],
@@ -167,6 +164,7 @@ export const commentsRelations = relations(comments, ({ one }) => ({
     fields: [comments.parentId],
     references: [comments.id],
   }),
+  replies: many(comments),
 }));
 
 export const tagsRelations = relations(tags, ({ many }) => ({

@@ -5,12 +5,11 @@ import { Menu } from "lucide-react";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
-const navigation = [
-  { name: "홈", href: "/" },
-  { name: "블로그", href: "/blog" },
-  { name: "방명록", href: "/guestbook" },
-  { name: "소개", href: "/about" },
-];
+  const navigation = [
+    { name: "홈", href: "/" },
+    { name: "블로그", href: "/blog" },
+    { name: "소개", href: "/about" },
+  ];
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
