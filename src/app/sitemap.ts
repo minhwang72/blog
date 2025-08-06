@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 import { db } from '@/lib/db';
-import { posts, categories } from '@/lib/db/schema';
+import { posts } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -26,12 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily' as const,
       priority: 0.9,
     },
-    {
-      url: `${baseUrl}/categories`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.7,
-    },
+
     {
       url: `${baseUrl}/tags`,
       lastModified: new Date(),
@@ -64,21 +59,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     })) : [];
 
-    // 카테고리 페이지들
-    const allCategories = await db
-      .select({
-        slug: categories.slug,
-      })
-      .from(categories);
-
-    const categoryPages = Array.isArray(allCategories) ? allCategories.map((category) => ({
-      url: `${baseUrl}/category/${category.slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.5,
-    })) : [];
-
-    return [...staticPages, ...postPages, ...categoryPages];
+    return [...staticPages, ...postPages];
   } catch (error) {
     console.error('Sitemap generation error:', error);
     // 데이터베이스 연결 실패 시 정적 페이지만 반환
