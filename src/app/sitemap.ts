@@ -46,14 +46,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // 블로그 포스트들
     const allPosts = await db
       .select({
-        slug: posts.slug,
+        id: posts.id,
         updatedAt: posts.updatedAt,
       })
       .from(posts)
       .where(eq(posts.published, true));
 
     const postPages = Array.isArray(allPosts) ? allPosts.map((post) => ({
-      url: `${baseUrl}/blog/${post.slug}`,
+      url: `${baseUrl}/blog/${post.id}`,
       lastModified: post.updatedAt,
       changeFrequency: 'monthly' as const,
       priority: 0.6,

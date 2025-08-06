@@ -11,7 +11,7 @@ import Comments from '@/components/blog/Comments';
 
 interface Props {
   params: {
-    slug: string;
+    id: string;
   };
 }
 
@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       .from(posts)
       .leftJoin(users, eq(posts.authorId, users.id))
       .leftJoin(categories, eq(posts.categoryId, categories.id))
-      .where(eq(posts.slug, decodeURIComponent(params.slug)));
+      .where(eq(posts.id, parseInt(params.id)));
 
     if (!post[0]) {
       return {
@@ -463,14 +463,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-async function getPost(slug: string) {
+async function getPost(id: string) {
   try {
     if (process.env.SKIP_DATABASE_CONNECTION === 'true') {
       return null;
     }
 
-    // URL 디코딩 처리 (한글 슬러그 지원)
-    const decodedSlug = decodeURIComponent(slug);
+    // ID를 숫자로 변환
+    const postId = parseInt(id);
+    if (isNaN(postId)) {
+      return null;
+    }
 
     const post = await db
       .select({
@@ -489,7 +492,7 @@ async function getPost(slug: string) {
       .from(posts)
       .leftJoin(users, eq(posts.authorId, users.id))
       .leftJoin(categories, eq(posts.categoryId, categories.id))
-      .where(eq(posts.slug, decodedSlug));
+      .where(eq(posts.id, postId));
     
     return post[0];
   } catch (error) {
@@ -501,9 +504,9 @@ async function getPost(slug: string) {
 export default async function BlogPostPage({
   params,
 }: {
-  params: { slug: string };
+  params: { id: string };
 }) {
-  const post = await getPost(params.slug);
+  const post = await getPost(params.id);
 
   if (!post) {
     notFound();

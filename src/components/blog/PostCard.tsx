@@ -25,7 +25,7 @@ export default function PostCard({ post }: PostCardProps) {
   };
 
   return (
-    <Link href={`/blog/${post.slug}`} className="block group">
+    <Link href={`/blog/${post.id}`} className="block group">
       <article className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm dark:shadow-slate-900/50 hover:shadow-lg dark:hover:shadow-slate-900/80 transition-all duration-300 hover:-translate-y-1 p-6 h-full flex flex-col">
         {/* 카테고리 태그 */}
         {post.categoryName && (

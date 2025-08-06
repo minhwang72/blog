@@ -143,7 +143,7 @@ export default function BlogPage() {
               key={post.id}
               className="group relative rounded-lg border border-gray-200 dark:border-gray-800 p-6 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200 hover:shadow-md"
             >
-              <Link href={`/blog/${post.slug}`} className="block">
+              <Link href={`/blog/${post.id}`} className="block">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                   {post.title}
                 </h2>
