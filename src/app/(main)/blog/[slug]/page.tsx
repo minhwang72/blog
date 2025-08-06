@@ -5,6 +5,7 @@ import { posts, categories, users } from '@/lib/db/schema';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { Metadata } from 'next';
+import Script from 'next/script';
 
 interface Props {
   params: {
@@ -38,8 +39,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       .from(posts)
       .leftJoin(users, eq(posts.authorId, users.id))
       .leftJoin(categories, eq(posts.categoryId, categories.id))
-      .where(eq(posts.slug, params.slug))
-      .limit(1);
+      .where(eq(posts.slug, params.slug));
 
     if (!post[0]) {
       return {
@@ -71,7 +71,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       '웹개발',
       '프론트엔드',
       '백엔드',
-      'MCP',
       'AI',
       '자동화',
       'RPA',
@@ -485,8 +484,7 @@ async function getPost(slug: string) {
       .from(posts)
       .leftJoin(users, eq(posts.authorId, users.id))
       .leftJoin(categories, eq(posts.categoryId, categories.id))
-      .where(eq(posts.slug, slug))
-      .limit(1);
+      .where(eq(posts.slug, slug));
     
     return post[0];
   } catch (error) {
@@ -506,27 +504,71 @@ export default async function BlogPostPage({
     notFound();
   }
 
-  return (
-    <article className="prose prose-lg dark:prose-invert max-w-none">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl mb-4">
-          {post.title}
-        </h1>
-        <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-          <time dateTime={post.createdAt.toISOString()}>
-            {format(post.createdAt, 'PPP', { locale: ko })}
-          </time>
-          {post.updatedAt && post.updatedAt > post.createdAt && (
-            <span>
-              (Updated: {format(post.updatedAt, 'PPP', { locale: ko })})
-            </span>
-          )}
-        </div>
-      </header>
+  // 구조화된 데이터 생성
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.title,
+    "description": post.excerpt || post.content.replace(/<[^>]*>/g, '').substring(0, 200),
+    "author": {
+      "@type": "Person",
+      "name": post.authorName || "황민"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "min.log",
+      "url": "https://blog.eungming.com"
+    },
+    "datePublished": post.createdAt.toISOString(),
+    "dateModified": post.updatedAt?.toISOString() || post.createdAt.toISOString(),
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://blog.eungming.com/blog/${post.slug}`
+    },
+    "url": `https://blog.eungming.com/blog/${post.slug}`,
+    "image": "https://blog.eungming.com/og-image.jpg",
+    "articleSection": post.categoryName,
+    "keywords": [
+      post.title,
+      post.categoryName,
+      "황민",
+      "블로그",
+      "개발",
+      "프로그래밍"
+    ].filter(Boolean)
+  };
 
-      <div className="prose prose-lg dark:prose-invert max-w-none">
-        <div dangerouslySetInnerHTML={{ __html: post.content }} />
-      </div>
-    </article>
+  return (
+    <>
+      <Script
+        id="structured-data"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+      />
+      
+      <article className="prose prose-lg dark:prose-invert max-w-none">
+        <header className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl mb-4">
+            {post.title}
+          </h1>
+          <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+            <time dateTime={post.createdAt.toISOString()}>
+              {format(post.createdAt, 'PPP', { locale: ko })}
+            </time>
+            {post.updatedAt && post.updatedAt > post.createdAt && (
+              <span>
+                (Updated: {format(post.updatedAt, 'PPP', { locale: ko })})
+              </span>
+            )}
+          </div>
+        </header>
+
+        <div className="prose prose-lg dark:prose-invert max-w-none">
+          <div dangerouslySetInnerHTML={{ __html: post.content }} />
+        </div>
+      </article>
+    </>
   );
 } 
