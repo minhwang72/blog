@@ -26,7 +26,6 @@ interface DashboardStats {
   totalPosts: number;
   totalViews: number;
   totalComments: number;
-  totalGuestbook: number;
   viewsByCategory: {
     category: string;
     views: number;
@@ -219,37 +218,7 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          <div className="bg-white overflow-hidden shadow rounded-lg">
-            <div className="p-5">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <svg
-                    className="h-6 w-6 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"
-                    />
-                  </svg>
-                </div>
-                <div className="ml-5 w-0 flex-1">
-                  <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">
-                      Guestbook Messages
-                    </dt>
-                    <dd className="text-lg font-medium text-gray-900">
-                      {stats.totalGuestbook}
-                    </dd>
-                  </dl>
-                </div>
-              </div>
-            </div>
-          </div>
+
         </div>
 
         <div className="mt-8 bg-white shadow rounded-lg p-6">

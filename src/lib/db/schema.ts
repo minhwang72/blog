@@ -103,17 +103,7 @@ export const postsToTags = mysqlTable('posts_to_tags', {
   postIdx: index('idx_post_id').on(table.postId),
 }));
 
-// Guestbook entries table
-export const guestbook = mysqlTable('guestbook', {
-  id: int('id').autoincrement().primaryKey(),
-  content: text('content').notNull(),
-  name: varchar('name', { length: 255 }).notNull(),
-  email: varchar('email', { length: 255 }),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-}, (table) => ({
-  createdAtIdx: index('idx_created_at').on(table.createdAt),
-  nameIdx: index('idx_name').on(table.name),
-}));
+
 
 // Types
 export type User = typeof users.$inferSelect;
@@ -128,14 +118,12 @@ export type NewPost = typeof posts.$inferInsert;
 export type Comment = typeof comments.$inferSelect;
 export type NewComment = typeof comments.$inferInsert;
 
-export type GuestbookEntry = typeof guestbook.$inferSelect;
-export type NewGuestbookEntry = typeof guestbook.$inferInsert;
+
 
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   posts: many(posts),
   comments: many(comments),
-  guestbookEntries: many(guestbook),
 }));
 
 export const categoriesRelations = relations(categories, ({ many }) => ({
