@@ -2,8 +2,14 @@ import { db } from '@/lib/db';
 import { posts, users, categories } from '@/lib/db/schema';
 import { desc, eq } from 'drizzle-orm';
 import PostCard from '@/components/blog/PostCard';
+import { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: '태그 - min.log',
+  description: '태그별로 정리된 포스트를 확인하세요.',
+};
 
 async function getPostsWithTags() {
   try {
@@ -52,7 +58,7 @@ export default async function TagsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">포스트</h1>
+      <h1 className="text-3xl font-bold mb-8">태그</h1>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {Array.isArray(postsWithTags) && postsWithTags.map((post) => (
           <PostCard key={post.id} post={post} />

@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { db } from '@/lib/db';
 import { categories } from '@/lib/db/schema';
+import { Metadata } from 'next';
 
-export const metadata = {
-  title: '카테고리 - 은밍의 블로그',
-  description: '은밍의 블로그 카테고리 목록입니다.',
+export const metadata: Metadata = {
+  title: '카테고리 - min.log',
+  description: '관심 있는 주제의 글을 카테고리별로 모아보세요.',
 };
 
 async function getAllCategories() {

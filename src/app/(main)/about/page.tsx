@@ -1,3 +1,10 @@
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: '소개 - min.log',
+  description: '황민의 개발 블로그 소개 페이지입니다.',
+};
+
 export default function AboutPage() {
   return (
     <main className="min-h-screen bg-gray-50 py-12">
@@ -7,7 +14,7 @@ export default function AboutPage() {
         </h1>
         <div className="bg-white rounded-lg shadow-md p-8">
           <h2 className="text-2xl font-semibold text-gray-900 mb-4">
-            안녕하세요, 은밍입니다.
+            안녕하세요, 황민입니다.
           </h2>
           <p className="text-gray-600 mb-6">
             이 블로그는 개발과 일상을 기록하는 공간입니다. 주로 웹 개발, 프로그래밍,
@@ -32,7 +39,7 @@ export default function AboutPage() {
             연락처
           </h3>
           <p className="text-gray-600">
-            이메일: example@email.com
+            이메일: zxcyui6181@naver.com
           </p>
         </div>
       </div>

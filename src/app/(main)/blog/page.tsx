@@ -2,8 +2,14 @@ import Link from 'next/link';
 import { db } from '@/lib/db';
 import { posts, categories, users } from '@/lib/db/schema';
 import { desc, eq } from 'drizzle-orm';
+import { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: '블로그 - min.log',
+  description: '개발, 일상, 그리고 배움에 대한 모든 포스트를 확인하세요.',
+};
 
 async function getPosts() {
   try {
@@ -42,10 +48,10 @@ export default async function BlogPage() {
     <div className="space-y-8">
       <div className="space-y-4">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
-          Blog Posts
+          블로그
         </h1>
         <p className="text-lg text-gray-500 dark:text-gray-400">
-          Thoughts, stories and ideas about web development and life.
+          개발과 일상에 대한 모든 포스트를 확인하세요.
         </p>
       </div>
 

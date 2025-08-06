@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 
 interface GuestbookEntry {
@@ -63,13 +65,13 @@ export default function Guestbook() {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6">Guestbook</h2>
+      <h2 className="text-2xl font-bold mb-6">방명록</h2>
       
       <form onSubmit={handleSubmit} className="mb-8">
         <textarea
           value={newEntry}
           onChange={(e) => setNewEntry(e.target.value)}
-          placeholder="Leave a message..."
+          placeholder="메시지를 남겨주세요..."
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-2"
           rows={3}
         />
@@ -77,7 +79,7 @@ export default function Guestbook() {
           type="submit"
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
-          Submit
+          작성하기
         </button>
       </form>
 
