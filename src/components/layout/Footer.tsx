@@ -1,7 +1,15 @@
+'use client';
+
 import Link from 'next/link';
-import { Github, Mail, Settings } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 export default function Footer() {
+  const pathname = usePathname();
+  
+  // 홈 페이지가 아니면 푸터를 렌더링하지 않음
+  if (pathname !== '/') {
+    return null;
+  }
   return (
     <footer className="mt-auto border-t border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
       <div className="w-full flex h-auto items-center px-6 py-8">

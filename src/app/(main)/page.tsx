@@ -174,6 +174,9 @@ export default async function Home({ searchParams }: PageProps) {
           </div>
         )}
       </section>
+      
+      {/* 푸터를 위한 추가 공간 */}
+      <div className="h-32"></div>
     </div>
   );
 } 
