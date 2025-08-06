@@ -1,7 +1,7 @@
 'use client';
 
 import Link from "next/link";
-import { Menu, SparklesIcon } from "lucide-react";
+import { Menu } from "lucide-react";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
