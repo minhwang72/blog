@@ -157,40 +157,26 @@ html {
   opacity: 0.8;
 }
 
-/* 카드 스타일 */
+/* 카드 스타일 - Tailwind 우선 사용 */
 .card {
-  background: var(--card);
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
-  box-shadow: var(--card-shadow);
-  transition: all 0.3s ease;
-  overflow: hidden;
+  @apply bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm dark:shadow-slate-900/50 transition-all duration-300 overflow-hidden;
 }
 
 .card:hover {
-  box-shadow: var(--card-shadow-hover);
-  transform: translateY(-2px);
+  @apply shadow-lg dark:shadow-slate-900/80 -translate-y-1;
 }
 
-/* 탭 스타일 */
+/* 탭 스타일 - Tailwind 우선 사용 */
 .tab {
-  background: var(--tab-inactive);
-  color: var(--tab-text);
-  border-radius: 8px;
-  padding: 8px 16px;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  border: none;
-  font-weight: 500;
+  @apply bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg px-4 py-2 transition-all duration-300 cursor-pointer border-0 font-medium;
 }
 
 .tab.active {
-  background: var(--tab-active);
-  color: var(--primary-text);
+  @apply bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300;
 }
 
 .tab:hover:not(.active) {
-  background: var(--muted);
+  @apply bg-slate-200 dark:bg-slate-600;
 }
 
 /* 버튼 스타일 */

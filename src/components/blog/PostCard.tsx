@@ -26,18 +26,18 @@ export default function PostCard({ post }: PostCardProps) {
 
   return (
     <Link href={`/blog/${post.slug}`} className="block group">
-      <article className="card p-6 h-full flex flex-col">
+      <article className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm dark:shadow-slate-900/50 hover:shadow-lg dark:hover:shadow-slate-900/80 transition-all duration-300 hover:-translate-y-1 p-6 h-full flex flex-col">
         {/* 카테고리 태그 */}
         {post.categoryName && (
           <div className="mb-3">
-            <span className="inline-block px-3 py-1 text-xs font-medium bg-primary/10 text-primary rounded-full">
+            <span className="inline-block px-3 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full">
               {post.categoryName}
             </span>
           </div>
         )}
 
         {/* 제목 */}
-        <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-3 group-hover:text-primary transition-colors line-clamp-2">
+        <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
           {post.title}
         </h3>
 

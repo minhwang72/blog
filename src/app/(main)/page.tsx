@@ -102,22 +102,22 @@ export default async function Home({ searchParams }: PageProps) {
         
         {/* 통계 카드 */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg">
-            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{posts.length}</div>
-            <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mt-1">총 포스트</div>
-            <div className="absolute top-2 right-2 text-blue-200 dark:text-blue-800">
+          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg border border-blue-100 dark:border-blue-800/50">
+            <div className="text-3xl font-bold text-blue-600 dark:text-blue-300">{posts.length}</div>
+            <div className="text-sm font-medium text-gray-600 dark:text-gray-300 mt-1">총 포스트</div>
+            <div className="absolute top-2 right-2 text-blue-200 dark:text-blue-700">
               <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
           </div>
           
-          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-50 to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20 p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg">
-            <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
+          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-50 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg border border-purple-100 dark:border-purple-800/50">
+            <div className="text-3xl font-bold text-purple-600 dark:text-purple-300">
               {posts.reduce((sum, post: any) => sum + (post.viewCount || 0), 0)}
             </div>
-            <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mt-1">총 조회수</div>
-            <div className="absolute top-2 right-2 text-purple-200 dark:text-purple-800">
+            <div className="text-sm font-medium text-gray-600 dark:text-gray-300 mt-1">총 조회수</div>
+            <div className="absolute top-2 right-2 text-purple-200 dark:text-purple-700">
               <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                 <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
@@ -125,12 +125,12 @@ export default async function Home({ searchParams }: PageProps) {
             </div>
           </div>
           
-          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/20 dark:to-emerald-900/20 p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg">
-            <div className="text-3xl font-bold text-green-600 dark:text-green-400">
+          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg border border-green-100 dark:border-green-800/50">
+            <div className="text-3xl font-bold text-green-600 dark:text-green-300">
               {new Set(posts.map((post: any) => post.categoryName)).size}
             </div>
-            <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mt-1">카테고리</div>
-            <div className="absolute top-2 right-2 text-green-200 dark:text-green-800">
+            <div className="text-sm font-medium text-gray-600 dark:text-gray-300 mt-1">카테고리</div>
+            <div className="absolute top-2 right-2 text-green-200 dark:text-green-700">
               <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
               </svg>

@@ -76,7 +76,7 @@ function CategoryTabsContent() {
           }`}
         >
           <span>전체 보기</span>
-          <span className="text-xs bg-slate-200 dark:bg-slate-600 px-2 py-1 rounded-full">
+          <span className="text-xs bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-300 px-2 py-1 rounded-full">
             {categories.reduce((sum, cat) => sum + cat.postCount, 0)}
           </span>
         </button>
@@ -91,7 +91,7 @@ function CategoryTabsContent() {
             }`}
           >
             <span>{category.name}</span>
-            <span className="text-xs bg-slate-200 dark:bg-slate-600 px-2 py-1 rounded-full">
+            <span className="text-xs bg-slate-200 dark:bg-slate-600 text-slate-700 dark:text-slate-300 px-2 py-1 rounded-full">
               {category.postCount}
             </span>
           </button>
