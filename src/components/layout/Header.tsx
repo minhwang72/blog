@@ -41,7 +41,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md">
-      <div className="w-full flex h-16 items-center px-4">
+      <div className="w-full flex h-16 items-center px-6">
         {/* 로고 */}
         <Link href="/" className="logo text-2xl font-bold tracking-tight hover:opacity-80 transition-opacity">
           min.log

@@ -4,7 +4,7 @@ import { Github, Mail, Settings } from 'lucide-react';
 export default function Footer() {
   return (
     <footer className="mt-auto border-t border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
-      <div className="w-full flex h-auto items-center px-4 py-8">
+      <div className="w-full flex h-auto items-center px-6 py-8">
         <div className="w-full">
           {/* 메인 푸터 콘텐츠 */}
           <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-8 mb-8">
