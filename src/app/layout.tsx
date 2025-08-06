@@ -59,6 +59,9 @@ export const metadata: Metadata = {
       "naver-site-verification": "86c5c1cc1c8932ac679396eae3ac57d4ad6659c7",
     },
   },
+  other: {
+    "google-adsense-account": "ca-pub-4467822003966307",
+  },
   icons: {
     icon: '/logo.svg',
     shortcut: '/logo.svg',
