@@ -102,7 +102,7 @@ export default async function Home({ searchParams }: PageProps) {
         
         {/* 통계 카드 */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg border border-blue-100 dark:border-blue-800/50">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 p-6 border border-blue-100 dark:border-blue-800/50">
             <div className="text-3xl font-bold text-blue-600 dark:text-blue-300">{posts.length}</div>
             <div className="text-sm font-medium text-gray-600 dark:text-gray-300 mt-1">총 포스트</div>
             <div className="absolute top-2 right-2 text-blue-200 dark:text-blue-700">
@@ -112,7 +112,7 @@ export default async function Home({ searchParams }: PageProps) {
             </div>
           </div>
           
-          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-50 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg border border-purple-100 dark:border-purple-800/50">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-50 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 p-6 border border-purple-100 dark:border-purple-800/50">
             <div className="text-3xl font-bold text-purple-600 dark:text-purple-300">
               {posts.reduce((sum, post: any) => sum + (post.viewCount || 0), 0)}
             </div>
@@ -125,7 +125,7 @@ export default async function Home({ searchParams }: PageProps) {
             </div>
           </div>
           
-          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg border border-green-100 dark:border-green-800/50">
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 p-6 border border-green-100 dark:border-green-800/50">
             <div className="text-3xl font-bold text-green-600 dark:text-green-300">
               {new Set(posts.map((post: any) => post.categoryName)).size}
             </div>

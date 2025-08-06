@@ -142,14 +142,15 @@ html {
   background: var(--primary);
 }
 
-/* 로고 스타일 */
+/* 로고 스타일 - 고정 그라데이션 */
 .logo {
   font-family: 'Pretendard', sans-serif;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: -0.5px;
-  background: var(--gradient-primary);
+  background: linear-gradient(135deg, #87CEEB 0%, #9370DB 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
   transition: opacity 0.3s ease;
 }
 
