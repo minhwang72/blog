@@ -13,8 +13,10 @@ export async function GET() {
         slug: posts.slug,
         excerpt: posts.excerpt,
         createdAt: posts.createdAt,
+        updatedAt: posts.updatedAt,
         authorName: users.name,
         categoryName: categories.name,
+        categoryId: posts.categoryId,
       })
       .from(posts)
       .leftJoin(users, eq(posts.authorId, users.id))
