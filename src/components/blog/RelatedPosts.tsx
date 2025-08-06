@@ -55,8 +55,24 @@ export default function RelatedPosts({ currentPostId, categoryId, categoryName }
     );
   }
 
+  // 디버그용: 개발 환경에서는 관련 포스트가 없어도 컴포넌트 표시
   if (relatedPosts.length === 0) {
-    return null;
+    return (
+      <div className="my-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
+        <div className="flex items-center space-x-2 mb-4">
+          <span className="text-lg">📚</span>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            {categoryName && `${categoryName} 카테고리의 `}다른 글
+          </h3>
+        </div>
+        <div className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+          {categoryName ? 
+            `${categoryName} 카테고리에 아직 다른 글이 없습니다.` : 
+            '아직 관련 포스트가 없습니다.'
+          }
+        </div>
+      </div>
+    );
   }
 
   return (
