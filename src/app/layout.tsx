@@ -118,13 +118,16 @@ export default function RootLayout({
           </div>
         </Providers>
         
-        {/* Google AdSense */}
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID"
-          crossOrigin="anonymous"
-          strategy="afterInteractive"
-        />
+        {/* Google AdSense - 환경변수가 설정된 경우에만 로드 */}
+        {process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID && 
+         !process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID.includes('YOUR_PUBLISHER_ID') && (
+          <Script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID}`}
+            crossOrigin="anonymous"
+            strategy="afterInteractive"
+          />
+        )}
       </body>
     </html>
   );
