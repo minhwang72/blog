@@ -97,13 +97,6 @@ function CategoryTabsContent() {
           </button>
         ))}
       </div>
-
-      {/* 새 카테고리 추가 안내 */}
-      <div className="mt-6 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-        <p className="text-sm text-slate-600 dark:text-slate-400">
-          💡 MCP로 글을 작성하면 새로운 카테고리가 자동으로 추가됩니다!
-        </p>
-      </div>
     </div>
   );
 }
