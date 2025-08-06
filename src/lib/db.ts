@@ -103,6 +103,10 @@ const dummyDb = {
   }),
 };
 
+// DB 호스트 자동 감지
+const isProduction = process.env.NODE_ENV === 'production';
+const DB_HOST = isProduction ? '192.168.0.19' : (process.env.DB_HOST || 'monsilserver.iptime.org');
+
 // 빌드 시 데이터베이스 연결 건너뛰기
 const poolConnection = process.env.SKIP_DATABASE_CONNECTION === 'true'
   ? mysql.createPool({
@@ -113,8 +117,8 @@ const poolConnection = process.env.SKIP_DATABASE_CONNECTION === 'true'
       database: 'dummy',
     })
   : mysql.createPool({
-      host: process.env.DB_HOST,
-      port: Number(process.env.DB_PORT),
+      host: DB_HOST,
+      port: Number(process.env.DB_PORT || 3306),
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
