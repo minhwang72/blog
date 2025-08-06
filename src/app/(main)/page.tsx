@@ -34,10 +34,18 @@ export const metadata: Metadata = {
   },
 };
 
-async function getPosts() {
+async function getPosts(categorySlug?: string) {
   try {
     if (process.env.SKIP_DATABASE_CONNECTION === 'true') {
       return [];
+    }
+
+    // 기본 쿼리 구성
+    let whereConditions = [eq(posts.published, true)];
+    
+    // 카테고리 필터링 추가
+    if (categorySlug && categorySlug !== 'all') {
+      whereConditions.push(eq(categories.slug, categorySlug));
     }
 
     // Drizzle ORM 타입 문제로 인해 any 사용
@@ -58,7 +66,7 @@ async function getPosts() {
       .from(posts)
       .leftJoin(users, eq(posts.authorId, users.id))
       .leftJoin(categories, eq(posts.categoryId, categories.id))
-      .where(eq(posts.published, true))
+      .where(and(...whereConditions))
       .orderBy(desc(posts.createdAt));
     
     return Array.isArray(allPosts) ? allPosts : [];
@@ -74,38 +82,59 @@ interface PageProps {
 
 export default async function Home({ searchParams }: PageProps) {
   const categorySlug = searchParams.category || 'all';
-  const posts = await getPosts();
+  const posts = await getPosts(categorySlug);
 
   return (
     <div className="space-y-8">
       {/* Hero Section */}
-      <section className="text-center space-y-6 py-8">
-        <div className="space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-slate-900 to-slate-600 dark:from-slate-100 dark:to-slate-400 bg-clip-text text-transparent">
-            개발, 일상 그리고 배움에 대한 기록
-          </h1>
-          <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            프로그래밍, 일상 생활, 그리고 새로운 것을 배우는 과정을 기록합니다.
+      <section className="text-center space-y-8 py-12">
+        <div className="space-y-6">
+          <div className="relative">
+            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent leading-tight">
+              개발, 일상 그리고 배움에 대한 기록
+            </h1>
+            <div className="absolute -inset-x-4 -inset-y-2 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-3xl blur-3xl -z-10 opacity-30"></div>
+          </div>
+          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            프로그래밍, 일상 생활, 그리고 새로운 것을 배우는 과정을 기록하며 공유하는 공간입니다.
           </p>
         </div>
         
         {/* 통계 카드 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl mx-auto">
-          <div className="card p-4 text-center">
-            <div className="text-2xl font-bold text-primary">{posts.length}</div>
-            <div className="text-sm text-slate-600 dark:text-slate-400">총 포스트</div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/20 dark:to-indigo-900/20 p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">{posts.length}</div>
+            <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mt-1">총 포스트</div>
+            <div className="absolute top-2 right-2 text-blue-200 dark:text-blue-800">
+              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
           </div>
-          <div className="card p-4 text-center">
-            <div className="text-2xl font-bold text-primary">
+          
+          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-50 to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20 p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+            <div className="text-3xl font-bold text-purple-600 dark:text-purple-400">
               {posts.reduce((sum, post: any) => sum + (post.viewCount || 0), 0)}
             </div>
-            <div className="text-sm text-slate-600 dark:text-slate-400">총 조회수</div>
+            <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mt-1">총 조회수</div>
+            <div className="absolute top-2 right-2 text-purple-200 dark:text-purple-800">
+              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+              </svg>
+            </div>
           </div>
-          <div className="card p-4 text-center">
-            <div className="text-2xl font-bold text-primary">
+          
+          <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/20 dark:to-emerald-900/20 p-6 transition-all duration-300 hover:scale-105 hover:shadow-lg">
+            <div className="text-3xl font-bold text-green-600 dark:text-green-400">
               {new Set(posts.map((post: any) => post.categoryName)).size}
             </div>
-            <div className="text-sm text-slate-600 dark:text-slate-400">카테고리</div>
+            <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mt-1">카테고리</div>
+            <div className="absolute top-2 right-2 text-green-200 dark:text-green-800">
+              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+              </svg>
+            </div>
           </div>
         </div>
       </section>

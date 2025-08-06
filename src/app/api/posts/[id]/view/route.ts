@@ -8,8 +8,11 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
+    const postId = parseInt(params.id);
+    
+    // 포스트 존재 확인
     const post = await db.query.posts.findFirst({
-      where: eq(posts.id, parseInt(params.id)),
+      where: eq(posts.id, postId),
     });
 
     if (!post) {
@@ -19,7 +22,19 @@ export async function POST(
       );
     }
 
-    return NextResponse.json({ success: true });
+    // 조회수 증가
+    await db
+      .update(posts)
+      .set({ 
+        viewCount: post.viewCount + 1,
+        updatedAt: new Date()
+      })
+      .where(eq(posts.id, postId));
+
+    return NextResponse.json({ 
+      success: true,
+      viewCount: post.viewCount + 1 
+    });
   } catch (error) {
     console.error('Error processing view:', error);
     return NextResponse.json(

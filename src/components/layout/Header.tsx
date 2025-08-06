@@ -6,9 +6,8 @@ import { useState } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navigation = [
+  { name: "홈", href: "/" },
   { name: "블로그", href: "/blog" },
-  { name: "카테고리", href: "/categories" },
-  { name: "태그", href: "/tags" },
   { name: "방명록", href: "/guestbook" },
   { name: "소개", href: "/about" },
 ];
@@ -17,23 +16,23 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md">
       <div className="max-w-7xl mx-auto flex h-16 items-center px-4">
         {/* 로고 */}
-        <Link href="/" className="logo text-2xl font-bold tracking-tight bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">
+        <Link href="/" className="logo text-2xl font-bold tracking-tight hover:opacity-80 transition-opacity">
           min.log
         </Link>
 
         {/* 데스크탑 네비게이션 */}
-        <nav className="hidden md:flex items-center gap-6 ml-auto">
+        <nav className="hidden md:flex items-center gap-8 ml-auto">
           {navigation.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className="text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors hover:text-primary relative group"
+              className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all duration-200 relative group py-2"
             >
               {item.name}
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-300 group-hover:w-full"></span>
             </Link>
           ))}
         </nav>
@@ -53,13 +52,13 @@ export default function Header() {
 
       {/* 모바일 메뉴 */}
       {isMenuOpen && (
-        <div className="md:hidden border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2">
-          <nav className="space-y-1">
+        <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-4 py-4">
+          <nav className="space-y-2">
             {navigation.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="block py-2 px-3 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg"
+                className="block py-3 px-4 text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-all duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.name}
