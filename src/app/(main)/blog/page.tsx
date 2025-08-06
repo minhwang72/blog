@@ -170,11 +170,7 @@ export default function BlogPage() {
                       {post.categoryName}
                     </span>
                   )}
-                  {post.updatedAt && post.updatedAt > post.createdAt && (
-                    <span className="text-xs">
-                      (Updated: {new Date(post.updatedAt).toLocaleDateString('ko-KR')})
-                    </span>
-                  )}
+
                 </div>
               </Link>
             </article>

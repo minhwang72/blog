@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { CalendarIcon, EyeIcon, UserIcon } from '@heroicons/react/24/outline';
+import { CalendarIcon, EyeIcon } from '@heroicons/react/24/outline';
 
 interface PostCardProps {
   post: {
@@ -64,20 +64,7 @@ export default function PostCard({ post }: PostCardProps) {
             )}
           </div>
 
-          {/* 작성자 */}
-          {post.authorName && (
-            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
-              <UserIcon className="w-4 h-4" />
-              <span>{post.authorName}</span>
-            </div>
-          )}
 
-          {/* 수정일 표시 */}
-          {post.updatedAt && post.updatedAt > post.createdAt && (
-            <div className="text-xs text-slate-400 dark:text-slate-500">
-              수정: {formatDate(post.updatedAt)}
-            </div>
-          )}
         </div>
 
         {/* 호버 효과 */}

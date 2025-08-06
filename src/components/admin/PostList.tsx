@@ -84,8 +84,6 @@ export default function PostList({ posts: initialPosts }: PostListProps) {
                   {post.title}
                 </h3>
                 <div className="mt-1 flex items-center space-x-2 text-sm text-gray-500">
-                  <span>{post.author.name}</span>
-                  <span>•</span>
                   <span>{post.category?.name || '카테고리 없음'}</span>
                   <span>•</span>
                   <span>

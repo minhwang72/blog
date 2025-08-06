@@ -57,8 +57,6 @@ export default function PostList() {
             <p className="text-gray-600 mb-4">{post.excerpt}</p>
             <div className="flex justify-between items-center">
               <div className="text-sm text-gray-500">
-                <span>{post.authorName}</span>
-                <span className="mx-2">·</span>
                 <span>{post.categoryName}</span>
               </div>
               <Link

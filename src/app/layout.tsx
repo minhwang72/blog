@@ -4,6 +4,7 @@ import { Providers } from './providers';
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { usePathname } from 'next/navigation';
+import Script from 'next/script';
 
 export const metadata: Metadata = {
   title: {
@@ -116,6 +117,14 @@ export default function RootLayout({
             {children}
           </div>
         </Providers>
+        
+        {/* Google AdSense */}
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
       </body>
     </html>
   );
