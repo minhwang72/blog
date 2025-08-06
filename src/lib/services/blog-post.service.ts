@@ -28,6 +28,8 @@ export class BlogPostService {
       authorId: 1, // Default admin user
       categoryId: category.id,
       viewCount: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
     // Handle tags if provided
@@ -60,6 +62,7 @@ export class BlogPostService {
       name,
       slug,
       description: `Posts about ${name}`,
+      createdAt: new Date(),
     });
 
     return {
@@ -86,6 +89,7 @@ export class BlogPostService {
         const newTagResult = await db.insert(tags).values({
           name: tagName,
           slug,
+          createdAt: new Date(),
         });
         tagId = newTagResult.insertId;
       }
