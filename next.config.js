@@ -44,33 +44,7 @@ const nextConfig = {
     ];
   },
   
-  // Redirects for domain migration
-  async redirects() {
-    return [
-      {
-        source: '/:path*',
-        has: [
-          {
-            type: 'host',
-            value: 'blog.eungming.com',
-          },
-        ],
-        destination: 'https://eungming.com/:path*',
-        permanent: true,
-      },
-      {
-        source: '/:path*',
-        has: [
-          {
-            type: 'host',
-            value: 'www.eungming.com',
-          },
-        ],
-        destination: 'https://eungming.com/:path*',
-        permanent: true,
-      },
-    ];
-  },
+  // Note: Redirects are handled by nginx to prevent redirect loops
 };
 
 module.exports = nextConfig; 
