@@ -60,9 +60,8 @@ export default function RelatedPosts({ currentPostId, categoryId, categoryName }
     return (
       <div className="my-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
         <div className="flex items-center space-x-2 mb-4">
-          <span className="text-lg">📚</span>
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            {categoryName && `${categoryName} 카테고리의 `}다른 글
+            {categoryName || '다른 글'}
           </h3>
         </div>
         <div className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
@@ -78,9 +77,8 @@ export default function RelatedPosts({ currentPostId, categoryId, categoryName }
   return (
     <div className="my-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
       <div className="flex items-center space-x-2 mb-4">
-        <span className="text-lg">📚</span>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-          {categoryName && `${categoryName} 카테고리의 `}다른 글
+          {categoryName || '다른 글'}
         </h3>
       </div>
       
