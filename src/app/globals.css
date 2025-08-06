@@ -2,20 +2,98 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 디자인 시스템 변수 */
 :root {
+  /* 밝은 모드 */
   --background: #ffffff;
-  --foreground: #000000;
+  --foreground: #1a1a1a;
+  --card: #ffffff;
+  --card-border: #e5e7eb;
+  --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --card-shadow-hover: 0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  /* 포인트 컬러 - 파스텔 하늘색 */
+  --primary: #A0D8EF;
+  --primary-light: #B8E4F2;
+  --primary-dark: #7BC8E0;
+  --primary-text: #1e40af;
+  
+  /* 보조 컬러 */
+  --secondary: #f8fafc;
+  --secondary-foreground: #64748b;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  
+  /* 탭 컬러 */
+  --tab-active: #A0D8EF;
+  --tab-inactive: #f1f5f9;
+  --tab-text: #475569;
+  
+  /* 그라데이션 */
+  --gradient-primary: linear-gradient(135deg, #A0D8EF 0%, #B8E4F2 100%);
+  --gradient-background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  
+  /* 패턴 배경 */
+  --pattern-opacity: 0.03;
 }
 
 [data-theme="dark"] {
-  --background: #0a0a0a;
+  /* 다크 모드 */
+  --background: #0A1F44;
   --foreground: #ffffff;
+  --card: #1C1C1C;
+  --card-border: #2d3748;
+  --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+  --card-shadow-hover: 0 10px 25px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  
+  /* 포인트 컬러 - 밝은 민트 */
+  --primary: #8FF1D0;
+  --primary-light: #A5F4D8;
+  --primary-dark: #7AE8C0;
+  --primary-text: #ffffff;
+  
+  /* 보조 컬러 */
+  --secondary: #1a202c;
+  --secondary-foreground: #a0aec0;
+  --muted: #2d3748;
+  --muted-foreground: #a0aec0;
+  
+  /* 탭 컬러 */
+  --tab-active: #8FF1D0;
+  --tab-inactive: #2d3748;
+  --tab-text: #a0aec0;
+  
+  /* 그라데이션 */
+  --gradient-primary: linear-gradient(135deg, #8FF1D0 0%, #A5F4D8 100%);
+  --gradient-background: linear-gradient(135deg, #0A1F44 0%, #1a202c 100%);
+  
+  /* 패턴 배경 */
+  --pattern-opacity: 0.05;
 }
 
+/* 기본 스타일 */
 body {
   background-color: var(--background);
   color: var(--foreground);
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
+  line-height: 1.6;
+}
+
+/* 배경 패턴 */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 25% 25%, var(--primary) var(--pattern-opacity), transparent 1px),
+    radial-gradient(circle at 75% 75%, var(--primary) var(--pattern-opacity), transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  z-index: -1;
 }
 
 /* Smooth scrolling */
@@ -25,13 +103,14 @@ html {
 
 /* Focus styles */
 *:focus-visible {
-  @apply outline-none ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900;
+  outline: none;
+  box-shadow: 0 0 0 3px var(--primary);
 }
 
 /* Selection styles */
 ::selection {
-  background-color: #3b82f6;
-  color: #ffffff;
+  background-color: var(--primary);
+  color: var(--primary-text);
 }
 
 /* 접근성 개선을 위한 스타일 */
@@ -54,39 +133,24 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--muted);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888;
+  background: var(--secondary-foreground);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-/* 다크 모드 스크롤바 */
-@media (prefers-color-scheme: dark) {
-  ::-webkit-scrollbar-track {
-    background: #1f2937;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #4b5563;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: #6b7280;
-  }
+  background: var(--primary);
 }
 
 /* 로고 스타일 */
 .logo {
-  font-family: 'Fira Code', monospace;
+  font-family: 'Pretendard', sans-serif;
   font-weight: 700;
   letter-spacing: -0.5px;
-  background: linear-gradient(to right, #3b82f6, #8b5cf6);
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   transition: opacity 0.3s ease;
@@ -94,5 +158,101 @@ html {
 
 .logo:hover {
   opacity: 0.8;
+}
+
+/* 카드 스타일 */
+.card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.card:hover {
+  box-shadow: var(--card-shadow-hover);
+  transform: translateY(-2px);
+}
+
+/* 탭 스타일 */
+.tab {
+  background: var(--tab-inactive);
+  color: var(--tab-text);
+  border-radius: 8px;
+  padding: 8px 16px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: none;
+  font-weight: 500;
+}
+
+.tab.active {
+  background: var(--tab-active);
+  color: var(--primary-text);
+}
+
+.tab:hover:not(.active) {
+  background: var(--muted);
+}
+
+/* 버튼 스타일 */
+.btn-primary {
+  background: var(--gradient-primary);
+  color: var(--primary-text);
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(160, 216, 239, 0.3);
+}
+
+/* 링크 스타일 */
+.link {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.link:hover {
+  color: var(--primary-dark);
+}
+
+/* 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  .card {
+    border-radius: 8px;
+  }
+  
+  .tab {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+  
+  .btn-primary {
+    padding: 10px 20px;
+  }
 }
 

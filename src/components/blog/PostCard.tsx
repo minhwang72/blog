@@ -1,62 +1,96 @@
 import Link from 'next/link';
-import { formatDate } from '@/lib/utils';
-import { Post } from '@/lib/db/schema';
+import { CalendarIcon, EyeIcon, UserIcon } from '@heroicons/react/24/outline';
 
 interface PostCardProps {
-  post: Omit<Post, 'thumbnail' | 'viewCount'> & {
-    thumbnail?: string | null;
+  post: {
+    id: number;
+    title: string;
+    slug: string;
+    excerpt?: string;
+    createdAt: Date;
+    updatedAt?: Date;
+    authorName?: string;
+    categoryName?: string;
     viewCount?: number;
   };
 }
 
 export default function PostCard({ post }: PostCardProps) {
+  const formatDate = (date: Date) => {
+    return new Date(date).toLocaleDateString('ko-KR', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
   return (
-    <article
-      className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105"
-      aria-labelledby={`post-title-${post.id}`}
-    >
-      {post.thumbnail && (
-        <div className="relative h-48">
-          <img
-            src={post.thumbnail}
-            alt=""
-            className="w-full h-full object-cover"
-            aria-hidden="true"
-          />
-        </div>
-      )}
-      <div className="p-6">
-        <Link
-          href={`/blog/${post.slug}`}
-          className="block hover:text-blue-600 dark:hover:text-blue-400"
-        >
-          <h2
-            id={`post-title-${post.id}`}
-            className="text-xl font-semibold mb-2"
-          >
-            {post.title}
-          </h2>
-        </Link>
-        <p
-          className="text-gray-600 dark:text-gray-300 text-sm mb-4"
-          aria-label="포스트 요약"
-        >
-          {post.excerpt}
-        </p>
-        <div
-          className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400"
-          aria-label="포스트 메타 정보"
-        >
-          <time dateTime={post.createdAt.toISOString()}>
-            {formatDate(post.createdAt)}
-          </time>
-          {post.viewCount !== undefined && (
-            <span aria-label={`조회수 ${post.viewCount}회`}>
-              {post.viewCount} views
+    <Link href={`/blog/${post.slug}`} className="block group">
+      <article className="card p-6 h-full flex flex-col">
+        {/* 카테고리 태그 */}
+        {post.categoryName && (
+          <div className="mb-3">
+            <span className="inline-block px-3 py-1 text-xs font-medium bg-primary/10 text-primary rounded-full">
+              {post.categoryName}
             </span>
+          </div>
+        )}
+
+        {/* 제목 */}
+        <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-3 group-hover:text-primary transition-colors line-clamp-2">
+          {post.title}
+        </h3>
+
+        {/* 요약 */}
+        {post.excerpt && (
+          <p className="text-slate-600 dark:text-slate-400 mb-4 line-clamp-3 flex-grow">
+            {post.excerpt}
+          </p>
+        )}
+
+        {/* 메타 정보 */}
+        <div className="mt-auto space-y-2">
+          <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
+            <div className="flex items-center gap-2">
+              <CalendarIcon className="w-4 h-4" />
+              <span>{formatDate(post.createdAt)}</span>
+            </div>
+            
+            {post.viewCount !== undefined && (
+              <div className="flex items-center gap-1">
+                <EyeIcon className="w-4 h-4" />
+                <span>{post.viewCount}</span>
+              </div>
+            )}
+          </div>
+
+          {/* 작성자 */}
+          {post.authorName && (
+            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+              <UserIcon className="w-4 h-4" />
+              <span>{post.authorName}</span>
+            </div>
+          )}
+
+          {/* 수정일 표시 */}
+          {post.updatedAt && post.updatedAt > post.createdAt && (
+            <div className="text-xs text-slate-400 dark:text-slate-500">
+              수정: {formatDate(post.updatedAt)}
+            </div>
           )}
         </div>
-      </div>
-    </article>
+
+        {/* 호버 효과 */}
+        <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+          <div
+            className="w-full h-full rounded-lg"
+            style={{
+              background: 'var(--gradient-primary)',
+              opacity: 0.05,
+            }}
+          />
+        </div>
+      </article>
+    </Link>
   );
 } 
