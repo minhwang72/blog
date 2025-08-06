@@ -60,15 +60,10 @@ export default function BlogPage() {
   }, []);
 
   useEffect(() => {
-    console.log('필터링 중:', { selectedCategory, postsCount: posts.length });
     if (selectedCategory === null) {
       setFilteredPosts(posts);
     } else {
-      const filtered = posts.filter(post => {
-        console.log('포스트 확인:', { postId: post.id, postCategoryId: post.categoryId, selectedCategory });
-        return post.categoryId === selectedCategory;
-      });
-      console.log('필터링 결과:', filtered.length);
+      const filtered = posts.filter(post => post.categoryId === selectedCategory);
       setFilteredPosts(filtered);
     }
   }, [selectedCategory, posts]);

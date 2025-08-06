@@ -13,7 +13,7 @@ Cursor 설정에 다음을 추가하세요:
         "-H", "Content-Type: application/json",
         "-H", "Authorization: Bearer mcp-secure-token-2024",
         "-d", "{\"tool\": \"create_blog_post\", \"args\": {\"title\": \"{{title}}\", \"content\": \"{{content}}\"}}",
-        "http://localhost:3000/api/mcp/"
+        "http://localhost:3001/api/mcp/"
       ]
     }
   }
