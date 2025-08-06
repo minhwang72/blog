@@ -4,8 +4,8 @@ import { Github, Mail, Settings } from 'lucide-react';
 export default function Footer() {
   return (
     <footer className="mt-auto border-t border-slate-200 dark:border-slate-700 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
-      <div className="w-full px-4 py-8">
-        <div className="max-w-6xl mx-auto">
+      <div className="w-full flex h-auto items-center px-4 py-8">
+        <div className="w-full">
           {/* 메인 푸터 콘텐츠 */}
           <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-8 mb-8">
             {/* 왼쪽: 로고 및 소개 */}
@@ -18,9 +18,6 @@ export default function Footer() {
             
             {/* 오른쪽: 카테고리 링크 */}
             <div className="text-center lg:text-right">
-              <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-200 mb-3 uppercase tracking-wider">
-                빠른 링크
-              </h3>
               <div className="flex flex-wrap justify-center lg:justify-end gap-4 text-sm">
                 <Link href="/" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors">
                   홈
