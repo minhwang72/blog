@@ -2,7 +2,18 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: '소개 - min.log',
-  description: '황민의 개발 블로그 소개 페이지입니다.',
+  description: '황민의 개발 블로그 소개 페이지입니다. 기술 스택, 블로그 목적, 연락처 등을 확인하세요.',
+  openGraph: {
+    title: '소개 - min.log',
+    description: '황민의 개발 블로그 소개 페이지입니다. 기술 스택, 블로그 목적, 연락처 등을 확인하세요.',
+    url: 'https://eungming.com/about',
+    siteName: 'min.log',
+    locale: 'ko_KR',
+    type: 'website',
+  },
+  alternates: {
+    canonical: 'https://eungming.com/about',
+  },
 };
 
 export default function AboutPage() {

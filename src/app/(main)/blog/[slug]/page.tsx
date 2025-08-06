@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       .from(posts)
       .leftJoin(users, eq(posts.authorId, users.id))
       .leftJoin(categories, eq(posts.categoryId, categories.id))
-      .where(eq(posts.slug, params.slug));
+      .where(eq(posts.slug, decodeURIComponent(params.slug)));
 
     if (!post[0]) {
       return {
@@ -430,12 +430,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         publishedTime: postData.createdAt.toISOString(),
         modifiedTime: postData.updatedAt?.toISOString() || postData.createdAt.toISOString(),
         authors: [postData.authorName || '황민'],
-        url: `https://blog.eungming.com/blog/${postData.slug}`,
+        url: `https://eungming.com/blog/${postData.slug}`,
         siteName: 'min.log',
         locale: 'ko_KR',
         images: [
           {
-            url: 'https://blog.eungming.com/og-image.jpg',
+            url: 'https://eungming.com/og-image.jpg',
             width: 1200,
             height: 630,
             alt: postData.title,
@@ -447,10 +447,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         title: postData.title,
         description,
         creator: '@minhwang72',
-        images: ['https://blog.eungming.com/og-image.jpg'],
+        images: ['https://eungming.com/og-image.jpg'],
       },
       alternates: {
-        canonical: `https://blog.eungming.com/blog/${postData.slug}`,
+        canonical: `https://eungming.com/blog/${postData.slug}`,
       },
     };
   } catch (error) {
@@ -467,6 +467,9 @@ async function getPost(slug: string) {
     if (process.env.SKIP_DATABASE_CONNECTION === 'true') {
       return null;
     }
+
+    // URL 디코딩 처리 (한글 슬러그 지원)
+    const decodedSlug = decodeURIComponent(slug);
 
     const post = await db
       .select({
@@ -485,7 +488,7 @@ async function getPost(slug: string) {
       .from(posts)
       .leftJoin(users, eq(posts.authorId, users.id))
       .leftJoin(categories, eq(posts.categoryId, categories.id))
-      .where(eq(posts.slug, slug));
+      .where(eq(posts.slug, decodedSlug));
     
     return post[0];
   } catch (error) {
@@ -518,16 +521,16 @@ export default async function BlogPostPage({
     "publisher": {
       "@type": "Organization",
       "name": "min.log",
-      "url": "https://blog.eungming.com"
+      "url": "https://eungming.com"
     },
     "datePublished": post.createdAt.toISOString(),
     "dateModified": post.updatedAt?.toISOString() || post.createdAt.toISOString(),
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://blog.eungming.com/blog/${post.slug}`
+      "@id": `https://eungming.com/blog/${post.slug}`
     },
-    "url": `https://blog.eungming.com/blog/${post.slug}`,
-    "image": "https://blog.eungming.com/og-image.jpg",
+    "url": `https://eungming.com/blog/${post.slug}`,
+    "image": "https://eungming.com/og-image.jpg",
     "articleSection": post.categoryName,
     "keywords": [
       post.title,

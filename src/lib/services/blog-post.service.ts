@@ -15,8 +15,8 @@ export class BlogPostService {
     // Get or create category
     const category = await this.getOrCreateCategory(data.category);
     
-    // Generate slug from title
-    const slug = this.generateSlug(data.title);
+    // Generate unique slug from title
+    const slug = await this.generateUniqueSlug(data.title);
     
     // Create post
     const postResult = await db.insert(posts).values({
@@ -28,13 +28,19 @@ export class BlogPostService {
       authorId: 1, // Default admin user
       categoryId: category.id,
       viewCount: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      // createdAt과 updatedAt은 DB에서 자동으로 처리됨
     });
+
+    // insertId 추출
+    const postId = postResult.insertId || postResult.lastInsertRowid || postResult[0]?.insertId;
+    
+    if (!postId) {
+      throw new Error(`Failed to get post ID after insert`);
+    }
 
     // Handle tags if provided
     if (data.tags && data.tags.length > 0) {
-      await this.handleTags(postResult.insertId, data.tags);
+      await this.handleTags(postId, data.tags);
     }
 
     return {
@@ -62,7 +68,7 @@ export class BlogPostService {
       name,
       slug,
       description: `Posts about ${name}`,
-      createdAt: new Date(),
+      // createdAt은 DB에서 자동으로 처리됨
     });
 
     return {
@@ -89,9 +95,14 @@ export class BlogPostService {
         const newTagResult = await db.insert(tags).values({
           name: tagName,
           slug,
-          createdAt: new Date(),
+          // createdAt은 DB에서 자동으로 처리됨
         });
-        tagId = newTagResult.insertId;
+        
+        tagId = newTagResult.insertId || newTagResult.lastInsertRowid || newTagResult[0]?.insertId;
+        
+        if (!tagId) {
+          throw new Error(`Failed to get tag ID after insert`);
+        }
       }
 
       // Create post-tag relationship
@@ -102,13 +113,46 @@ export class BlogPostService {
     }
   }
 
+  private async generateUniqueSlug(text: string): Promise<string> {
+    let baseSlug = this.generateSlug(text);
+    let slug = baseSlug;
+    let counter = 1;
+
+    // 슬러그 중복 확인
+    while (true) {
+      const existing = await db
+        .select()
+        .from(posts)
+        .where(eq(posts.slug, slug));
+
+      if (existing.length === 0) {
+        break; // 중복되지 않음
+      }
+
+      // 중복되면 번호 추가
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+    }
+
+    return slug;
+  }
+
   private generateSlug(text: string): string {
-    return text
+    // 한글, 영문, 숫자, 공백, 하이픈만 허용
+    let slug = text
       .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim();
+      .replace(/[^\uac00-\ud7af\u1100-\u11ff\u3130-\u318fa-z0-9\s-]/g, '') // 한글, 영문, 숫자, 공백, 하이픈만
+      .replace(/\s+/g, '-') // 공백을 하이픈으로
+      .replace(/-+/g, '-') // 연속 하이픈을 하나로
+      .trim()
+      .replace(/^-+|-+$/g, ''); // 앞뒤 하이픈 제거
+
+    // 빈 슬러그면 타임스탬프 사용
+    if (!slug) {
+      slug = `post-${Date.now()}`;
+    }
+
+    return slug;
   }
 
   private generateExcerpt(content: string): string {

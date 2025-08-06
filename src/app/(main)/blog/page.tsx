@@ -9,6 +9,17 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: '블로그 - min.log',
   description: '개발, 일상, 그리고 배움에 대한 모든 포스트를 확인하세요.',
+  openGraph: {
+    title: '블로그 - min.log',
+    description: '개발, 일상, 그리고 배움에 대한 모든 포스트를 확인하세요.',
+    url: 'https://eungming.com/blog',
+    siteName: 'min.log',
+    locale: 'ko_KR',
+    type: 'website',
+  },
+  alternates: {
+    canonical: 'https://eungming.com/blog',
+  },
 };
 
 async function getPosts() {

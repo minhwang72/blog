@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       content,
       name,
       email: email || null,
-      createdAt: new Date(),
+      // createdAt은 DB에서 자동으로 처리됨
     });
 
     return NextResponse.json({ success: true, id: newEntry.insertId });

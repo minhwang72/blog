@@ -4,7 +4,7 @@ import { posts, categories } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://blog.eungming.com';
+  const baseUrl = 'https://eungming.com';
 
   // 정적 페이지들
   const staticPages = [
@@ -31,6 +31,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
       priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/tags`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/search`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/guestbook`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
     },
   ];
 

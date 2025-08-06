@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/admin/', '/api/'],
     },
-    sitemap: 'https://blog.eungming.com/sitemap.xml',
+    sitemap: 'https://eungming.com/sitemap.xml',
   };
 } 

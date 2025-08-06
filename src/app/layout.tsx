@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   authors: [{ name: "황민" }],
   creator: "황민",
   publisher: "황민",
-  metadataBase: new URL("https://blog.eungming.com"),
+  metadataBase: new URL("https://eungming.com"),
   alternates: {
     canonical: "/",
   },
@@ -25,10 +25,10 @@ export const metadata: Metadata = {
     type: "website",
     locale: "ko_KR",
     siteName: "min.log",
-    url: "https://blog.eungming.com",
+    url: "https://eungming.com",
     images: [
       {
-        url: "https://blog.eungming.com/og-image.jpg",
+        url: "https://eungming.com/og-image.jpg",
         width: 1200,
         height: 630,
         alt: "min.log",
@@ -53,9 +53,9 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: "9Z_prNqvq3nBzOi0yCqieF_-aSE574JAVoqfTEHMqmE",
+    google: "_6y4DjCJpX30-CdY9nGiBrTi4GBpxu1vjrXbxLDnq6M",
     other: {
-      "naver-site-verification": "99e12692fd067f27aa19bab9c061dca62f07abfa",
+      "naver-site-verification": "86c5c1cc1c8932ac679396eae3ac57d4ad6659c7",
     },
   },
   icons: {
@@ -110,7 +110,7 @@ export default function RootLayout({
           `}
         </style>
       </head>
-      <body>
+      <body className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
         <Providers>
           <div className="flex min-h-screen flex-col">
             {children}

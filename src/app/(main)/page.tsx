@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'min.log - 개발, 일상, 그리고 배움에 대한 기록',
     description: '황민의 개발 블로그입니다. 프로그래밍, 일상 생활, 그리고 새로운 것을 배우는 과정을 기록합니다.',
-    url: 'https://blog.eungming.com',
+    url: 'https://eungming.com',
     siteName: 'min.log',
     locale: 'ko_KR',
     type: 'website',
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     creator: '@minhwang72',
   },
   alternates: {
-    canonical: 'https://blog.eungming.com',
+    canonical: 'https://eungming.com',
   },
 };
 
