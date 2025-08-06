@@ -24,12 +24,20 @@ export default function AboutPage() {
         <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-4xl font-bold shadow-lg">
           황민
         </div>
-        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-          안녕하세요! 👋
+        <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">
+          👋 안녕하세요, 황민입니다!
         </h1>
-        <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed max-w-2xl mx-auto">
-          개발과 일상, 그리고 새로운 것을 배우는 과정을 기록하고 공유하는 블로그를 운영하고 있습니다.
-        </p>
+        <div className="text-lg text-gray-600 dark:text-gray-300 leading-relaxed max-w-3xl mx-auto space-y-4">
+          <p>
+            개발자로서의 경험과 일상 속 배움을 기록하며,<br/>
+            기술을 쉽고 재밌게 공유하는 블로그를 운영하고 있습니다.
+          </p>
+          <p>
+            웹 개발, 자동화 솔루션, AI 기반 워크플로우까지<br/>
+            다양한 분야에서 쌓은 인사이트를 나누며,<br/>
+            저만의 색깔로 성장하는 과정을 담고 있습니다.
+          </p>
+        </div>
       </div>
 
       {/* About Me Section */}
@@ -37,12 +45,23 @@ export default function AboutPage() {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center">
             <span className="mr-2">💻</span>
-            개발자 황민
+            개발자 & 기술 크리에이터 황민
           </h2>
-          <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-            풀스택 개발자로서 웹 애플리케이션부터 백엔드 시스템까지 다양한 프로젝트에 참여하고 있습니다. 
-            새로운 기술을 학습하고 이를 실무에 적용하는 것을 좋아하며, 배운 것들을 블로그를 통해 공유하고 있습니다.
-          </p>
+          <div className="text-gray-600 dark:text-gray-300 leading-relaxed space-y-3">
+            <p>
+              풀스택 개발자로서 웹 애플리케이션, 백엔드 시스템, RPA 자동화 프로젝트까지 
+              다양한 기술을 경험해왔습니다.
+            </p>
+            <p>
+              특히 UiPath를 활용한 업무 자동화,<br/>
+              MCP 기반 AI 콘텐츠 자동화 등<br/>
+              최신 기술을 실무에 적용하며 얻은 노하우를 공유하고 있습니다.
+            </p>
+            <p>
+              기술을 배우고 적용하는 과정에서 느낀 깨달음들을<br/>
+              이 블로그를 통해 많은 분들과 나누고 싶습니다.
+            </p>
+          </div>
         </div>
 
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
@@ -50,10 +69,17 @@ export default function AboutPage() {
             <span className="mr-2">🎯</span>
             블로그 목표
           </h2>
-          <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-            복잡한 기술을 쉽게 설명하고, 개발 과정에서 마주한 문제들과 해결 방법을 정리하여 
-            다른 개발자들에게 도움이 되는 콘텐츠를 만들고자 합니다.
-          </p>
+          <div className="text-gray-600 dark:text-gray-300 leading-relaxed">
+            <ul className="space-y-2">
+              <li>• 복잡한 기술을 쉽고 명확하게 설명하기</li>
+              <li>• 개발 과정에서 마주하는 문제와 해결법을 기록하기</li>
+              <li>• RPA, AI, 개발 툴 등 최신 기술을 실무 관점에서 소개하기</li>
+              <li>• 일상 속 배움과 성장 이야기를 공유하기</li>
+            </ul>
+            <p className="mt-4 italic">
+              개발과 자동화, 그리고 사람 이야기가 공존하는 블로그를 지향합니다.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -62,30 +88,43 @@ export default function AboutPage() {
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-8 text-center">
           💡 관심사 & 기술 스택
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 p-6 rounded-lg border border-blue-100 dark:border-blue-800/50">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
               <span className="mr-2">🎨</span>
-              Frontend
+              Frontend & UI
             </h3>
-            <ul className="space-y-2 text-gray-600 dark:text-gray-300">
-              <li>• React & Next.js</li>
+            <ul className="space-y-2 text-gray-600 dark:text-gray-300 text-sm">
+              <li>• React & Next.js (App Router)</li>
               <li>• TypeScript</li>
-              <li>• Tailwind CSS</li>
-              <li>• Framer Motion</li>
+              <li>• Tailwind CSS, Framer Motion</li>
+              <li>• 사용자 경험을 고려한 UI/UX 설계</li>
             </ul>
           </div>
 
           <div className="bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 p-6 rounded-lg border border-green-100 dark:border-green-800/50">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
               <span className="mr-2">⚙️</span>
-              Backend
+              Backend & Infra
             </h3>
-            <ul className="space-y-2 text-gray-600 dark:text-gray-300">
+            <ul className="space-y-2 text-gray-600 dark:text-gray-300 text-sm">
               <li>• Node.js & Express</li>
               <li>• Python & Django</li>
-              <li>• MySQL & MongoDB</li>
-              <li>• RESTful API</li>
+              <li>• MySQL, MongoDB</li>
+              <li>• RESTful API 설계 및 최적화</li>
+            </ul>
+          </div>
+
+          <div className="bg-gradient-to-br from-orange-50 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 p-6 rounded-lg border border-orange-100 dark:border-orange-800/50">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3 flex items-center">
+              <span className="mr-2">🤖</span>
+              Automation & AI
+            </h3>
+            <ul className="space-y-2 text-gray-600 dark:text-gray-300 text-sm">
+              <li>• UiPath RPA 개발 및 프로세스 최적화</li>
+              <li>• MCP 기반 AI 콘텐츠 자동화 시스템 구축</li>
+              <li>• AI API (ChatGPT, Claude 등) 연동 워크플로우 개발</li>
+              <li>• Cursor IDE를 통한 AI 개발 생산성 향상</li>
             </ul>
           </div>
 
@@ -94,11 +133,12 @@ export default function AboutPage() {
               <span className="mr-2">☁️</span>
               DevOps & Tools
             </h3>
-            <ul className="space-y-2 text-gray-600 dark:text-gray-300">
+            <ul className="space-y-2 text-gray-600 dark:text-gray-300 text-sm">
               <li>• Docker & Kubernetes</li>
               <li>• AWS & Azure</li>
-              <li>• Git & GitHub Actions</li>
-              <li>• Linux & Nginx</li>
+              <li>• GitHub Actions CI/CD 파이프라인 구축</li>
+              <li>• Linux 서버 및 Nginx 운영</li>
+              <li>• 개발 업무를 편리하게 만드는 도구 연구</li>
             </ul>
           </div>
         </div>
@@ -170,8 +210,8 @@ export default function AboutPage() {
         
         <div className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 p-6 rounded-xl border border-blue-100 dark:border-blue-800/50">
           <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-            💡 궁금한 점이 있으시거나 함께 이야기하고 싶은 주제가 있다면 언제든 연락주세요!<br/>
-            <span className="text-sm text-gray-600 dark:text-gray-400">개발 관련 질문, 프로젝트 협업, 또는 단순한 안부 인사도 환영합니다. 🚀</span>
+            💡 개발 관련 질문, 협업 제안, 또는 가벼운 인사까지 언제든 환영합니다.<br/>
+            <span className="text-sm text-gray-600 dark:text-gray-400">기술을 통해 더 많은 사람들과 소통하고 싶습니다. 🚀</span>
           </p>
         </div>
       </div>
