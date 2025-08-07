@@ -25,7 +25,7 @@ export default function Footer() {
                 </span>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400 text-center sm:text-left max-w-xs">
-                개발, 일상, 그리고 배움의 기록
+                황민의 개인 블로그
               </p>
             </div>
             
