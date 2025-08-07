@@ -133,50 +133,50 @@ export default async function CategoriesPage() {
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                       {categoryPosts.slice(0, 6).map((post) => (
-                        <div key={post.id} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 p-6 h-full flex flex-col relative overflow-hidden group">
-                          {/* 배경 그라데이션 효과 */}
-                          <div className="absolute inset-0 bg-gradient-to-br from-sky-50/50 via-indigo-50/30 to-purple-50/50 dark:from-sky-900/10 dark:via-indigo-900/5 dark:to-purple-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                          
-                          {/* 카테고리 태그 */}
-                          <div className="mb-4 relative z-10">
-                            <span className="inline-block px-3 py-1 text-xs font-medium bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300 rounded-full border border-sky-200 dark:border-sky-800">
-                              {category.name}
-                            </span>
-                          </div>
+                        <Link key={post.id} href={`/blog/${post.id}`} className="block group">
+                          <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 p-6 h-full flex flex-col relative overflow-hidden">
+                            {/* 배경 그라데이션 효과 */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-sky-50/50 via-slate-50/30 to-gray-50/50 dark:from-sky-900/10 dark:via-slate-900/5 dark:to-gray-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                            
+                            {/* 카테고리 태그 */}
+                            <div className="mb-4 relative z-10">
+                              <span className="inline-block px-3 py-1 text-xs font-medium bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300 rounded-full border border-sky-200 dark:border-sky-800">
+                                {category.name}
+                              </span>
+                            </div>
 
-                          {/* 제목 */}
-                          <Link href={`/blog/${post.id}`} className="relative z-10">
-                            <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors duration-200 line-clamp-2">
+                            {/* 제목 */}
+                            <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors duration-200 line-clamp-2 relative z-10">
                               {post.title}
                             </h3>
-                          </Link>
 
-                          {/* 요약 */}
-                          {post.excerpt && (
-                            <p className="text-slate-600 dark:text-slate-400 mb-6 line-clamp-3 flex-grow relative z-10">
-                              {post.excerpt}
-                            </p>
-                          )}
+                            {/* 요약 */}
+                            {post.excerpt && (
+                              <p className="text-slate-600 dark:text-slate-400 mb-6 line-clamp-3 flex-grow relative z-10">
+                                {post.excerpt}
+                              </p>
+                            )}
 
-                          {/* 메타 정보 */}
-                          <div className="mt-auto space-y-3 relative z-10">
-                            <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
-                              <div className="flex items-center gap-2">
-                                <svg className="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                <span>{new Date(post.createdAt).toLocaleDateString('ko-KR', {
-                                  year: 'numeric',
-                                  month: 'long',
-                                  day: 'numeric',
-                                })}</span>
+                            {/* 메타 정보 */}
+                            <div className="mt-auto space-y-3 relative z-10">
+                              <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
+                                <div className="flex items-center gap-2">
+                                  <svg className="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                  </svg>
+                                  <span>{new Date(post.createdAt).toLocaleDateString('ko-KR', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                  })}</span>
+                                </div>
                               </div>
                             </div>
-                          </div>
 
-                          {/* 우상단 장식 요소 */}
-                          <div className="absolute top-4 right-4 w-2 h-2 bg-gradient-to-r from-sky-400 to-purple-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        </div>
+                            {/* 우상단 장식 요소 */}
+                            <div className="absolute top-4 right-4 w-2 h-2 bg-gradient-to-r from-sky-400 to-gray-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          </div>
+                        </Link>
                       ))}
                     </div>
                   )}
