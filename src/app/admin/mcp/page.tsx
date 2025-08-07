@@ -24,6 +24,7 @@ export default function MCPPage() {
     setResult(null);
 
     try {
+      // 실제 MCP 서버 호출 (상대경로 사용)
       const response = await fetch('/api/mcp', {
         method: 'POST',
         headers: {
@@ -34,7 +35,7 @@ export default function MCPPage() {
           tool: 'create_blog_post',
           args: {
             title: title,
-            content: content || '제목에 맞는 블로그 포스트를 작성해주세요.',
+            content: content || `제목 "${title}"에 맞는 한국어 블로그 포스트를 HTML 형식으로 작성해주세요. 실용적이고 유용한 내용으로 작성해주세요.`,
           },
         }),
       });
