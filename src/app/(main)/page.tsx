@@ -159,15 +159,9 @@ export default async function Home({ searchParams }: PageProps) {
                 <h3 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-4">
                   아직 포스트가 없습니다
                 </h3>
-                <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-md mx-auto">
-                  첫 번째 포스트를 작성해보세요!
+                <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto">
+                  첫 번째 포스트를 기다리고 있습니다.
                 </p>
-                <Link 
-                  href="/admin/posts/new" 
-                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-sky-500 to-gray-600 hover:from-sky-600 hover:to-gray-700 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
-                >
-                  포스트 작성하기
-                </Link>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

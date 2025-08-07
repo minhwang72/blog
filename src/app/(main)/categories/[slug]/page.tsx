@@ -118,15 +118,9 @@ export default async function CategoryPage({ params }: PageProps) {
                 <h3 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-4">
                   포스트가 없습니다
                 </h3>
-                <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-md mx-auto">
+                <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto">
                   이 카테고리에 아직 포스트가 없습니다.
                 </p>
-                <Link 
-                  href="/admin/posts/new" 
-                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-sky-500 to-purple-500 hover:from-sky-600 hover:to-purple-600 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
-                >
-                  포스트 작성하기
-                </Link>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

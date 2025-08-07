@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
@@ -10,10 +10,17 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // 로그인 페이지에서는 인증 체크를 하지 않음
+    if (pathname === '/admin/login') {
+      setIsLoading(false);
+      return;
+    }
+
     const checkAuth = () => {
       const sessionId = localStorage.getItem('adminSession');
       if (!sessionId) {
@@ -45,12 +52,17 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     };
 
     checkAuth();
-  }, [router]);
+  }, [router, pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem('adminSession');
     router.push('/admin/login');
   };
+
+  // 로그인 페이지인 경우 바로 렌더링
+  if (pathname === '/admin/login') {
+    return <>{children}</>;
+  }
 
   if (isLoading) {
     return (
