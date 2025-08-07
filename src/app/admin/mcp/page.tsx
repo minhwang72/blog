@@ -110,17 +110,17 @@ export default function MCPPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  포스트 제목
+                  포스트 제목 *
                 </label>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="생성할 포스트의 제목을 입력하세요"
+                  placeholder="AI가 생성할 포스트의 제목을 입력하세요"
                 />
               </div>
-
+       
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   추가 지시사항 (선택사항)
@@ -130,10 +130,10 @@ export default function MCPPage() {
                   onChange={(e) => setContent(e.target.value)}
                   rows={4}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="포스트 작성에 대한 추가 지시사항을 입력하세요"
+                  placeholder="포스트 작성에 대한 추가 지시사항을 입력하세요 (예: 특정 기술에 대해 다루기, 실용적인 예시 포함 등)"
                 />
               </div>
-
+       
               <button
                 onClick={handleGeneratePost}
                 disabled={loading}
@@ -145,10 +145,10 @@ export default function MCPPage() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    생성 중...
+                    AI 생성 중...
                   </>
                 ) : (
-                  'AI 포스트 생성'
+                  '🤖 AI 포스트 생성'
                 )}
               </button>
             </div>
@@ -249,9 +249,10 @@ export default function MCPPage() {
           💡 사용법
         </h3>
         <div className="space-y-2 text-sm text-blue-800 dark:text-blue-200">
-          <p><strong>AI 포스트 생성:</strong> 제목을 입력하면 AI가 자동으로 블로그 포스트를 생성합니다.</p>
-          <p><strong>내용 분류:</strong> 텍스트를 입력하면 적절한 카테고리로 자동 분류됩니다.</p>
-          <p><strong>추가 지시사항:</strong> 포스트 생성 시 구체적인 요구사항을 추가할 수 있습니다.</p>
+          <p><strong>🤖 AI 포스트 생성:</strong> 제목을 입력하면 AI가 자동으로 블로그 포스트를 생성합니다. 추가 지시사항을 통해 더 구체적인 내용을 요청할 수 있습니다.</p>
+          <p><strong>🏷️ 내용 분류:</strong> 텍스트를 입력하면 적절한 카테고리로 자동 분류됩니다.</p>
+          <p><strong>✨ AI 생성 특징:</strong> HTML 형식으로 작성되며, 제목에 맞는 실용적이고 유용한 내용을 자동 생성합니다.</p>
+          <p><strong>📝 추가 지시사항:</strong> 특정 기술, 예시, 코드 등을 포함하도록 요청할 수 있습니다.</p>
         </div>
       </div>
     </div>
