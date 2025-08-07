@@ -17,6 +17,7 @@
     "db:setup-remote": "ts-node -r tsconfig-paths/register scripts/setup-remote-db.ts",
     "db:debug": "ts-node -r tsconfig-paths/register scripts/debug-db-connection.ts",
     "setup:admin-tables": "ts-node -r tsconfig-paths/register scripts/setup-admin-tables.ts",
+    "setup:ads-tables": "ts-node -r tsconfig-paths/register scripts/setup-admin-ads-tables.ts",
     "create:admin": "ts-node -r tsconfig-paths/register scripts/create-admin.ts"
   },
   "dependencies": {

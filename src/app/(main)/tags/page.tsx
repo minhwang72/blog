@@ -7,7 +7,7 @@ import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: '태그 - min.log',
+  title: '태그',
   description: '태그별로 정리된 포스트를 확인하세요.',
 };
 

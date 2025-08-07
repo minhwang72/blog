@@ -15,18 +15,18 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
   
   if (!query) {
     return {
-      title: '검색 - min.log',
+      title: '검색',
       description: '블로그 포스트를 검색하세요.',
     };
   }
 
   return {
-    title: `"${query}" 검색 결과 - min.log`,
+    title: `"${query}" 검색 결과`,
     description: `"${query}"에 대한 검색 결과입니다.`,
     keywords: `${query},검색,블로그,개발,프로그래밍,황민`,
     robots: 'index, follow',
     openGraph: {
-      title: `"${query}" 검색 결과 - min.log`,
+      title: `"${query}" 검색 결과`,
       description: `"${query}"에 대한 검색 결과입니다.`,
       url: `https://blog.eungming.com/search?q=${encodeURIComponent(query)}`,
       siteName: 'min.log',

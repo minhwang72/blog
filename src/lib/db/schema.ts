@@ -44,6 +44,24 @@ export const aboutContent = mysqlTable('about_content', {
   updatedBy: int('updated_by').notNull(), // admin id
 });
 
+// 광고 설정 테이블
+export const adSettings = mysqlTable('ad_settings', {
+  id: int('id').primaryKey().autoincrement(),
+  name: varchar('name', { length: 100 }).notNull(), // 광고 설정 이름
+  position: mysqlEnum('position', ['top', 'middle', 'bottom', 'sidebar', 'inline']).notNull(),
+  adCode: longtext('ad_code').notNull(), // 구글 애드센스 코드
+  enabled: boolean('enabled').default(true).notNull(),
+  postTypes: varchar('post_types', { length: 255 }).default('all'), // 'all', 'specific' 등
+  displayRules: longtext('display_rules'), // JSON 형태의 표시 규칙
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+  updatedBy: int('updated_by').notNull(),
+}, (table) => ({
+  nameIdx: index('idx_ad_name').on(table.name),
+  positionIdx: index('idx_ad_position').on(table.position),
+  enabledIdx: index('idx_ad_enabled').on(table.enabled),
+}));
+
 // Users table
 export const users = mysqlTable('users', {
   id: int('id').autoincrement().primaryKey(),

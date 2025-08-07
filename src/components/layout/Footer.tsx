@@ -6,8 +6,8 @@ import { usePathname } from 'next/navigation';
 export default function Footer() {
   const pathname = usePathname();
   
-  // 홈 페이지가 아니면 푸터를 렌더링하지 않음
-  if (pathname !== '/') {
+  // 관리자 페이지에서는 푸터를 렌더링하지 않음
+  if (pathname.startsWith('/admin')) {
     return null;
   }
   return (
@@ -24,20 +24,18 @@ export default function Footer() {
               </p>
             </div>
             
-            {/* 오른쪽: 카테고리 링크 */}
+            {/* 오른쪽: 설정 아이콘 */}
             <div className="text-center lg:text-right">
-              <div className="flex flex-wrap justify-center lg:justify-end gap-4 text-sm">
-                <Link href="/" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors">
-                  홈
-                </Link>
-                <Link href="/blog" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors">
-                  블로그
-                </Link>
-                <Link href="/about" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors">
-                  소개
-                </Link>
-
-              </div>
+              <a
+                href="/admin/login"
+                className="inline-flex items-center p-2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors opacity-70 hover:opacity-100"
+                title="관리자 설정"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </a>
             </div>
           </div>
           
@@ -51,18 +49,7 @@ export default function Footer() {
             </p>
           </div>
           
-          {/* 관리자 버튼 - 간소하게 하단에 */}
-          <div className="text-center mt-2">
-            <a
-              href="/admin/login"
-              className="inline-flex items-center px-2 py-1 text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors opacity-70 hover:opacity-100"
-            >
-              <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
-              </svg>
-              관리자
-            </a>
-          </div>
+
         </div>
       </div>
     </footer>
