@@ -12,7 +12,7 @@
     "db:studio": "drizzle-kit studio",
     "db:fix": "ts-node -r tsconfig-paths/register scripts/run-db-fix-simple.ts",
     "db:reset": "ts-node -r tsconfig-paths/register scripts/run-db-fix.ts && drizzle-kit generate:mysql",
-    "create:admin": "ts-node -r tsconfig-paths/register scripts/create-admin.ts",
+
     "seed": "ts-node -r tsconfig-paths/register scripts/seed.ts",
     "generate:mcp-token": "ts-node -r tsconfig-paths/register scripts/generate-mcp-token.ts",
     "db:setup-remote": "ts-node -r tsconfig-paths/register scripts/setup-remote-db.ts",

@@ -13,10 +13,10 @@ export default function Comments({ postId }: CommentsProps) {
   const [submitting, setSubmitting] = useState(false);
   const [replyingTo, setReplyingTo] = useState<number | null>(null);
   const [editingComment, setEditingComment] = useState<number | null>(null);
-  const [isCommentsExpanded, setIsCommentsExpanded] = useState(false);
+  const [isCommentsExpanded, setIsCommentsExpanded] = useState(true); // 기본적으로 댓글 표시
   const [isFormExpanded, setIsFormExpanded] = useState(false);
   const [showAllComments, setShowAllComments] = useState(false); // 더보기/접기 상태
-  const INITIAL_COMMENT_COUNT = 4; // 처음에 보여줄 댓글 수
+  const INITIAL_COMMENT_COUNT = 3; // 처음에 보여줄 댓글 수
   
   // 댓글 폼 데이터
   const [formData, setFormData] = useState<CommentFormData>({
@@ -189,116 +189,109 @@ export default function Comments({ postId }: CommentsProps) {
     fetchComments();
   }, [postId]);
 
-  // 댓글 렌더링 (현대적인 스타일)
+  // 댓글 렌더링 (간소화된 스타일 - 박스 제거, 가로선으로 구분)
   const renderComment = (comment: Comment, depth: number = 0) => (
-    <div key={comment.id} className={`${depth > 0 ? 'ml-6 mt-3' : 'mt-4'}`}>
-      <div className="bg-white dark:bg-slate-800/50 rounded-xl border border-gray-100 dark:border-slate-700/50 p-4 hover:shadow-sm dark:hover:shadow-slate-900/20 transition-all duration-200">
-        <div className="flex items-start space-x-3">
-          {/* 현대적인 아바타 */}
-          <div className="flex-shrink-0">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-full flex items-center justify-center text-white font-semibold text-sm shadow-lg">
-              {comment.name.charAt(0).toUpperCase()}
-            </div>
+    <div key={comment.id} className={`${depth > 0 ? 'ml-8 mt-4' : 'mt-4'} ${depth === 0 ? 'border-b border-gray-100 dark:border-gray-800 pb-4' : ''}`}>
+      <div className="flex items-start space-x-3">
+        {/* 작은 아바타 */}
+        <div className="flex-shrink-0">
+          <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-medium text-xs">
+            {comment.name.charAt(0).toUpperCase()}
           </div>
+        </div>
 
-          <div className="flex-1 min-w-0">
-            {/* 헤더 */}
-            <div className="flex items-center justify-between mb-2">
-              <div className="flex items-center space-x-2">
-                <span className="font-semibold text-gray-900 dark:text-white text-sm">
-                  {comment.name}
-                </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">
-                  {new Date(comment.createdAt).toLocaleDateString('ko-KR', {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </span>
-              </div>
-              
-              <div className="flex items-center space-x-1">
-                <button
-                  onClick={() => handleReply(comment.id)}
-                  className="px-3 py-1 text-xs font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
-                >
-                  답글
-                </button>
-                <button
-                  onClick={() => setEditingComment(editingComment === comment.id ? null : comment.id)}
-                  className="p-1 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
-                >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                  </svg>
-                </button>
-              </div>
-            </div>
+        <div className="flex-1 min-w-0">
+          {/* 헤더 - 더 컴팩트하게 */}
+          <div className="flex items-center space-x-3 mb-1">
+            <span className="font-medium text-gray-900 dark:text-white text-sm">
+              {comment.name}
+            </span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              {new Date(comment.createdAt).toLocaleDateString('ko-KR', {
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </span>
             
-            {/* 댓글 내용 */}
-            <div className="prose prose-sm dark:prose-invert max-w-none">
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
-                {comment.content}
-              </p>
+            {/* 액션 버튼들 - 더 작게 */}
+            <div className="flex items-center space-x-2 ml-auto">
+              <button
+                onClick={() => handleReply(comment.id)}
+                className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                답글
+              </button>
+              <button
+                onClick={() => setEditingComment(editingComment === comment.id ? null : comment.id)}
+                className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+              >
+                •••
+              </button>
             </div>
-
-            {/* 수정/삭제 패널 */}
-            {editingComment === comment.id && (
-              <div className="mt-3 p-3 bg-gray-50 dark:bg-slate-700/50 rounded-lg border border-gray-200 dark:border-slate-600">
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="password"
-                    placeholder="비밀번호"
-                    value={actionPassword}
-                    onChange={(e) => setActionPassword(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <button
-                    onClick={() => handleEdit(comment.id)}
-                    className="px-3 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
-                  >
-                    수정
-                  </button>
-                  <button
-                    onClick={() => handleDelete(comment.id)}
-                    className="px-3 py-2 bg-red-500 text-white rounded-lg text-sm hover:bg-red-600 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
-                  >
-                    삭제
-                  </button>
-                  <button
-                    onClick={() => {
-                      setEditingComment(null);
-                      setActionPassword('');
-                    }}
-                    className="px-3 py-2 bg-gray-500 text-white rounded-lg text-sm hover:bg-gray-600 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
-                  >
-                    취소
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* 답글 폼 */}
-            {replyingTo === comment.id && (
-              <div className="mt-3">
-                <CompactCommentForm
-                  formData={formData}
-                  setFormData={setFormData}
-                  onSubmit={handleSubmit}
-                  onCancel={cancelReply}
-                  submitting={submitting}
-                  isReply={true}
-                />
-              </div>
-            )}
           </div>
+          
+          {/* 댓글 내용 - 더 간단하게 */}
+          <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-wrap mb-2">
+            {comment.content}
+          </p>
+
+          {/* 수정/삭제 패널 - 더 컴팩트하게 */}
+          {editingComment === comment.id && (
+            <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center space-x-2 text-sm">
+                <input
+                  type="password"
+                  placeholder="비밀번호"
+                  value={actionPassword}
+                  onChange={(e) => setActionPassword(e.target.value)}
+                  className="flex-1 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-xs bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                />
+                <button
+                  onClick={() => handleEdit(comment.id)}
+                  className="px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
+                >
+                  수정
+                </button>
+                <button
+                  onClick={() => handleDelete(comment.id)}
+                  className="px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
+                >
+                  삭제
+                </button>
+                <button
+                  onClick={() => {
+                    setEditingComment(null);
+                    setActionPassword('');
+                  }}
+                  className="px-2 py-1 bg-gray-500 text-white rounded text-xs hover:bg-gray-600"
+                >
+                  취소
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* 답글 폼 */}
+          {replyingTo === comment.id && (
+            <div className="mt-3">
+              <CompactCommentForm
+                formData={formData}
+                setFormData={setFormData}
+                onSubmit={handleSubmit}
+                onCancel={cancelReply}
+                submitting={submitting}
+                isReply={true}
+              />
+            </div>
+          )}
         </div>
       </div>
 
-      {/* 대댓글 */}
+      {/* 대댓글 - 더 가벼운 구분선 */}
       {comment.replies && comment.replies.length > 0 && (
-        <div className="ml-4 border-l-2 border-gray-100 dark:border-slate-700 pl-4 mt-3">
+        <div className="ml-6 border-l border-gray-200 dark:border-gray-700 pl-3 mt-2">
           {comment.replies.map((reply) => renderComment(reply, depth + 1))}
         </div>
       )}
@@ -319,43 +312,25 @@ export default function Comments({ postId }: CommentsProps) {
 
   return (
     <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
-      {/* 댓글 섹션 헤더 - 현대적 스타일 */}
-      <div className="flex items-center justify-between mb-6">
-        <button
-          onClick={() => setIsCommentsExpanded(!isCommentsExpanded)}
-          className="flex items-center space-x-3 group"
-        >
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                댓글 {totalComments > 0 && `${totalComments}개`}
-              </h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {isCommentsExpanded ? '댓글 숨기기' : '댓글 보기'}
-              </p>
-            </div>
+      {/* 댓글 섹션 헤더 - 간소화된 스타일 */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-md flex items-center justify-center">
+            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" clipRule="evenodd" />
+            </svg>
           </div>
-          <svg 
-            className={`w-5 h-5 text-gray-500 group-hover:text-blue-500 transition-all duration-200 ${isCommentsExpanded ? 'rotate-180' : ''}`} 
-            fill="none" 
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </button>
+          <h3 className="text-base font-medium text-gray-900 dark:text-white">
+            댓글 {totalComments > 0 && `${totalComments}개`}
+          </h3>
+        </div>
         
         {!isFormExpanded && (
           <button
             onClick={() => setIsFormExpanded(true)}
-            className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-blue-600 hover:to-purple-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-sm transition-all duration-200"
+            className="inline-flex items-center space-x-1 px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600 transition-colors"
           >
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
             </svg>
             <span>댓글 작성</span>
@@ -363,25 +338,16 @@ export default function Comments({ postId }: CommentsProps) {
         )}
       </div>
 
-      {/* 댓글 작성 폼 (컴팩트한 스타일) */}
+      {/* 댓글 작성 폼 (더 간소화) */}
       {isFormExpanded && (
-        <div className="mb-4 p-4 bg-white dark:bg-slate-800/50 rounded-lg border border-gray-200 dark:border-slate-700/50 shadow-sm">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center space-x-2">
-              <div className="w-5 h-5 bg-gradient-to-r from-green-500 to-blue-500 rounded-md flex items-center justify-center">
-                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <h4 className="font-medium text-gray-900 dark:text-white text-sm">댓글 작성</h4>
-            </div>
+        <div className="mb-6 p-3 bg-gray-50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white">댓글 작성</h4>
             <button
               onClick={() => setIsFormExpanded(false)}
-              className="p-1 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+              className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              ✕
             </button>
           </div>
           <CompactCommentForm
@@ -393,57 +359,47 @@ export default function Comments({ postId }: CommentsProps) {
         </div>
       )}
 
-      {/* 댓글 목록 (더보기/접기 기능 포함) */}
-      {isCommentsExpanded && (
-        <div className="space-y-4">
-          {comments.length === 0 ? (
-            <div className="text-center py-8">
-              <div className="w-12 h-12 bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 rounded-full flex items-center justify-center mx-auto mb-3">
-                <svg className="w-6 h-6 text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" clipRule="evenodd" />
-                </svg>
+      {/* 댓글 목록 - 기본적으로 3개 표시, 더보기 기능 */}
+      <div className="space-y-0">
+        {comments.length === 0 ? (
+          <div className="text-center py-6">
+            <p className="text-gray-500 dark:text-gray-400 text-sm">
+              아직 댓글이 없습니다. 첫 번째 댓글을 남겨보세요!
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* 처음 3개 댓글 또는 모든 댓글 표시 */}
+            {(showAllComments ? comments : comments.slice(0, INITIAL_COMMENT_COUNT)).map((comment) => renderComment(comment))}
+            
+            {/* 더보기/접기 버튼 */}
+            {comments.length > INITIAL_COMMENT_COUNT && (
+              <div className="text-center pt-4 border-t border-gray-100 dark:border-gray-800 mt-4">
+                <button
+                  onClick={() => setShowAllComments(!showAllComments)}
+                  className="inline-flex items-center space-x-1 px-3 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                >
+                  {showAllComments ? (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                      </svg>
+                      <span>댓글 접기</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>댓글 {comments.length - INITIAL_COMMENT_COUNT}개 더 보기</span>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </>
+                  )}
+                </button>
               </div>
-              <h4 className="text-base font-medium text-gray-900 dark:text-white mb-1">
-                아직 댓글이 없습니다
-              </h4>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">
-                첫 번째 댓글을 남겨보세요!
-              </p>
-            </div>
-          ) : (
-            <>
-              {/* 처음 3-4개 댓글 또는 모든 댓글 표시 */}
-              {(showAllComments ? comments : comments.slice(0, INITIAL_COMMENT_COUNT)).map((comment) => renderComment(comment))}
-              
-              {/* 더보기/접기 버튼 */}
-              {comments.length > INITIAL_COMMENT_COUNT && (
-                <div className="text-center pt-4">
-                  <button
-                    onClick={() => setShowAllComments(!showAllComments)}
-                    className="inline-flex items-center space-x-2 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
-                  >
-                    {showAllComments ? (
-                      <>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-                        </svg>
-                        <span>댓글 접기</span>
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                        <span>댓글 {comments.length - INITIAL_COMMENT_COUNT}개 더 보기</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      )}
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }

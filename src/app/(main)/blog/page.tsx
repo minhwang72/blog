@@ -31,6 +31,11 @@ export default function BlogPage() {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // 페이지네이션 상태
+  const [currentPage, setCurrentPage] = useState(1);
+  const [postsPerPage, setPostsPerPage] = useState(10);
+  const [paginatedPosts, setPaginatedPosts] = useState<Post[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,6 +64,7 @@ export default function BlogPage() {
     fetchData();
   }, []);
 
+  // 카테고리 필터링 (페이지도 1로 리셋)
   useEffect(() => {
     if (selectedCategory === null) {
       setFilteredPosts(posts);
@@ -66,11 +72,26 @@ export default function BlogPage() {
       const filtered = posts.filter(post => post.categoryId === selectedCategory);
       setFilteredPosts(filtered);
     }
+    setCurrentPage(1); // 카테고리 변경 시 첫 페이지로
   }, [selectedCategory, posts]);
+
+  // 페이지네이션 적용
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * postsPerPage;
+    const endIndex = startIndex + postsPerPage;
+    setPaginatedPosts(filteredPosts.slice(startIndex, endIndex));
+  }, [filteredPosts, currentPage, postsPerPage]);
 
   const handleCategoryFilter = (categoryId: number | null) => {
     setSelectedCategory(categoryId);
   };
+
+  const handlePostsPerPageChange = (newPerPage: number) => {
+    setPostsPerPage(newPerPage);
+    setCurrentPage(1); // 페이지 크기 변경 시 첫 페이지로
+  };
+
+  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
 
   if (loading) {
     return (
@@ -129,16 +150,45 @@ export default function BlogPage() {
         </div>
       </div>
 
-      {/* 포스트 목록 */}
-      <div className="grid gap-8">
-        {filteredPosts.length === 0 ? (
+      {/* 페이지당 포스트 수 선택 */}
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div className="flex items-center space-x-4">
+          <span className="text-sm text-gray-600 dark:text-gray-400">페이지당 표시:</span>
+          <div className="flex space-x-2">
+            {[10, 20, 50].map((size) => (
+              <button
+                key={size}
+                onClick={() => handlePostsPerPageChange(size)}
+                className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                  postsPerPage === size
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                }`}
+              >
+                {size}
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          총 {filteredPosts.length}개 포스트 중 {Math.min((currentPage - 1) * postsPerPage + 1, filteredPosts.length)}-{Math.min(currentPage * postsPerPage, filteredPosts.length)}개 표시
+        </div>
+      </div>
+
+      {/* 포스트 목록 - 스크롤 가능한 컨테이너 */}
+      <div className="min-h-[600px] space-y-6">
+        {paginatedPosts.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-500 dark:text-gray-400">
-              {selectedCategory === null ? '포스트가 없습니다.' : '해당 카테고리에 포스트가 없습니다.'}
+              {filteredPosts.length === 0 
+                ? (selectedCategory === null ? '포스트가 없습니다.' : '해당 카테고리에 포스트가 없습니다.')
+                : '해당 페이지에 포스트가 없습니다.'
+              }
             </p>
           </div>
         ) : (
-          filteredPosts.map((post) => (
+          paginatedPosts.map((post) => (
             <article
               key={post.id}
               className="group relative rounded-lg border border-gray-200 dark:border-gray-800 p-6 hover:border-gray-300 dark:hover:border-gray-700 transition-all duration-200 hover:shadow-md"
@@ -165,7 +215,6 @@ export default function BlogPage() {
                       {post.categoryName}
                     </span>
                   )}
-
                 </div>
               </Link>
             </article>
@@ -173,9 +222,58 @@ export default function BlogPage() {
         )}
       </div>
 
+      {/* 페이지네이션 */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center space-x-2 pt-8 border-t border-gray-200 dark:border-gray-700">
+          <button
+            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+            disabled={currentPage === 1}
+            className="px-3 py-2 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300 dark:border-gray-600"
+          >
+            이전
+          </button>
+          
+          {/* 페이지 번호 */}
+          {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+            let pageNum;
+            if (totalPages <= 5) {
+              pageNum = i + 1;
+            } else if (currentPage <= 3) {
+              pageNum = i + 1;
+            } else if (currentPage >= totalPages - 2) {
+              pageNum = totalPages - 4 + i;
+            } else {
+              pageNum = currentPage - 2 + i;
+            }
+            
+            return (
+              <button
+                key={pageNum}
+                onClick={() => setCurrentPage(pageNum)}
+                className={`px-3 py-2 rounded-md border ${
+                  currentPage === pageNum
+                    ? 'bg-blue-500 text-white border-blue-500'
+                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700'
+                }`}
+              >
+                {pageNum}
+              </button>
+            );
+          })}
+          
+          <button
+            onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+            disabled={currentPage === totalPages}
+            className="px-3 py-2 rounded-md bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300 dark:border-gray-600"
+          >
+            다음
+          </button>
+        </div>
+      )}
+
       {/* 선택된 카테고리 표시 */}
       {selectedCategory !== null && (
-        <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
           <p className="text-sm text-blue-800 dark:text-blue-200">
             <span className="font-medium">
               {categories.find(cat => cat.id === selectedCategory)?.name}
