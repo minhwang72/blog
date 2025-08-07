@@ -6,12 +6,12 @@ interface PostCardProps {
     id: number;
     title: string;
     slug: string;
-    excerpt?: string;
+    excerpt?: string | null;
     createdAt: Date;
-    updatedAt?: Date;
-    authorName?: string;
-    categoryName?: string;
-    viewCount?: number;
+    updatedAt?: Date | null;
+    authorName?: string | null;
+    categoryName?: string | null;
+    viewCount?: number | null;
   };
 }
 
@@ -59,7 +59,7 @@ export default function PostCard({ post }: PostCardProps) {
               <span>{formatDate(post.createdAt)}</span>
             </div>
             
-            {post.viewCount !== undefined && (
+            {post.viewCount !== undefined && post.viewCount !== null && (
               <div className="flex items-center gap-1">
                 <EyeIcon className="w-4 h-4 text-indigo-500" />
                 <span>{post.viewCount}</span>

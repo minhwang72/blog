@@ -177,11 +177,11 @@ export default function Comments({ postId }: CommentsProps) {
 
   // 댓글 렌더링
   const renderComment = (comment: Comment, depth: number = 0) => (
-    <div key={comment.id} className={`${depth > 0 ? 'ml-8 mt-4' : 'mt-4'} ${depth === 0 ? 'border-b border-gray-100 dark:border-gray-800 pb-4' : ''}`}>
+    <div key={comment.id} className={`${depth > 0 ? 'ml-8 mt-4' : 'mt-4'} ${depth === 0 ? 'border-b border-slate-200 dark:border-slate-700 pb-4' : ''}`}>
       <div className="flex items-start space-x-3">
         {/* 작은 아바타 */}
         <div className="flex-shrink-0">
-          <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-medium text-xs">
+          <div className="w-6 h-6 bg-gradient-to-br from-sky-400 to-purple-500 rounded-full flex items-center justify-center text-white font-medium text-xs">
             {comment.name.charAt(0).toUpperCase()}
           </div>
         </div>
@@ -189,10 +189,10 @@ export default function Comments({ postId }: CommentsProps) {
         <div className="flex-1 min-w-0">
           {/* 헤더 */}
           <div className="flex items-center space-x-3 mb-1">
-            <span className="font-medium text-gray-900 dark:text-white text-sm">
+            <span className="font-medium text-slate-900 dark:text-slate-100 text-sm">
               {comment.name}
             </span>
-            <span className="text-xs text-gray-500 dark:text-gray-400">
+            <span className="text-xs text-slate-500 dark:text-slate-400">
               {new Date(comment.createdAt).toLocaleDateString('ko-KR', {
                 month: 'short',
                 day: 'numeric',
@@ -205,13 +205,13 @@ export default function Comments({ postId }: CommentsProps) {
             <div className="flex items-center space-x-2 ml-auto">
               <button
                 onClick={() => handleReply(comment.id)}
-                className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                className="text-xs text-sky-600 dark:text-sky-400 hover:underline"
               >
                 답글
               </button>
               <button
                 onClick={() => openModal('edit', { commentId: comment.id, content: comment.content })}
-                className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                className="text-xs text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
               >
                 수정
               </button>
@@ -225,7 +225,7 @@ export default function Comments({ postId }: CommentsProps) {
           </div>
           
           {/* 댓글 내용 */}
-          <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-wrap mb-2">
+          <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed whitespace-pre-wrap mb-2">
             {comment.content}
           </p>
         </div>
@@ -233,7 +233,7 @@ export default function Comments({ postId }: CommentsProps) {
 
       {/* 대댓글 */}
       {comment.replies && comment.replies.length > 0 && (
-        <div className="ml-6 border-l border-gray-200 dark:border-gray-700 pl-3 mt-2">
+        <div className="ml-6 border-l border-slate-200 dark:border-slate-700 pl-3 mt-2">
           {comment.replies.map((reply) => renderComment(reply, depth + 1))}
         </div>
       )}
@@ -244,8 +244,8 @@ export default function Comments({ postId }: CommentsProps) {
 
   if (loading) {
     return (
-      <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
-        <div className="text-sm text-gray-500 dark:text-gray-400">
+      <div className="mt-8 border-t border-slate-200 dark:border-slate-700 pt-6">
+        <div className="text-sm text-slate-500 dark:text-slate-400">
           💬 댓글을 불러오는 중...
         </div>
       </div>
@@ -253,23 +253,23 @@ export default function Comments({ postId }: CommentsProps) {
   }
 
   return (
-    <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
+    <div className="mt-8 border-t border-slate-200 dark:border-slate-700 pt-6">
       {/* 댓글 섹션 헤더 */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
-          <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-md flex items-center justify-center">
+          <div className="w-6 h-6 bg-gradient-to-r from-sky-400 to-purple-500 rounded-md flex items-center justify-center">
             <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" clipRule="evenodd" />
             </svg>
           </div>
-          <h3 className="text-base font-medium text-gray-900 dark:text-white">
+          <h3 className="text-base font-medium text-slate-900 dark:text-slate-100">
             댓글 {totalComments > 0 && `${totalComments}개`}
           </h3>
         </div>
         
         <button
           onClick={() => openModal('create')}
-          className="inline-flex items-center space-x-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-sm rounded-lg hover:from-blue-600 hover:to-indigo-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-sm"
+          className="inline-flex items-center space-x-1 px-4 py-2 bg-gradient-to-r from-sky-500 to-purple-500 text-white text-sm rounded-lg hover:from-sky-600 hover:to-purple-600 focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 transition-all duration-200 shadow-sm"
         >
           <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
@@ -282,7 +282,7 @@ export default function Comments({ postId }: CommentsProps) {
       <div className="space-y-0">
         {comments.length === 0 ? (
           <div className="text-center py-6">
-            <p className="text-gray-500 dark:text-gray-400 text-sm">
+            <p className="text-slate-500 dark:text-slate-400 text-sm">
               아직 댓글이 없습니다. 첫 번째 댓글을 남겨보세요!
             </p>
           </div>
@@ -291,10 +291,10 @@ export default function Comments({ postId }: CommentsProps) {
             {(showAllComments ? comments : comments.slice(0, INITIAL_COMMENT_COUNT)).map((comment) => renderComment(comment))}
             
             {comments.length > INITIAL_COMMENT_COUNT && (
-              <div className="text-center pt-4 border-t border-gray-100 dark:border-gray-800 mt-4">
+              <div className="text-center pt-4 border-t border-slate-200 dark:border-slate-700 mt-4">
                 <button
                   onClick={() => setShowAllComments(!showAllComments)}
-                  className="inline-flex items-center space-x-1 px-3 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
+                  className="inline-flex items-center space-x-1 px-3 py-2 text-sm text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/20 rounded transition-colors"
                 >
                   {showAllComments ? (
                     <>

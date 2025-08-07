@@ -4,6 +4,7 @@ import { desc, eq, and } from 'drizzle-orm';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import PostCard from '@/components/blog/PostCard';
 
 export const dynamic = 'force-dynamic';
 
@@ -93,15 +94,15 @@ export default async function CategoryPage({ params }: PageProps) {
   const categoryPosts = await getCategoryPosts(category.id);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
-        <div className="space-y-8">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-1">
+        <div className="space-y-12">
           {/* 헤더 섹션 */}
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="flex items-center gap-3">
               <Link
                 href="/categories"
-                className="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -110,59 +111,41 @@ export default async function CategoryPage({ params }: PageProps) {
               </Link>
             </div>
             
-            <div className="space-y-2">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
-                {category.name}
-              </h1>
-              <p className="text-lg text-gray-500 dark:text-gray-400">
+            <div className="text-center space-y-6">
+              <div className="relative">
+                <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sky-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                  {category.name}
+                </h1>
+                <div className="absolute -inset-x-6 -inset-y-3 bg-gradient-to-r from-sky-100/50 via-indigo-100/50 to-purple-100/50 dark:from-sky-900/20 dark:via-indigo-900/20 dark:to-purple-900/20 rounded-3xl blur-3xl -z-10 opacity-30"></div>
+              </div>
+              <p className="text-xl text-slate-600 dark:text-slate-400">
                 {categoryPosts.length}개의 포스트
               </p>
             </div>
           </div>
 
           {/* 포스트 목록 */}
-          <div className="space-y-6">
+          <div className="space-y-8">
             {categoryPosts.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-6xl mb-4">📂</div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              <div className="text-center py-16">
+                <div className="text-6xl mb-6">📂</div>
+                <h3 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-4">
                   포스트가 없습니다
                 </h3>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-md mx-auto">
                   이 카테고리에 아직 포스트가 없습니다.
                 </p>
+                <Link 
+                  href="/admin/posts/new" 
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-sky-500 to-purple-500 hover:from-sky-600 hover:to-purple-600 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  포스트 작성하기
+                </Link>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {categoryPosts.map((post) => (
-                  <article
-                    key={post.id}
-                    className="group relative rounded-lg border border-gray-200 dark:border-gray-800 p-6 hover:border-blue-300 dark:hover:border-blue-700 transition-all duration-200 hover:shadow-md bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-900 hover:from-blue-50 hover:to-indigo-50 dark:hover:from-gray-700 dark:hover:to-gray-800"
-                  >
-                    <Link href={`/blog/${post.id}`} className="block h-full">
-                      <div className="flex flex-col h-full">
-                        <h2 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 line-clamp-2 mb-3">
-                          {post.title}
-                        </h2>
-                        {post.excerpt && (
-                          <p className="text-gray-600 dark:text-gray-400 line-clamp-3 mb-4 flex-grow text-sm">
-                            {post.excerpt}
-                          </p>
-                        )}
-                        <div className="mt-auto space-y-2">
-                          <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                            <time dateTime={post.createdAt.toString()}>
-                              {new Date(post.createdAt).toLocaleDateString('ko-KR', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric',
-                              })}
-                            </time>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
-                  </article>
+                  <PostCard key={post.id} post={post} />
                 ))}
               </div>
             )}
