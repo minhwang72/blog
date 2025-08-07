@@ -17,6 +17,8 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError('');
 
+    console.log('로그인 시도:', formData);
+
     try {
       const response = await fetch('/api/admin/login', {
         method: 'POST',
@@ -26,16 +28,21 @@ export default function AdminLoginPage() {
         body: JSON.stringify(formData),
       });
 
+      console.log('로그인 응답 상태:', response.status);
+
       if (response.ok) {
         const data = await response.json();
+        console.log('로그인 성공:', data);
         // 세션 저장
         localStorage.setItem('adminSession', data.sessionId);
         router.push('/admin');
       } else {
         const errorData = await response.json();
+        console.log('로그인 실패:', errorData);
         setError(errorData.message || '로그인에 실패했습니다.');
       }
     } catch (error) {
+      console.error('로그인 오류:', error);
       setError('로그인 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);

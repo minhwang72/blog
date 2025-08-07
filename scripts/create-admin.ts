@@ -6,7 +6,12 @@
  */
 
 import * as dotenv from 'dotenv';
-dotenv.config();
+import * as path from 'path';
+
+// 환경변수 파일들을 순서대로 로드
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
+dotenv.config({ path: path.resolve(process.cwd(), '.env.production') });
 
 import { db } from '../src/lib/db';
 import { admins } from '../src/lib/db/schema';
@@ -18,6 +23,12 @@ const ADMIN_PASSWORD = 'f8tgw3lshms!';
 async function createAdmin() {
   try {
     console.log('🔐 관리자 계정 생성 중...');
+    console.log('환경변수 확인:', {
+      DB_HOST: process.env.DB_HOST,
+      DB_USER: process.env.DB_USER,
+      DB_NAME: process.env.DB_NAME,
+      DB_PASSWORD: process.env.DB_PASSWORD ? '***' : 'undefined'
+    });
 
     // 비밀번호 해시화
     const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 12);
@@ -44,6 +55,7 @@ async function createAdmin() {
       console.log(`👤 기존 아이디: ${ADMIN_USERNAME}`);
     } else {
       console.error('❌ 관리자 계정 생성 실패:', error.message);
+      console.error('전체 오류:', error);
     }
     process.exit(1);
   }
