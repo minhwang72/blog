@@ -12,11 +12,12 @@
     "db:studio": "drizzle-kit studio",
     "db:fix": "ts-node -r tsconfig-paths/register scripts/run-db-fix-simple.ts",
     "db:reset": "ts-node -r tsconfig-paths/register scripts/run-db-fix.ts && drizzle-kit generate:mysql",
-
     "seed": "ts-node -r tsconfig-paths/register scripts/seed.ts",
     "generate:mcp-token": "ts-node -r tsconfig-paths/register scripts/generate-mcp-token.ts",
     "db:setup-remote": "ts-node -r tsconfig-paths/register scripts/setup-remote-db.ts",
-    "db:debug": "ts-node -r tsconfig-paths/register scripts/debug-db-connection.ts"
+    "db:debug": "ts-node -r tsconfig-paths/register scripts/debug-db-connection.ts",
+    "setup:admin-tables": "ts-node -r tsconfig-paths/register scripts/setup-admin-tables.ts",
+    "create:admin": "ts-node -r tsconfig-paths/register scripts/create-admin.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^0.3.6",
@@ -32,6 +33,7 @@
     "framer-motion": "^12.10.0",
     "lucide-react": "^0.507.0",
     "mysql2": "^3.14.1",
+    "nanoid": "^5.1.5",
     "next": "14.1.0",
     "next-auth": "^4.24.5",
     "next-themes": "^0.4.6",

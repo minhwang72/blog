@@ -36,9 +36,7 @@ export default function Footer() {
                 <Link href="/about" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors">
                   소개
                 </Link>
-                <Link href="/admin" className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200 transition-colors">
-                  관리자
-                </Link>
+
               </div>
             </div>
           </div>
@@ -51,6 +49,19 @@ export default function Footer() {
             <p className="text-xs text-slate-500 dark:text-slate-500">
               © 2025 Hwang Min. All rights reserved.
             </p>
+          </div>
+          
+          {/* 관리자 버튼 - 간소하게 하단에 */}
+          <div className="text-center mt-2">
+            <a
+              href="/admin/login"
+              className="inline-flex items-center px-2 py-1 text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors opacity-70 hover:opacity-100"
+            >
+              <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-6-3a2 2 0 11-4 0 2 2 0 014 0zm-2 4a5 5 0 00-4.546 2.916A5.986 5.986 0 0010 16a5.986 5.986 0 004.546-2.084A5 5 0 0010 11z" clipRule="evenodd" />
+              </svg>
+              관리자
+            </a>
           </div>
         </div>
       </div>

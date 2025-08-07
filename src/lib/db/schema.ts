@@ -13,6 +13,37 @@ import {
   foreignKey,
 } from 'drizzle-orm/mysql-core';
 
+// 관리자 계정 테이블
+export const admins = mysqlTable('admins', {
+  id: int('id').autoincrement().primaryKey(),
+  username: varchar('username', { length: 50 }).notNull().unique(),
+  password: varchar('password', { length: 255 }).notNull(), // bcrypt 해시 저장
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  usernameIdx: index('idx_admin_username').on(table.username),
+}));
+
+// 관리자 세션 테이블
+export const adminSessions = mysqlTable('admin_sessions', {
+  id: varchar('id', { length: 255 }).primaryKey(),
+  adminId: int('admin_id').notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+}, (table) => ({
+  adminIdIdx: index('idx_admin_session_admin_id').on(table.adminId),
+  expiresAtIdx: index('idx_admin_session_expires_at').on(table.expiresAt),
+}));
+
+// 소개 페이지 컨텐츠 테이블 (DB화)
+export const aboutContent = mysqlTable('about_content', {
+  id: int('id').primaryKey().autoincrement(),
+  title: varchar('title', { length: 255 }).notNull(),
+  content: longtext('content').notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
+  updatedBy: int('updated_by').notNull(), // admin id
+});
+
 // Users table
 export const users = mysqlTable('users', {
   id: int('id').autoincrement().primaryKey(),

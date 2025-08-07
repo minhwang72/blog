@@ -138,12 +138,7 @@ const poolConnection = process.env.SKIP_DATABASE_CONNECTION === 'true'
         user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME,
-        // 연결 풀 설정 추가
         connectionLimit: 10,
-        acquireTimeout: 60000,
-        timeout: 60000,
-        // 재연결 설정
-        reconnect: true,
       });
     })();
 
