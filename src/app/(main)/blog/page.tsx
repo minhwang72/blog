@@ -77,149 +77,135 @@ export default function BlogPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
-        <div className="space-y-8">
-          <div className="space-y-4">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
-              블로그
-            </h1>
-            <p className="text-lg text-gray-500 dark:text-gray-400">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-1">
+        <div className="space-y-12">
+          {/* 헤더 섹션 */}
+          <div className="text-center space-y-6">
+            <div className="relative">
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sky-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
+                블로그
+              </h1>
+              <div className="absolute -inset-x-6 -inset-y-3 bg-gradient-to-r from-sky-100/50 via-indigo-100/50 to-purple-100/50 dark:from-sky-900/20 dark:via-indigo-900/20 dark:to-purple-900/20 rounded-3xl blur-3xl -z-10 opacity-30"></div>
+            </div>
+            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
               개발과 일상에 대한 모든 포스트를 확인하세요.
             </p>
           </div>
 
           {/* 포스트 목록 - 웹에 맞는 레이아웃 */}
-          <div className="space-y-6">
+          <div className="space-y-8">
             {paginatedPosts.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-gray-500 dark:text-gray-400">
-                  포스트가 없습니다.
+              <div className="text-center py-16">
+                <div className="text-6xl mb-6">📝</div>
+                <h3 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-4">
+                  포스트가 없습니다
+                </h3>
+                <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-md mx-auto">
+                  첫 번째 포스트를 작성해보세요!
                 </p>
+                <Link 
+                  href="/admin/posts/new" 
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-sky-500 to-purple-500 hover:from-sky-600 hover:to-purple-600 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+                >
+                  포스트 작성하기
+                </Link>
               </div>
             ) : (
-              <div className="space-y-4">
-                {paginatedPosts.map((post, index) => (
-                  <article
-                    key={post.id}
-                    className="group relative rounded-lg border border-gray-200 dark:border-gray-800 p-6 hover:border-green-300 dark:hover:border-green-700 transition-all duration-200 hover:shadow-md bg-gradient-to-r from-white to-green-50 dark:from-gray-800 dark:to-gray-900 hover:from-green-50 hover:to-emerald-50 dark:hover:from-gray-700 dark:hover:to-gray-800"
-                  >
-                    <Link href={`/blog/${post.id}`} className="block">
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <h2 className="text-xl font-semibold text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-200 mb-2">
-                            {post.title}
-                          </h2>
-                          {post.excerpt && (
-                            <p className="text-gray-600 dark:text-gray-400 line-clamp-2 mb-3 text-base">
-                              {post.excerpt}
-                            </p>
-                          )}
-                          <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                            <time dateTime={post.createdAt}>
-                              {new Date(post.createdAt).toLocaleString('ko-KR', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit',
-                                timeZone: 'Asia/Seoul'
-                              })}
-                            </time>
-                            {post.categoryName && (
-                              <span className="bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 text-green-700 dark:text-green-300 px-3 py-1 rounded-full border border-green-200 dark:border-green-800/50">
-                                {post.categoryName}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="ml-6 text-gray-400 group-hover:text-green-400 transition-colors">
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {paginatedPosts.map((post) => (
+                  <div key={post.id} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 p-6 h-full flex flex-col relative overflow-hidden group">
+                    {/* 배경 그라데이션 효과 */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-sky-50/50 via-indigo-50/30 to-purple-50/50 dark:from-sky-900/10 dark:via-indigo-900/5 dark:to-purple-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    
+                    {/* 카테고리 태그 */}
+                    {post.categoryName && (
+                      <div className="mb-4 relative z-10">
+                        <span className="inline-block px-3 py-1 text-xs font-medium bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300 rounded-full border border-sky-200 dark:border-sky-800">
+                          {post.categoryName}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* 제목 */}
+                    <Link href={`/blog/${post.id}`} className="relative z-10">
+                      <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors duration-200 line-clamp-2">
+                        {post.title}
+                      </h3>
+                    </Link>
+
+                    {/* 요약 */}
+                    {post.excerpt && (
+                      <p className="text-slate-600 dark:text-slate-400 mb-6 line-clamp-3 flex-grow relative z-10">
+                        {post.excerpt}
+                      </p>
+                    )}
+
+                    {/* 메타 정보 */}
+                    <div className="mt-auto space-y-3 relative z-10">
+                      <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
+                        <div className="flex items-center gap-2">
+                          <svg className="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
+                          <span>{new Date(post.createdAt).toLocaleDateString('ko-KR', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                          })}</span>
                         </div>
                       </div>
-                    </Link>
-                  </article>
+                    </div>
+
+                    {/* 우상단 장식 요소 */}
+                    <div className="absolute top-4 right-4 w-2 h-2 bg-gradient-to-r from-sky-400 to-purple-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  </div>
                 ))}
               </div>
             )}
-          </div>
 
-          {/* 페이지당 포스트 수 선택 */}
-          <div className="flex items-center justify-between flex-wrap gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600 dark:text-gray-400">페이지당 표시:</span>
-              <div className="flex space-x-2">
-                {[5, 10, 20].map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => handlePostsPerPageChange(size)}
-                    className={`px-4 py-2 text-sm rounded-md transition-colors ${
-                      postsPerPage === size
-                        ? 'bg-gradient-to-r from-green-400 to-emerald-400 text-white'
-                        : 'bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 text-green-700 dark:text-green-300 hover:from-green-200 hover:to-emerald-200 dark:hover:from-green-800/40 dark:hover:to-emerald-800/40 border border-green-200 dark:border-green-800/50'
-                    }`}
+            {/* 페이지네이션 */}
+            {paginatedPosts.length > 0 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8 border-t border-slate-200 dark:border-slate-700">
+                <div className="flex items-center gap-4">
+                  <span className="text-sm text-slate-600 dark:text-slate-400">
+                    페이지당 포스트 수:
+                  </span>
+                  <select
+                    value={postsPerPage}
+                    onChange={(e) => handlePostsPerPageChange(Number(e.target.value))}
+                    className="text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
                   >
-                    {size}
+                    <option value={5}>5개</option>
+                    <option value={10}>10개</option>
+                    <option value={20}>20개</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                    disabled={currentPage === 1}
+                    className="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    이전
                   </button>
-                ))}
+                  
+                  <span className="text-sm text-slate-600 dark:text-slate-400 px-3">
+                    {currentPage} / {totalPages}
+                  </span>
+                  
+                  <button
+                    onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                    disabled={currentPage === totalPages}
+                    className="px-3 py-1 text-sm border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    다음
+                  </button>
+                </div>
               </div>
-            </div>
-
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              총 {posts.length}개 포스트 중 {Math.min((currentPage - 1) * postsPerPage + 1, posts.length)}-{Math.min(currentPage * postsPerPage, posts.length)}개 표시
-            </div>
+            )}
           </div>
-
-          {/* 페이지네이션 */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-center space-x-2 pt-8 border-t border-gray-200 dark:border-gray-700">
-              <button
-                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                disabled={currentPage === 1}
-                className="px-4 py-2 rounded-md bg-gradient-to-r from-teal-100 to-cyan-100 dark:from-teal-900/30 dark:to-cyan-900/30 text-teal-700 dark:text-teal-300 hover:from-teal-200 hover:to-cyan-200 dark:hover:from-teal-800/40 dark:hover:to-cyan-800/40 disabled:opacity-50 disabled:cursor-not-allowed border border-teal-200 dark:border-teal-800/50 transition-all duration-200"
-              >
-                이전
-              </button>
-
-              {/* 페이지 번호 */}
-              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
-                let pageNum;
-                if (totalPages <= 5) {
-                  pageNum = i + 1;
-                } else if (currentPage <= 3) {
-                  pageNum = i + 1;
-                } else if (currentPage >= totalPages - 2) {
-                  pageNum = totalPages - 4 + i;
-                } else {
-                  pageNum = currentPage - 2 + i;
-                }
-
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={`px-4 py-2 rounded-md border transition-all duration-200 ${
-                      currentPage === pageNum
-                        ? 'bg-gradient-to-r from-teal-400 to-cyan-400 text-white border-teal-400'
-                        : 'bg-gradient-to-r from-teal-100 to-cyan-100 dark:from-teal-900/30 dark:to-cyan-900/30 text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-800/50 hover:from-teal-200 hover:to-cyan-200 dark:hover:from-teal-800/40 dark:hover:to-cyan-800/40'
-                    }`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
-
-              <button
-                onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                disabled={currentPage === totalPages}
-                className="px-4 py-2 rounded-md bg-gradient-to-r from-teal-100 to-cyan-100 dark:from-teal-900/30 dark:to-cyan-900/30 text-teal-700 dark:text-teal-300 hover:from-teal-200 hover:to-cyan-200 dark:hover:from-teal-800/40 dark:hover:to-cyan-800/40 disabled:opacity-50 disabled:cursor-not-allowed border border-teal-200 dark:border-teal-800/50 transition-all duration-200"
-              >
-                다음
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </div>

@@ -88,10 +88,10 @@ export default async function Home({ searchParams }: PageProps) {
           <section className="text-center space-y-12 py-16">
             <div className="space-y-8">
               <div className="relative">
-                <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 bg-clip-text text-transparent leading-tight tracking-tight">
+                <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-sky-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent leading-tight tracking-tight">
                   개발자의 기록 공간
                 </h1>
-                <div className="absolute -inset-x-8 -inset-y-4 bg-gradient-to-r from-emerald-100/50 via-teal-100/50 to-cyan-100/50 dark:from-emerald-900/20 dark:via-teal-900/20 dark:to-cyan-900/20 rounded-3xl blur-3xl -z-10 opacity-40"></div>
+                <div className="absolute -inset-x-8 -inset-y-4 bg-gradient-to-r from-sky-100/50 via-indigo-100/50 to-purple-100/50 dark:from-sky-900/20 dark:via-indigo-900/20 dark:to-purple-900/20 rounded-3xl blur-3xl -z-10 opacity-40"></div>
               </div>
               <div className="space-y-4">
                 <p className="text-xl md:text-2xl text-slate-700 dark:text-slate-200 max-w-3xl mx-auto leading-relaxed font-medium">
@@ -105,22 +105,22 @@ export default async function Home({ searchParams }: PageProps) {
             
             {/* 통계 카드 */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-              <div className="group relative overflow-hidden rounded-xl bg-white dark:bg-slate-800 p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700 hover:border-emerald-300 dark:hover:border-emerald-600">
-                <div className="text-4xl font-bold text-emerald-600 dark:text-emerald-400 mb-2">{posts.length}</div>
+              <div className="group relative overflow-hidden rounded-xl bg-white dark:bg-slate-800 p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700 hover:border-sky-300 dark:hover:border-sky-600">
+                <div className="text-4xl font-bold text-sky-600 dark:text-sky-400 mb-2">{posts.length}</div>
                 <div className="text-sm font-medium text-slate-600 dark:text-slate-300">총 포스트</div>
-                <div className="absolute top-4 right-4 text-emerald-200 dark:text-emerald-800 group-hover:scale-110 transition-transform duration-300">
+                <div className="absolute top-4 right-4 text-sky-200 dark:text-sky-800 group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
               </div>
               
-              <div className="group relative overflow-hidden rounded-xl bg-white dark:bg-slate-800 p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700 hover:border-teal-300 dark:hover:border-teal-600">
-                <div className="text-4xl font-bold text-teal-600 dark:text-teal-400 mb-2">
+              <div className="group relative overflow-hidden rounded-xl bg-white dark:bg-slate-800 p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700 hover:border-indigo-300 dark:hover:border-indigo-600">
+                <div className="text-4xl font-bold text-indigo-600 dark:text-indigo-400 mb-2">
                   {posts.reduce((sum, post: any) => sum + (post.viewCount || 0), 0)}
                 </div>
                 <div className="text-sm font-medium text-slate-600 dark:text-slate-300">총 조회수</div>
-                <div className="absolute top-4 right-4 text-teal-200 dark:text-teal-800 group-hover:scale-110 transition-transform duration-300">
+                <div className="absolute top-4 right-4 text-indigo-200 dark:text-indigo-800 group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                     <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
@@ -128,12 +128,12 @@ export default async function Home({ searchParams }: PageProps) {
                 </div>
               </div>
               
-              <div className="group relative overflow-hidden rounded-xl bg-white dark:bg-slate-800 p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700 hover:border-cyan-300 dark:hover:border-cyan-600">
-                <div className="text-4xl font-bold text-cyan-600 dark:text-cyan-400 mb-2">
+              <div className="group relative overflow-hidden rounded-xl bg-white dark:bg-slate-800 p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700 hover:border-purple-300 dark:hover:border-purple-600">
+                <div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">
                   {new Set(posts.map((post: any) => post.categoryName)).size}
                 </div>
                 <div className="text-sm font-medium text-slate-600 dark:text-slate-300">카테고리</div>
-                <div className="absolute top-4 right-4 text-cyan-200 dark:text-cyan-800 group-hover:scale-110 transition-transform duration-300">
+                <div className="absolute top-4 right-4 text-purple-200 dark:text-purple-800 group-hover:scale-110 transition-transform duration-300">
                   <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
                   </svg>
@@ -164,7 +164,7 @@ export default async function Home({ searchParams }: PageProps) {
                 </p>
                 <Link 
                   href="/admin/posts/new" 
-                  className="inline-flex items-center px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg transition-colors duration-200 shadow-lg hover:shadow-xl"
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-sky-500 to-purple-500 hover:from-sky-600 hover:to-purple-600 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   포스트 작성하기
                 </Link>
