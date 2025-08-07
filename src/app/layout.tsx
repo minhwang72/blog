@@ -1,10 +1,38 @@
 import type { Metadata } from "next";
+import localFont from 'next/font/local';
 import "./globals.css";
 import { Providers } from './providers';
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { usePathname } from 'next/navigation';
 import Script from 'next/script';
+
+const pretendard = localFont({
+  src: [
+    {
+      path: '../../public/fonts/Pretendard-Regular.woff2',
+      weight: '400',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/Pretendard-Medium.woff2',
+      weight: '500',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/Pretendard-SemiBold.woff2',
+      weight: '600',
+      style: 'normal',
+    },
+    {
+      path: '../../public/fonts/Pretendard-Bold.woff2',
+      weight: '700',
+      style: 'normal',
+    },
+  ],
+  variable: '--font-pretendard',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: {
@@ -79,9 +107,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang="ko" suppressHydrationWarning={true}>
       <head></head>
-      <body className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+      <body className={`${pretendard.variable} bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300`}>
         <Providers>
           <div className="flex min-h-screen flex-col">
             {children}
