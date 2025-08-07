@@ -71,11 +71,9 @@
   --pattern-opacity: 0.05;
 }
 
-/* 폰트는 layout.tsx에서 localFont로 관리 */
-
 /* 기본 스타일 */
 body {
-  font-family: var(--font-pretendard), -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   line-height: 1.6;
 }
 
@@ -102,17 +100,17 @@ html {
 
 /* Focus styles */
 *:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 3px var(--primary);
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }
 
 /* Selection styles */
 ::selection {
   background-color: var(--primary);
-  color: var(--primary-text);
+  color: var(--foreground);
 }
 
-/* 접근성 개선을 위한 스타일 */
+/* Visually hidden for screen readers */
 .visually-hidden {
   position: absolute;
   width: 1px;
@@ -125,10 +123,9 @@ html {
   border: 0;
 }
 
-/* 스크롤바 스타일 */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
-  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -136,89 +133,85 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--secondary-foreground);
+  background: var(--primary);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
+  background: var(--primary-dark);
 }
 
-/* 로고 스타일 - 고정 그라데이션 */
+/* Logo styles */
 .logo {
-  font-family: 'Pretendard', sans-serif;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  background: linear-gradient(135deg, #87CEEB 0%, #9370DB 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-clip: text;
-  transition: opacity 0.3s ease;
+  font-weight: 700;
+  transition: opacity 0.2s ease;
 }
 
 .logo:hover {
   opacity: 0.8;
 }
 
-/* 카드 스타일 - Tailwind 우선 사용 */
+/* Card styles */
 .card {
-  @apply bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm dark:shadow-slate-900/50 transition-all duration-300 overflow-hidden;
+  transition: all 0.2s ease;
 }
 
 .card:hover {
-  @apply shadow-lg dark:shadow-slate-900/80 -translate-y-1;
+  transform: translateY(-2px);
 }
 
-/* 탭 스타일 - Tailwind 우선 사용 */
+/* Tab styles */
 .tab {
-  @apply bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-lg px-4 py-2 transition-all duration-300 cursor-pointer border-0 font-medium;
+  transition: all 0.2s ease;
 }
 
 .tab.active {
-  @apply bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300;
+  background: var(--tab-active);
 }
 
 .tab:hover:not(.active) {
-  @apply bg-slate-200 dark:bg-slate-600;
+  background: var(--tab-inactive);
 }
 
-/* 버튼 스타일 */
+/* Button styles */
 .btn-primary {
   background: var(--gradient-primary);
   color: var(--primary-text);
-  border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
   font-weight: 600;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+  border: none;
   cursor: pointer;
 }
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(160, 216, 239, 0.3);
+  box-shadow: var(--card-shadow-hover);
 }
 
-/* 링크 스타일 */
+/* Link styles */
 .link {
   color: var(--primary);
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 .link:hover {
   color: var(--primary-dark);
 }
 
-/* 애니메이션 */
+/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -234,26 +227,25 @@ html {
 }
 
 .fade-in {
-  animation: fadeIn 0.6s ease-out;
+  animation: fadeIn 0.5s ease-out;
 }
 
 .animate-fade-in-up {
-  animation: fadeInUp 0.5s ease-out;
+  animation: fadeInUp 0.6s ease-out;
 }
 
-/* 반응형 디자인 */
+/* Responsive adjustments */
 @media (max-width: 768px) {
   .card {
-    border-radius: 8px;
+    margin-bottom: 1rem;
   }
   
   .tab {
-    padding: 6px 12px;
-    font-size: 14px;
+    font-size: 0.875rem;
   }
   
   .btn-primary {
-    padding: 10px 20px;
+    padding: 0.5rem 1rem;
   }
 }
 

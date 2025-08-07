@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { posts } from '@/lib/db/schema';
+import { posts, categories } from '@/lib/db/schema';
 import { eq, and, ne, sql, isNotNull } from 'drizzle-orm';
 
 export async function GET(
@@ -19,10 +19,20 @@ export async function GET(
       );
     }
 
-    // 같은 카테고리의 다른 포스트 중 최근 3개를 가져옴
+    // 같은 카테고리의 다른 포스트 중 최근 3개를 가져옴 (카테고리 정보 포함)
     const relatedPosts = await db
-      .select()
+      .select({
+        id: posts.id,
+        title: posts.title,
+        slug: posts.slug,
+        excerpt: posts.excerpt,
+        createdAt: posts.createdAt,
+        categoryId: posts.categoryId,
+        categoryName: categories.name,
+        categorySlug: categories.slug,
+      })
       .from(posts)
+      .leftJoin(categories, eq(posts.categoryId, categories.id))
       .where(
         and(
           isNotNull(posts.categoryId),

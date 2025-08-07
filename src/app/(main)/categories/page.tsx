@@ -78,6 +78,9 @@ export default async function CategoriesPage() {
     getPosts()
   ]);
 
+  // 디버깅용 로그
+  console.log('Categories data:', categories.map(c => ({ name: c.name, slug: c.slug })));
+
   return (
     <div className="min-h-screen flex flex-col">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
@@ -151,19 +154,17 @@ export default async function CategoriesPage() {
                   </div>
 
                   {/* 더보기 버튼 */}
-                  {category.postCount > 4 && (
-                    <div className="flex justify-center pt-4">
-                      <Link
-                        href={`/categories/${category.slug}`}
-                        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
-                      >
-                        더보기
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                      </Link>
-                    </div>
-                  )}
+                  <div className="flex justify-center pt-4">
+                    <Link
+                      href={`/categories/${category.slug}`}
+                      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                    >
+                      모든 글 보기
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  </div>
                 </div>
               );
             })}

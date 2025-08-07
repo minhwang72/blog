@@ -10,6 +10,7 @@ interface RelatedPost {
   excerpt?: string;
   createdAt: Date;
   categoryName?: string;
+  categorySlug?: string;
 }
 
 interface RelatedPostsProps {
@@ -21,6 +22,7 @@ interface RelatedPostsProps {
 export default function RelatedPosts({ currentPostId, categoryId, categoryName }: RelatedPostsProps) {
   const [relatedPosts, setRelatedPosts] = useState<RelatedPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [categorySlug, setCategorySlug] = useState<string>('');
 
   useEffect(() => {
     const fetchRelatedPosts = async () => {
@@ -44,6 +46,11 @@ export default function RelatedPosts({ currentPostId, categoryId, categoryName }
           const data = await response.json();
           console.log('관련 포스트 데이터:', data);
           setRelatedPosts(data);
+          
+          // 카테고리 slug 설정 (첫 번째 포스트에서 가져옴)
+          if (data.length > 0 && data[0].categorySlug) {
+            setCategorySlug(data[0].categorySlug);
+          }
         }
       } catch (error) {
         console.error('관련 포스트 조회 오류:', error);
@@ -127,10 +134,10 @@ export default function RelatedPosts({ currentPostId, categoryId, categoryName }
         ))}
       </div>
       
-      {relatedPosts.length > 0 && categoryName && (
+      {relatedPosts.length > 0 && categoryName && categorySlug && (
         <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800/30">
           <Link
-            href={`/categories/${categoryName.toLowerCase()}`}
+            href={`/categories/${categorySlug}`}
             className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:underline"
           >
             {categoryName} 카테고리의 모든 글 보기 →
