@@ -26,57 +26,50 @@ export default function PostCard({ post }: PostCardProps) {
 
   return (
     <Link href={`/blog/${post.id}`} className="block group">
-      <article className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm dark:shadow-slate-900/50 hover:shadow-lg dark:hover:shadow-slate-900/80 transition-all duration-300 hover:-translate-y-1 p-6 h-full flex flex-col">
+      <article className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 p-6 h-full flex flex-col relative overflow-hidden">
+        {/* 배경 그라데이션 효과 */}
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-50/50 via-teal-50/30 to-cyan-50/50 dark:from-emerald-900/10 dark:via-teal-900/5 dark:to-cyan-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        
         {/* 카테고리 태그 */}
         {post.categoryName && (
-          <div className="mb-3">
-            <span className="inline-block px-3 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded-full">
+          <div className="mb-4 relative z-10">
+            <span className="inline-block px-3 py-1 text-xs font-medium bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 rounded-full border border-emerald-200 dark:border-emerald-800">
               {post.categoryName}
             </span>
           </div>
         )}
 
         {/* 제목 */}
-                        <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 line-clamp-2">
+        <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-200 line-clamp-2 relative z-10">
           {post.title}
         </h3>
 
         {/* 요약 */}
         {post.excerpt && (
-          <p className="text-slate-600 dark:text-slate-400 mb-4 line-clamp-3 flex-grow">
+          <p className="text-slate-600 dark:text-slate-400 mb-6 line-clamp-3 flex-grow relative z-10">
             {post.excerpt}
           </p>
         )}
 
         {/* 메타 정보 */}
-        <div className="mt-auto space-y-2">
+        <div className="mt-auto space-y-3 relative z-10">
           <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
             <div className="flex items-center gap-2">
-              <CalendarIcon className="w-4 h-4" />
+              <CalendarIcon className="w-4 h-4 text-emerald-500" />
               <span>{formatDate(post.createdAt)}</span>
             </div>
             
             {post.viewCount !== undefined && (
               <div className="flex items-center gap-1">
-                <EyeIcon className="w-4 h-4" />
+                <EyeIcon className="w-4 h-4 text-teal-500" />
                 <span>{post.viewCount}</span>
               </div>
             )}
           </div>
-
-
         </div>
 
-        {/* 호버 효과 */}
-        <div className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-          <div
-            className="w-full h-full rounded-lg"
-            style={{
-              background: 'var(--gradient-primary)',
-              opacity: 0.05,
-            }}
-          />
-        </div>
+        {/* 우상단 장식 요소 */}
+        <div className="absolute top-4 right-4 w-2 h-2 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
       </article>
     </Link>
   );

@@ -16,10 +16,10 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-700 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md">
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md">
       <div className="w-full flex h-16 items-center px-6">
         {/* 로고 */}
-        <Link href="/" className="logo text-2xl font-bold tracking-tight hover:opacity-80 transition-opacity">
+        <Link href="/" className="logo text-2xl font-bold tracking-tight hover:opacity-80 transition-opacity bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
           min.log
         </Link>
 
@@ -29,16 +29,16 @@ export default function Header() {
             <Link
               key={item.name}
               href={item.href}
-              className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all duration-200 relative group py-2"
+              className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all duration-200 relative group py-2"
             >
               {item.name}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-300 group-hover:w-full"></span>
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-300 group-hover:w-full"></span>
             </Link>
           ))}
           <ThemeToggle />
           <Link
             href="/admin/login"
-            className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors opacity-70 hover:opacity-100"
+            className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors opacity-70 hover:opacity-100"
             title="관리자 설정"
           >
             <Settings className="h-4 w-4" />
@@ -50,7 +50,7 @@ export default function Header() {
           <ThemeToggle />
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors p-2"
+            className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors p-2"
           >
             {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -59,13 +59,13 @@ export default function Header() {
 
       {/* 모바일 메뉴 - 드롭다운 박스 */}
       {isMenuOpen && (
-        <div className="md:hidden absolute top-16 left-0 right-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-lg">
+        <div className="md:hidden absolute top-16 left-0 right-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shadow-lg">
           <nav className="px-6 py-4 space-y-2">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="block text-base font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors py-3 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
+                className="block text-base font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors py-3 px-4 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.name}
@@ -73,10 +73,10 @@ export default function Header() {
             ))}
             
             {/* 관리자 설정 버튼 - 모바일에서만 표시 */}
-            <div className="pt-2 mt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="pt-2 mt-4 border-t border-slate-200 dark:border-slate-700">
               <Link
                 href="/admin/login"
-                className="flex items-center gap-3 text-base font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors py-3 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
+                className="flex items-center gap-3 text-base font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors py-3 px-4 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800"
                 onClick={() => setIsMenuOpen(false)}
               >
                 <Settings className="h-5 w-5" />

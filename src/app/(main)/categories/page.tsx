@@ -98,21 +98,17 @@ export default async function CategoriesPage() {
           {/* 카테고리별 포스트 그리드 */}
           <div className="space-y-8">
             {categories.map((category) => {
-              const categoryPosts = posts
-                .filter(post => post.categoryId === category.id)
-                .slice(0, 4); // 최신 4개만
-
+              const categoryPosts = posts.filter(post => post.categoryName === category.name).slice(0, 4);
+              
               return (
                 <div key={category.id} className="space-y-4">
                   {/* 카테고리 헤더 */}
                   <div className="flex items-center justify-between">
-                    <Link 
+                    <Link
                       href={`/categories/${category.slug}`}
                       className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-700 dark:text-blue-300 hover:from-blue-200 hover:to-indigo-200 dark:hover:from-blue-800/40 dark:hover:to-indigo-800/40 border border-blue-200 dark:border-blue-800/50 transition-all duration-200 hover:shadow-md cursor-pointer"
                     >
-                      <h3 className="text-lg font-semibold">
-                        {category.name}
-                      </h3>
+                      <h3 className="text-lg font-semibold">{category.name}</h3>
                       <span className="text-sm font-medium text-blue-600 dark:text-blue-400 bg-white/50 dark:bg-gray-800/50 px-2 py-1 rounded-full">
                         {category.postCount}
                       </span>
@@ -131,14 +127,12 @@ export default async function CategoriesPage() {
                             <h4 className="text-base font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 line-clamp-2 mb-3">
                               {post.title}
                             </h4>
-                            {post.excerpt && (
-                              <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-4 flex-grow">
-                                {post.excerpt}
-                              </p>
-                            )}
+                            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-4 flex-grow">
+                              {post.excerpt}
+                            </p>
                             <div className="mt-auto space-y-2">
                               <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                                <time dateTime={post.createdAt.toString()}>
+                                <time dateTime={new Date(post.createdAt).toISOString()}>
                                   {new Date(post.createdAt).toLocaleDateString('ko-KR', {
                                     year: 'numeric',
                                     month: 'short',
@@ -153,7 +147,7 @@ export default async function CategoriesPage() {
                     ))}
                   </div>
 
-                  {/* 더보기 버튼 */}
+                  {/* 모든 글 보기 버튼 */}
                   <div className="flex justify-center pt-4">
                     <Link
                       href={`/categories/${category.slug}`}
@@ -161,7 +155,7 @@ export default async function CategoriesPage() {
                     >
                       모든 글 보기
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path>
                       </svg>
                     </Link>
                   </div>
