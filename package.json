@@ -15,7 +15,8 @@
     "create:admin": "ts-node -r tsconfig-paths/register scripts/create-admin.ts",
     "seed": "ts-node -r tsconfig-paths/register scripts/seed.ts",
     "generate:mcp-token": "ts-node -r tsconfig-paths/register scripts/generate-mcp-token.ts",
-    "db:setup-remote": "ts-node -r tsconfig-paths/register scripts/setup-remote-db.ts"
+    "db:setup-remote": "ts-node -r tsconfig-paths/register scripts/setup-remote-db.ts",
+    "db:debug": "ts-node -r tsconfig-paths/register scripts/debug-db-connection.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^0.3.6",

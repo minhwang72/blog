@@ -107,6 +107,20 @@ const dummyDb = {
 const isProduction = process.env.NODE_ENV === 'production';
 const DB_HOST = isProduction ? '192.168.0.19' : (process.env.DB_HOST || 'monsilserver.iptime.org');
 
+// 환경변수 검증
+function validateDatabaseEnvs() {
+  const requiredEnvs = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];
+  const missingEnvs = requiredEnvs.filter(env => !process.env[env]);
+  
+  if (missingEnvs.length > 0) {
+    console.error('❌ 누락된 데이터베이스 환경변수:', missingEnvs);
+    throw new Error(`Missing required database environment variables: ${missingEnvs.join(', ')}`);
+  }
+  
+  console.log('✅ 데이터베이스 환경변수 검증 완료');
+  console.log(`DB 연결 정보: ${process.env.DB_USER}@${DB_HOST}:${process.env.DB_PORT}/${process.env.DB_NAME}`);
+}
+
 // 빌드 시 데이터베이스 연결 건너뛰기
 const poolConnection = process.env.SKIP_DATABASE_CONNECTION === 'true'
   ? mysql.createPool({
@@ -116,13 +130,22 @@ const poolConnection = process.env.SKIP_DATABASE_CONNECTION === 'true'
       password: 'dummy',
       database: 'dummy',
     })
-  : mysql.createPool({
-      host: DB_HOST,
-      port: Number(process.env.DB_PORT || 3306),
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-    });
+  : (() => {
+      validateDatabaseEnvs();
+      return mysql.createPool({
+        host: DB_HOST,
+        port: Number(process.env.DB_PORT || 3306),
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_NAME,
+        // 연결 풀 설정 추가
+        connectionLimit: 10,
+        acquireTimeout: 60000,
+        timeout: 60000,
+        // 재연결 설정
+        reconnect: true,
+      });
+    })();
 
 export const db = process.env.SKIP_DATABASE_CONNECTION === 'true'
   ? dummyDb
