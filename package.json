@@ -19,6 +19,7 @@
     "setup:admin-tables": "ts-node -r tsconfig-paths/register scripts/setup-admin-tables.ts",
     "setup:ads-tables": "ts-node -r tsconfig-paths/register scripts/setup-admin-ads-tables.ts",
     "setup:about-content": "ts-node -r tsconfig-paths/register scripts/setup-about-content-direct.ts",
+    "analyze:db": "ts-node -r tsconfig-paths/register scripts/analyze-db-status.ts",
     "create:admin": "ts-node -r tsconfig-paths/register scripts/create-admin.ts"
   },
   "dependencies": {

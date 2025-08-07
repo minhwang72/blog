@@ -19,14 +19,20 @@ export default function AdminLayout({
   const router = useRouter();
   const pathname = usePathname();
 
+  // hooks는 항상 같은 순서로 호출되어야 함
+  useEffect(() => {
+    // 로그인 페이지가 아닐 때만 인증 체크
+    if (pathname !== '/admin/login') {
+      checkAuth();
+    } else {
+      setLoading(false);
+    }
+  }, [pathname]);
+
   // 로그인 페이지는 레이아웃 적용 안함
   if (pathname === '/admin/login') {
     return <>{children}</>;
   }
-
-  useEffect(() => {
-    checkAuth();
-  }, []);
 
   const checkAuth = async () => {
     try {

@@ -2,10 +2,11 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { db } from '@/lib/db';
 import { posts, users, categories } from '@/lib/db/schema';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, and } from 'drizzle-orm';
 
 export async function GET() {
   try {
+    // published = true인 게시글만 조회
     const allPosts = await db
       .select({
         id: posts.id,
@@ -17,10 +18,12 @@ export async function GET() {
         authorName: users.name,
         categoryName: categories.name,
         categoryId: posts.categoryId,
+        viewCount: posts.viewCount,
       })
       .from(posts)
       .leftJoin(users, eq(posts.authorId, users.id))
       .leftJoin(categories, eq(posts.categoryId, categories.id))
+      .where(eq(posts.published, true))
       .orderBy(desc(posts.createdAt));
 
     return NextResponse.json(allPosts);
