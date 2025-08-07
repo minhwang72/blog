@@ -564,9 +564,20 @@ export default async function BlogPostPage({
         
         <article className="prose prose-lg dark:prose-invert max-w-none">
           <header className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl mb-4">
-              {post.title}
-            </h1>
+            <div className="flex justify-between items-start mb-4">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+                {post.title}
+              </h1>
+              <a
+                href={`/admin/posts/${post.id}/edit`}
+                className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors opacity-70 hover:opacity-100"
+                title="관리자 편집"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </a>
+            </div>
             <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
               <time dateTime={post.createdAt.toISOString()}>
                 {format(post.createdAt, 'PPP', { locale: ko })}

@@ -28,7 +28,7 @@ export default function MCPPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer mcp-secure-token-2024',
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_MCP_API_TOKEN || 'mcp-secure-token-2024'}`,
         },
         body: JSON.stringify({
           tool: 'create_blog_post',
@@ -66,7 +66,7 @@ export default function MCPPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer mcp-secure-token-2024',
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_MCP_API_TOKEN || 'mcp-secure-token-2024'}`,
         },
         body: JSON.stringify({
           tool: 'classify_content',
