@@ -28,11 +28,19 @@ export default function AdminCommentsPage() {
 
   const fetchComments = async () => {
     try {
+      console.log('Fetching comments with params:', { page: currentPage, limit: commentsPerPage, filter });
       const response = await fetch(`/api/admin/comments?page=${currentPage}&limit=${commentsPerPage}&filter=${filter}`);
+      console.log('Response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('Comments data:', data);
         setComments(data.comments);
         setTotalPages(data.totalPages);
+      } else {
+        console.error('Failed to fetch comments:', response.status, response.statusText);
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
       }
     } catch (error) {
       console.error('Failed to fetch comments:', error);

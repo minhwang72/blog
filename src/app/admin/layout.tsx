@@ -96,9 +96,6 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 <Link href="/admin/comments" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium">
                   댓글 관리
                 </Link>
-                <Link href="/admin/ads" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                  광고 관리
-                </Link>
                 <Link href="/admin/mcp" className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium">
                   MCP 도구
                 </Link>

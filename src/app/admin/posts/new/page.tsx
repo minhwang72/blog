@@ -9,12 +9,6 @@ interface Category {
   slug: string;
 }
 
-interface AdPosition {
-  id: string;
-  name: string;
-  description: string;
-}
-
 export default function NewPostPage() {
   const [formData, setFormData] = useState({
     title: '',
@@ -22,7 +16,6 @@ export default function NewPostPage() {
     excerpt: '',
     categoryId: '',
     published: false,
-    adPositions: [] as string[],
   });
   const [categories, setCategories] = useState<Category[]>([]);
   const [newCategory, setNewCategory] = useState({ name: '', slug: '' });
@@ -31,12 +24,6 @@ export default function NewPostPage() {
   const [saving, setSaving] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
   const router = useRouter();
-
-  const adPositions: AdPosition[] = [
-    { id: 'top', name: '포스트 상단', description: '포스트 제목 바로 아래' },
-    { id: 'middle', name: '포스트 중간', description: '내용 중간에 삽입' },
-    { id: 'bottom', name: '포스트 하단', description: '포스트 끝 부분' },
-  ];
 
   useEffect(() => {
     fetchCategories();
@@ -89,14 +76,6 @@ export default function NewPostPage() {
       console.error('Category creation error:', error);
       alert('카테고리 생성 중 오류가 발생했습니다.');
     }
-  };
-
-  const handleAdPositionChange = (positionId: string) => {
-    const newAdPositions = formData.adPositions.includes(positionId)
-      ? formData.adPositions.filter(id => id !== positionId)
-      : [...formData.adPositions, positionId];
-    
-    setFormData({ ...formData, adPositions: newAdPositions });
   };
 
   const insertHtmlTag = (tag: string) => {
@@ -338,30 +317,6 @@ export default function NewPostPage() {
               />
             </div>
 
-            {/* 광고 설정 */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                광고 위치 설정
-              </label>
-              <div className="space-y-2">
-                {adPositions.map((position) => (
-                  <div key={position.id} className="flex items-center">
-                    <input
-                      id={`ad-${position.id}`}
-                      type="checkbox"
-                      checked={formData.adPositions.includes(position.id)}
-                      onChange={() => handleAdPositionChange(position.id)}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded"
-                    />
-                    <label htmlFor={`ad-${position.id}`} className="ml-2 block text-sm text-gray-900 dark:text-white">
-                      <div className="font-medium">{position.name}</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">{position.description}</div>
-                    </label>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {/* 내용 */}
             <div>
               <div className="flex justify-between items-center mb-2">
@@ -408,12 +363,13 @@ export default function NewPostPage() {
                   value={formData.content}
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm"
-                  placeholder="HTML 형식으로 포스트 내용을 입력하세요"
+                  placeholder="HTML 형식으로 포스트 내용을 입력하세요. 광고는 &lt;div class='ad-placeholder'&gt;광고 위치&lt;/div&gt; 형태로 삽입하세요."
                 />
               )}
               
               <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                HTML 태그를 사용할 수 있습니다. 예: &lt;h2&gt;, &lt;p&gt;, &lt;img&gt;, &lt;a&gt; 등
+                HTML 태그를 사용할 수 있습니다. 예: &lt;h2&gt;, &lt;p&gt;, &lt;img&gt;, &lt;a&gt; 등<br />
+                광고 삽입: &lt;div class='ad-placeholder'&gt;광고 위치&lt;/div&gt;
               </div>
             </div>
 
