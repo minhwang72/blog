@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { db } from '@/lib/db';
 import { posts } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
@@ -9,9 +8,22 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession();
+    // 관리자 인증 확인
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return new NextResponse('Unauthorized', { status: 401 });
+    }
 
-    if (!session?.user) {
+    const sessionId = authHeader.replace('Bearer ', '');
+    
+    // 세션 유효성 검사
+    const sessionResponse = await fetch(`${request.nextUrl.origin}/api/admin/me`, {
+      headers: {
+        'Authorization': `Bearer ${sessionId}`
+      }
+    });
+
+    if (!sessionResponse.ok) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
@@ -43,9 +55,22 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession();
+    // 관리자 인증 확인
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return new NextResponse('Unauthorized', { status: 401 });
+    }
 
-    if (!session?.user) {
+    const sessionId = authHeader.replace('Bearer ', '');
+    
+    // 세션 유효성 검사
+    const sessionResponse = await fetch(`${request.nextUrl.origin}/api/admin/me`, {
+      headers: {
+        'Authorization': `Bearer ${sessionId}`
+      }
+    });
+
+    if (!sessionResponse.ok) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 

@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { db } from '@/lib/db';
 import { posts, users, categories } from '@/lib/db/schema';
 import { eq, desc, and } from 'drizzle-orm';
@@ -35,9 +34,22 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession();
+    // 관리자 인증 확인
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return new NextResponse('Unauthorized', { status: 401 });
+    }
 
-    if (!session?.user) {
+    const sessionId = authHeader.replace('Bearer ', '');
+    
+    // 세션 유효성 검사
+    const sessionResponse = await fetch(`${new URL(request.url).origin}/api/admin/me`, {
+      headers: {
+        'Authorization': `Bearer ${sessionId}`
+      }
+    });
+
+    if (!sessionResponse.ok) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 
@@ -67,8 +79,7 @@ export async function POST(request: Request) {
       .from(posts)
       .leftJoin(users, eq(posts.authorId, users.id))
       .leftJoin(categories, eq(posts.categoryId, categories.id))
-      .where(eq(posts.slug, slug))
-      .limit(1);
+      .where(eq(posts.slug, slug));
 
     return NextResponse.json(newPost[0]);
   } catch (error) {

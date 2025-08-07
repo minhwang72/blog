@@ -30,9 +30,19 @@ export default function RelatedPosts({ currentPostId, categoryId, categoryName }
       }
 
       try {
-        const response = await fetch(`/api/posts/${currentPostId}/related?categoryId=${categoryId}`);
+        console.log('관련 포스트 조회 시작:', currentPostId, categoryId);
+        const response = await fetch(`/api/posts/${currentPostId}/related?categoryId=${categoryId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'same-origin',
+          mode: 'cors',
+        });
+        console.log('관련 포스트 응답 상태:', response.status);
         if (response.ok) {
           const data = await response.json();
+          console.log('관련 포스트 데이터:', data);
           setRelatedPosts(data);
         }
       } catch (error) {
@@ -58,7 +68,7 @@ export default function RelatedPosts({ currentPostId, categoryId, categoryName }
   // 디버그용: 개발 환경에서는 관련 포스트가 없어도 컴포넌트 표시
   if (relatedPosts.length === 0) {
     return (
-      <div className="my-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
+      <div className="my-8 p-6 bg-transparent border border-gray-100 dark:border-gray-800/30 rounded-xl">
         <div className="flex items-center space-x-2 mb-4">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             {categoryName || '다른 글'}
@@ -75,7 +85,7 @@ export default function RelatedPosts({ currentPostId, categoryId, categoryName }
   }
 
   return (
-    <div className="my-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border">
+    <div className="my-8 p-6 bg-transparent border border-gray-100 dark:border-gray-800/30 rounded-xl">
       <div className="flex items-center space-x-2 mb-4">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
           {categoryName || '다른 글'}
@@ -87,11 +97,11 @@ export default function RelatedPosts({ currentPostId, categoryId, categoryName }
           <Link
             key={post.id}
             href={`/blog/${post.id}`}
-            className="block p-3 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-blue-300 dark:hover:border-blue-500 transition-colors group"
+            className="block p-4 bg-white/50 dark:bg-gray-800/50 rounded-lg border border-gray-100 dark:border-gray-700/50 hover:border-gray-200 dark:hover:border-gray-600 transition-all duration-200 hover:shadow-sm group"
           >
             <div className="flex items-start justify-between">
               <div className="flex-1 min-w-0">
-                <h4 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+                <h4 className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-200 line-clamp-2">
                   {post.title}
                 </h4>
                 {post.excerpt && (
@@ -108,7 +118,7 @@ export default function RelatedPosts({ currentPostId, categoryId, categoryName }
                 </span>
               </div>
               <div className="ml-2 flex-shrink-0">
-                <span className="text-gray-400 group-hover:text-blue-500 transition-colors">
+                <span className="text-gray-400 group-hover:text-green-500 transition-colors">
                   →
                 </span>
               </div>
@@ -118,10 +128,10 @@ export default function RelatedPosts({ currentPostId, categoryId, categoryName }
       </div>
       
       {relatedPosts.length > 0 && categoryName && (
-        <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600">
+        <div className="mt-4 pt-3 border-t border-gray-100 dark:border-gray-800/30">
           <Link
-            href={`/category/${categoryName.toLowerCase()}`}
-            className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+            href={`/categories/${categoryName.toLowerCase()}`}
+            className="text-sm text-gray-600 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400 hover:underline"
           >
             {categoryName} 카테고리의 모든 글 보기 →
           </Link>

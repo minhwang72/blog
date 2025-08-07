@@ -36,10 +36,6 @@ export const metadata: Metadata = {
 
 async function getPosts(categorySlug?: string) {
   try {
-    if (process.env.SKIP_DATABASE_CONNECTION === 'true') {
-      return [];
-    }
-
     // 기본 쿼리 구성
     let whereConditions = [eq(posts.published, true)];
     
@@ -85,98 +81,99 @@ export default async function Home({ searchParams }: PageProps) {
   const posts = await getPosts(categorySlug);
 
   return (
-    <div className="space-y-8">
-      {/* Hero Section */}
-      <section className="text-center space-y-8 py-12">
-        <div className="space-y-6">
-          <div className="relative">
-            <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent leading-tight">
-              개발, 일상 그리고 배움에 대한 기록
-            </h1>
-            <div className="absolute -inset-x-4 -inset-y-2 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-3xl blur-3xl -z-10 opacity-30"></div>
-          </div>
-          <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            프로그래밍, 일상 생활, 그리고 새로운 것을 배우는 과정을 기록하며 공유하는 공간입니다.
-          </p>
-        </div>
-        
-        {/* 통계 카드 */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 p-6 border border-blue-100 dark:border-blue-800/50">
-            <div className="text-3xl font-bold text-blue-600 dark:text-blue-300">{posts.length}</div>
-            <div className="text-sm font-medium text-gray-600 dark:text-gray-300 mt-1">총 포스트</div>
-            <div className="absolute top-2 right-2 text-blue-200 dark:text-blue-700">
-              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+    <div className="flex-1 flex flex-col">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
+        <div className="space-y-8">
+          {/* Hero Section */}
+          <section className="text-center space-y-8 py-12">
+            <div className="space-y-6">
+              <div className="relative">
+                <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 bg-clip-text text-transparent leading-tight">
+                  개발, 일상 그리고 배움에 대한 기록
+                </h1>
+                <div className="absolute -inset-x-4 -inset-y-2 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/20 dark:to-purple-950/20 rounded-3xl blur-3xl -z-10 opacity-30"></div>
+              </div>
+              <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
+                프로그래밍, 일상 생활, 그리고 새로운 것을 배우는 과정을 기록하며 공유하는 공간입니다.
+              </p>
             </div>
-          </div>
-          
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-50 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 p-6 border border-purple-100 dark:border-purple-800/50">
-            <div className="text-3xl font-bold text-purple-600 dark:text-purple-300">
-              {posts.reduce((sum, post: any) => sum + (post.viewCount || 0), 0)}
+            
+            {/* 통계 카드 */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 p-6 border border-blue-100 dark:border-blue-800/50">
+                <div className="text-3xl font-bold text-blue-600 dark:text-blue-300">{posts.length}</div>
+                <div className="text-sm font-medium text-gray-600 dark:text-gray-300 mt-1">총 포스트</div>
+                <div className="absolute top-2 right-2 text-blue-200 dark:text-blue-700">
+                  <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
+              
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-50 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 p-6 border border-purple-100 dark:border-purple-800/50">
+                <div className="text-3xl font-bold text-purple-600 dark:text-purple-300">
+                  {posts.reduce((sum, post: any) => sum + (post.viewCount || 0), 0)}
+                </div>
+                <div className="text-sm font-medium text-gray-600 dark:text-gray-300 mt-1">총 조회수</div>
+                <div className="absolute top-2 right-2 text-purple-200 dark:text-purple-700">
+                  <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                    <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+              </div>
+              
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 p-6 border border-green-100 dark:border-green-800/50">
+                <div className="text-3xl font-bold text-green-600 dark:text-green-300">
+                  {new Set(posts.map((post: any) => post.categoryName)).size}
+                </div>
+                <div className="text-sm font-medium text-gray-600 dark:text-gray-300 mt-1">카테고리</div>
+                <div className="absolute top-2 right-2 text-green-200 dark:text-green-700">
+                  <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
+                  </svg>
+                </div>
+              </div>
             </div>
-            <div className="text-sm font-medium text-gray-600 dark:text-gray-300 mt-1">총 조회수</div>
-            <div className="absolute top-2 right-2 text-purple-200 dark:text-purple-700">
-              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-              </svg>
-            </div>
-          </div>
-          
-          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 p-6 border border-green-100 dark:border-green-800/50">
-            <div className="text-3xl font-bold text-green-600 dark:text-green-300">
-              {new Set(posts.map((post: any) => post.categoryName)).size}
-            </div>
-            <div className="text-sm font-medium text-gray-600 dark:text-gray-300 mt-1">카테고리</div>
-            <div className="absolute top-2 right-2 text-green-200 dark:text-green-700">
-              <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </section>
+          </section>
 
-      {/* Posts Grid */}
-      <section className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-            {categorySlug === 'all' ? '최근 포스트' : `${posts[0]?.categoryName || '카테고리'} 포스트`}
-          </h2>
-          <span className="text-sm text-slate-500 dark:text-slate-400">
-            {posts.length}개의 포스트
-          </span>
-        </div>
+          {/* Posts Grid */}
+          <section className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+                {categorySlug === 'all' ? '최근 포스트' : `${posts[0]?.categoryName || '카테고리'} 포스트`}
+              </h2>
+              <span className="text-sm text-slate-500 dark:text-slate-400">
+                {posts.length}개의 포스트
+              </span>
+            </div>
 
-        {posts.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="text-8xl mb-6">📝</div>
-            <h3 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-4">
-              아직 포스트가 없습니다
-            </h3>
-            <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-md mx-auto">
-              첫 번째 포스트를 작성해보세요!
-            </p>
-            <Link 
-              href="/admin/posts/new" 
-              className="inline-flex items-center px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition-colors"
-            >
-              포스트 작성하기
-            </Link>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {posts.map((post: any) => (
-              <PostCard key={post.id} post={post} />
-            ))}
-          </div>
-        )}
-      </section>
-      
-      {/* 푸터를 위한 추가 공간 */}
-      <div className="h-32"></div>
+            {posts.length === 0 ? (
+              <div className="text-center py-16">
+                <div className="text-8xl mb-6">📝</div>
+                <h3 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-4">
+                  아직 포스트가 없습니다
+                </h3>
+                <p className="text-slate-600 dark:text-slate-400 mb-8 max-w-md mx-auto">
+                  첫 번째 포스트를 작성해보세요!
+                </p>
+                <Link 
+                  href="/admin/posts/new" 
+                  className="inline-flex items-center px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  포스트 작성하기
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {posts.map((post: any) => (
+                  <PostCard key={post.id} post={post} />
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+      </div>
     </div>
   );
 } 

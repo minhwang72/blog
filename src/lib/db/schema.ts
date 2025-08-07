@@ -35,15 +35,6 @@ export const adminSessions = mysqlTable('admin_sessions', {
   expiresAtIdx: index('idx_admin_session_expires_at').on(table.expiresAt),
 }));
 
-// 소개 페이지 컨텐츠 테이블 (DB화)
-export const aboutContent = mysqlTable('about_content', {
-  id: int('id').primaryKey().autoincrement(),
-  title: varchar('title', { length: 255 }).notNull(),
-  content: longtext('content').notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow().notNull(),
-  updatedBy: int('updated_by').notNull(), // admin id
-});
-
 // 광고 설정 테이블
 export const adSettings = mysqlTable('ad_settings', {
   id: int('id').primaryKey().autoincrement(),

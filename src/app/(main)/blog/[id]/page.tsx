@@ -551,46 +551,57 @@ export default async function BlogPostPage({
   };
 
   return (
-    <>
-      <ViewCounter postId={post.id} />
-      <Script
-        id="structured-data"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(structuredData),
-        }}
-      />
-      
-      <article className="prose prose-lg dark:prose-invert max-w-none">
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl mb-4">
-            {post.title}
-          </h1>
-          <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-            <time dateTime={post.createdAt.toISOString()}>
-              {format(post.createdAt, 'PPP', { locale: ko })}
-            </time>
-
-          </div>
-        </header>
-
-        <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-strong:text-gray-900 dark:prose-strong:text-white prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-code:text-pink-600 dark:prose-code:text-pink-400 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-100 dark:prose-pre:bg-gray-800 prose-pre:border prose-pre:border-gray-200 dark:prose-pre:border-gray-700 prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:bg-blue-50 dark:prose-blockquote:bg-blue-900/20 prose-blockquote:pl-4 prose-blockquote:py-2 prose-ul:list-disc prose-ol:list-decimal prose-li:marker:text-blue-500">
-          <div dangerouslySetInnerHTML={{ __html: post.content }} />
-        </div>
-
-        {/* 관련 포스트 */}
-        <RelatedPosts 
-          currentPostId={post.id} 
-          categoryId={post.categoryId} 
-          categoryName={post.categoryName}
+    <div className="flex-1 flex flex-col">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
+        <ViewCounter postId={post.id} />
+        <Script
+          id="structured-data"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredData),
+          }}
         />
+        
+        <article className="prose prose-lg dark:prose-invert max-w-none">
+          <header className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl mb-4">
+              {post.title}
+            </h1>
+            <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
+              <time dateTime={post.createdAt.toISOString()}>
+                {format(post.createdAt, 'PPP', { locale: ko })}
+              </time>
+              {post.categoryName && (
+                <span className="bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-800/50">
+                  {post.categoryName}
+                </span>
+              )}
+            </div>
+            {post.excerpt && (
+              <p className="text-lg text-gray-600 dark:text-gray-400 italic border-l-4 border-blue-500 pl-4 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-r-lg">
+                {post.excerpt}
+              </p>
+            )}
+          </header>
 
-        {/* 하단 광고 - 애드센스 설정 시에만 표시 */}
-        <ArticleAd position="bottom" />
+          <div className="prose prose-lg dark:prose-invert max-w-none prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-strong:text-gray-900 dark:prose-strong:text-white prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-code:text-pink-600 dark:prose-code:text-pink-400 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-100 dark:prose-pre:bg-gray-800 prose-pre:border prose-pre:border-gray-200 dark:prose-pre:border-gray-700 prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:bg-blue-50 dark:prose-blockquote:bg-blue-900/20 prose-blockquote:pl-4 prose-blockquote:py-2 prose-ul:list-disc prose-ol:list-decimal prose-li:marker:text-blue-500">
+            <div dangerouslySetInnerHTML={{ __html: post.content }} />
+          </div>
 
-        {/* 댓글 시스템 */}
-        <Comments postId={post.id} />
-      </article>
-    </>
+          {/* 하단 광고 - 게시글 바로 아래 */}
+          <ArticleAd position="bottom" />
+
+          {/* 관련 포스트 - 부드러운 스타일 */}
+          <RelatedPosts 
+            currentPostId={post.id} 
+            categoryId={post.categoryId} 
+            categoryName={post.categoryName}
+          />
+
+          {/* 댓글 시스템 */}
+          <Comments postId={post.id} />
+        </article>
+      </div>
+    </div>
   );
 } 

@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import { BlogPostService } from '@/lib/services/blog-post.service';
 import { CategoryClassifier } from '@/lib/services/category-classifier.service';
 import { z } from 'zod';
@@ -41,17 +39,13 @@ export async function POST(req: NextRequest) {
   try {
     console.log('MCP API called');
     
-    // Check API token first (for MCP access)
+    // Check API token
     const hasValidToken = verifyApiToken(req);
     console.log('Token valid:', hasValidToken);
     
-    // If no valid token, check session (for web access)
     if (!hasValidToken) {
-      const session = await getServerSession(authOptions);
-      if (!session?.user || session.user.role !== 'admin') {
-        console.log('No valid session');
-        return new NextResponse('Unauthorized', { status: 401 });
-      }
+      console.log('No valid token');
+      return new NextResponse('Unauthorized', { status: 401 });
     }
 
     const body = await req.json();
@@ -119,10 +113,7 @@ export async function GET(req: NextRequest) {
   // Check API token for tools list
   const hasValidToken = verifyApiToken(req);
   if (!hasValidToken) {
-    const session = await getServerSession(authOptions);
-    if (!session?.user || session.user.role !== 'admin') {
-      return new NextResponse('Unauthorized', { status: 401 });
-    }
+    return new NextResponse('Unauthorized', { status: 401 });
   }
 
   return NextResponse.json({

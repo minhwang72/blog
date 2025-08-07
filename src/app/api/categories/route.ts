@@ -5,10 +5,6 @@ import { eq, and } from 'drizzle-orm';
 
 export async function GET() {
   try {
-    if (process.env.SKIP_DATABASE_CONNECTION === 'true') {
-      return NextResponse.json([]);
-    }
-
     // 모든 카테고리 조회
     const allCategories = await db.select().from(categories);
 
@@ -29,6 +25,7 @@ export async function GET() {
           id: category.id,
           name: category.name,
           slug: category.slug,
+          description: category.description,
           postCount: postCount.length,
         };
       })

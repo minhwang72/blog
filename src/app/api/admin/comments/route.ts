@@ -5,7 +5,7 @@ import { eq, desc, sql, isNull, isNotNull } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
+    const searchParams = request.nextUrl.searchParams;
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
     const filter = searchParams.get('filter') || 'all'; // 'all', 'main', 'replies'

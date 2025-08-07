@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface GoogleAdsenseProps {
   adSlot: string;
@@ -15,6 +15,8 @@ export default function GoogleAdsense({
   className = '',
   format = 'auto'
 }: GoogleAdsenseProps) {
+  const adRef = useRef<HTMLElement>(null);
+  
   // 애드센스 Publisher ID가 설정되지 않으면 광고를 표시하지 않음
   const publisherId = process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID;
   
@@ -23,11 +25,15 @@ export default function GoogleAdsense({
       return; // 애드센스가 설정되지 않으면 스크립트 실행하지 않음
     }
     
-    try {
-      // @ts-ignore
-      (window.adsbygoogle = window.adsbygoogle || []).push({});
-    } catch (err) {
-      console.error('Adsense error:', err);
+    // 이미 광고가 로드되었는지 확인
+    if (adRef.current && !adRef.current.hasAttribute('data-ad-loaded')) {
+      try {
+        // @ts-ignore
+        (window.adsbygoogle = window.adsbygoogle || []).push({});
+        adRef.current.setAttribute('data-ad-loaded', 'true');
+      } catch (err) {
+        console.error('Adsense error:', err);
+      }
     }
   }, [publisherId]);
 
@@ -39,6 +45,7 @@ export default function GoogleAdsense({
   return (
     <div className={`adsense-container ${className}`}>
       <ins
+        ref={adRef}
         className="adsbygoogle"
         style={style}
         data-ad-client={publisherId}

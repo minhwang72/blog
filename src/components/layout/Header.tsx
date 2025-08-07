@@ -1,14 +1,15 @@
 'use client';
 
 import Link from "next/link";
-import { Menu } from "lucide-react";
+import { Menu, X, Settings } from "lucide-react";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navigation = [
   { name: "홈", href: "/" },
   { name: "블로그", href: "/blog" },
-  { name: "소개", href: "/about" },
+  { name: "카테고리", href: "/categories" },
+  { name: "검색", href: "/search" },
 ];
 
 export default function Header() {
@@ -35,6 +36,13 @@ export default function Header() {
             </Link>
           ))}
           <ThemeToggle />
+          <Link
+            href="/admin/login"
+            className="text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors opacity-70 hover:opacity-100"
+            title="관리자 설정"
+          >
+            <Settings className="h-4 w-4" />
+          </Link>
         </nav>
 
         {/* 모바일 메뉴 버튼 */}
@@ -42,27 +50,39 @@ export default function Header() {
           <ThemeToggle />
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+            className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors p-2"
           >
-            <Menu className="h-6 w-6" />
+            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
 
-      {/* 모바일 메뉴 */}
+      {/* 모바일 메뉴 - 드롭다운 박스 */}
       {isMenuOpen && (
-        <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900">
-          <nav className="px-6 py-4 space-y-4">
+        <div className="md:hidden absolute top-16 left-0 right-0 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-lg">
+          <nav className="px-6 py-4 space-y-2">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="block text-base font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors py-2"
+                className="block text-base font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors py-3 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.name}
               </Link>
             ))}
+            
+            {/* 관리자 설정 버튼 - 모바일에서만 표시 */}
+            <div className="pt-2 mt-4 border-t border-gray-200 dark:border-gray-700">
+              <Link
+                href="/admin/login"
+                className="flex items-center gap-3 text-base font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors py-3 px-4 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <Settings className="h-5 w-5" />
+                관리자 설정
+              </Link>
+            </div>
           </nav>
         </div>
       )}

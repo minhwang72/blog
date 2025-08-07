@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Comment, CommentFormData } from '@/types/comment';
+import CommentModal from './CommentModal';
 
 interface CommentsProps {
   postId: number;
@@ -11,35 +12,28 @@ export default function Comments({ postId }: CommentsProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [replyingTo, setReplyingTo] = useState<number | null>(null);
-  const [editingComment, setEditingComment] = useState<number | null>(null);
-  const [isCommentsExpanded, setIsCommentsExpanded] = useState(true); // 기본적으로 댓글 표시
-  const [isFormExpanded, setIsFormExpanded] = useState(false);
-  const [showAllComments, setShowAllComments] = useState(false); // 더보기/접기 상태
-  const INITIAL_COMMENT_COUNT = 3; // 처음에 보여줄 댓글 수
+  const [isCommentsExpanded, setIsCommentsExpanded] = useState(true);
+  const [showAllComments, setShowAllComments] = useState(false);
+  const INITIAL_COMMENT_COUNT = 3;
   
-  // 댓글 폼 데이터
-  const [formData, setFormData] = useState<CommentFormData>({
-    content: '',
-    name: '',
-    password: '',
-    parentId: null,
-  });
-
-  // 수정/삭제용 비밀번호
-  const [actionPassword, setActionPassword] = useState('');
+  // 모달 상태
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'create' | 'edit' | 'delete'>('create');
+  const [modalData, setModalData] = useState<{
+    commentId?: number;
+    content?: string;
+    parentId?: number;
+  }>({});
 
   // 댓글을 트리 구조로 변환
   const organizeComments = (comments: Comment[]): Comment[] => {
     const commentMap = new Map<number, Comment>();
     const rootComments: Comment[] = [];
 
-    // 모든 댓글을 맵에 추가하고 replies 배열 초기화
     comments.forEach(comment => {
       commentMap.set(comment.id, { ...comment, replies: [] });
     });
 
-    // 각 댓글을 적절한 위치에 배치
     comments.forEach(comment => {
       const commentWithReplies = commentMap.get(comment.id)!;
       
@@ -59,9 +53,19 @@ export default function Comments({ postId }: CommentsProps) {
   // 댓글 조회
   const fetchComments = async () => {
     try {
-      const response = await fetch(`/api/posts/${postId}/comments`);
+      console.log('댓글 조회 시작:', postId);
+      const response = await fetch(`/api/posts/${postId}/comments`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'same-origin',
+        mode: 'cors',
+      });
+      console.log('댓글 응답 상태:', response.status);
       if (response.ok) {
         const data = await response.json();
+        console.log('댓글 데이터:', data);
         setComments(organizeComments(data));
       }
     } catch (error) {
@@ -72,25 +76,18 @@ export default function Comments({ postId }: CommentsProps) {
   };
 
   // 댓글 작성
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!formData.content.trim() || !formData.name.trim() || !formData.password.trim()) {
-      alert('모든 필드를 입력해주세요.');
-      return;
-    }
-
+  const handleCreateComment = async (data: { content: string; name: string; password: string; parentId?: number }) => {
     setSubmitting(true);
     try {
       const response = await fetch(`/api/posts/${postId}/comments`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(data),
       });
 
       if (response.ok) {
-        setFormData({ content: '', name: '', password: '', parentId: null });
-        setReplyingTo(null);
         await fetchComments();
+        setModalOpen(false);
         alert('댓글이 작성되었습니다!');
       } else {
         const error = await response.json();
@@ -105,30 +102,18 @@ export default function Comments({ postId }: CommentsProps) {
   };
 
   // 댓글 수정
-  const handleEdit = async (commentId: number) => {
-    if (!actionPassword.trim()) {
-      alert('비밀번호를 입력해주세요.');
-      return;
-    }
-
-    const newContent = prompt('수정할 내용을 입력하세요:');
-    if (!newContent || !newContent.trim()) return;
-
+  const handleEditComment = async (data: { commentId: number; content: string; password: string }) => {
+    setSubmitting(true);
     try {
       const response = await fetch(`/api/posts/${postId}/comments`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          commentId,
-          content: newContent,
-          password: actionPassword,
-        }),
+        body: JSON.stringify(data),
       });
 
       if (response.ok) {
-        setActionPassword('');
-        setEditingComment(null);
         await fetchComments();
+        setModalOpen(false);
         alert('댓글이 수정되었습니다!');
       } else {
         const error = await response.json();
@@ -137,31 +122,24 @@ export default function Comments({ postId }: CommentsProps) {
     } catch (error) {
       console.error('댓글 수정 오류:', error);
       alert('댓글 수정 중 오류가 발생했습니다.');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   // 댓글 삭제
-  const handleDelete = async (commentId: number) => {
-    if (!actionPassword.trim()) {
-      alert('비밀번호를 입력해주세요.');
-      return;
-    }
-
-    if (!confirm('정말 삭제하시겠습니까?')) return;
-
+  const handleDeleteComment = async (data: { commentId: number; password: string }) => {
+    setSubmitting(true);
     try {
       const response = await fetch(`/api/posts/${postId}/comments`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          commentId,
-          password: actionPassword,
-        }),
+        body: JSON.stringify(data),
       });
 
       if (response.ok) {
-        setActionPassword('');
         await fetchComments();
+        setModalOpen(false);
         alert('댓글이 삭제되었습니다!');
       } else {
         const error = await response.json();
@@ -170,26 +148,34 @@ export default function Comments({ postId }: CommentsProps) {
     } catch (error) {
       console.error('댓글 삭제 오류:', error);
       alert('댓글 삭제 중 오류가 발생했습니다.');
+    } finally {
+      setSubmitting(false);
     }
+  };
+
+  // 모달 열기
+  const openModal = (mode: 'create' | 'edit' | 'delete', data?: { commentId?: number; content?: string; parentId?: number }) => {
+    setModalMode(mode);
+    setModalData(data || {});
+    setModalOpen(true);
+  };
+
+  // 모달 닫기
+  const closeModal = () => {
+    setModalOpen(false);
+    setModalData({});
   };
 
   // 답글 달기
   const handleReply = (parentId: number) => {
-    setReplyingTo(parentId);
-    setFormData({ ...formData, parentId });
-  };
-
-  // 답글 취소
-  const cancelReply = () => {
-    setReplyingTo(null);
-    setFormData({ ...formData, parentId: null });
+    openModal('create', { parentId });
   };
 
   useEffect(() => {
     fetchComments();
   }, [postId]);
 
-  // 댓글 렌더링 (간소화된 스타일 - 박스 제거, 가로선으로 구분)
+  // 댓글 렌더링
   const renderComment = (comment: Comment, depth: number = 0) => (
     <div key={comment.id} className={`${depth > 0 ? 'ml-8 mt-4' : 'mt-4'} ${depth === 0 ? 'border-b border-gray-100 dark:border-gray-800 pb-4' : ''}`}>
       <div className="flex items-start space-x-3">
@@ -201,7 +187,7 @@ export default function Comments({ postId }: CommentsProps) {
         </div>
 
         <div className="flex-1 min-w-0">
-          {/* 헤더 - 더 컴팩트하게 */}
+          {/* 헤더 */}
           <div className="flex items-center space-x-3 mb-1">
             <span className="font-medium text-gray-900 dark:text-white text-sm">
               {comment.name}
@@ -215,7 +201,7 @@ export default function Comments({ postId }: CommentsProps) {
               })}
             </span>
             
-            {/* 액션 버튼들 - 더 작게 */}
+            {/* 액션 버튼들 */}
             <div className="flex items-center space-x-2 ml-auto">
               <button
                 onClick={() => handleReply(comment.id)}
@@ -224,72 +210,28 @@ export default function Comments({ postId }: CommentsProps) {
                 답글
               </button>
               <button
-                onClick={() => setEditingComment(editingComment === comment.id ? null : comment.id)}
+                onClick={() => openModal('edit', { commentId: comment.id, content: comment.content })}
                 className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
               >
-                •••
+                수정
+              </button>
+              <button
+                onClick={() => openModal('delete', { commentId: comment.id })}
+                className="text-xs text-red-500 hover:text-red-700 dark:hover:text-red-300"
+              >
+                삭제
               </button>
             </div>
           </div>
           
-          {/* 댓글 내용 - 더 간단하게 */}
+          {/* 댓글 내용 */}
           <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed whitespace-pre-wrap mb-2">
             {comment.content}
           </p>
-
-          {/* 수정/삭제 패널 - 더 컴팩트하게 */}
-          {editingComment === comment.id && (
-            <div className="mt-2 p-3 bg-gray-50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700">
-              <div className="flex items-center space-x-2 text-sm">
-                <input
-                  type="password"
-                  placeholder="비밀번호"
-                  value={actionPassword}
-                  onChange={(e) => setActionPassword(e.target.value)}
-                  className="flex-1 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded text-xs bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                />
-                <button
-                  onClick={() => handleEdit(comment.id)}
-                  className="px-2 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
-                >
-                  수정
-                </button>
-                <button
-                  onClick={() => handleDelete(comment.id)}
-                  className="px-2 py-1 bg-red-500 text-white rounded text-xs hover:bg-red-600"
-                >
-                  삭제
-                </button>
-                <button
-                  onClick={() => {
-                    setEditingComment(null);
-                    setActionPassword('');
-                  }}
-                  className="px-2 py-1 bg-gray-500 text-white rounded text-xs hover:bg-gray-600"
-                >
-                  취소
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* 답글 폼 */}
-          {replyingTo === comment.id && (
-            <div className="mt-3">
-              <CompactCommentForm
-                formData={formData}
-                setFormData={setFormData}
-                onSubmit={handleSubmit}
-                onCancel={cancelReply}
-                submitting={submitting}
-                isReply={true}
-              />
-            </div>
-          )}
         </div>
       </div>
 
-      {/* 대댓글 - 더 가벼운 구분선 */}
+      {/* 대댓글 */}
       {comment.replies && comment.replies.length > 0 && (
         <div className="ml-6 border-l border-gray-200 dark:border-gray-700 pl-3 mt-2">
           {comment.replies.map((reply) => renderComment(reply, depth + 1))}
@@ -312,7 +254,7 @@ export default function Comments({ postId }: CommentsProps) {
 
   return (
     <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
-      {/* 댓글 섹션 헤더 - 간소화된 스타일 */}
+      {/* 댓글 섹션 헤더 */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
           <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-md flex items-center justify-center">
@@ -325,41 +267,18 @@ export default function Comments({ postId }: CommentsProps) {
           </h3>
         </div>
         
-        {!isFormExpanded && (
-          <button
-            onClick={() => setIsFormExpanded(true)}
-            className="inline-flex items-center space-x-1 px-3 py-1 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600 transition-colors"
-          >
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
-            </svg>
-            <span>댓글 작성</span>
-          </button>
-        )}
+        <button
+          onClick={() => openModal('create')}
+          className="inline-flex items-center space-x-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-sm rounded-lg hover:from-blue-600 hover:to-indigo-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all duration-200 shadow-sm"
+        >
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
+          </svg>
+          <span>댓글 작성</span>
+        </button>
       </div>
 
-      {/* 댓글 작성 폼 (더 간소화) */}
-      {isFormExpanded && (
-        <div className="mb-6 p-3 bg-gray-50 dark:bg-gray-800/50 rounded border border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between mb-2">
-            <h4 className="text-sm font-medium text-gray-900 dark:text-white">댓글 작성</h4>
-            <button
-              onClick={() => setIsFormExpanded(false)}
-              className="text-xs text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
-            >
-              ✕
-            </button>
-          </div>
-          <CompactCommentForm
-            formData={formData}
-            setFormData={setFormData}
-            onSubmit={handleSubmit}
-            submitting={submitting}
-          />
-        </div>
-      )}
-
-      {/* 댓글 목록 - 기본적으로 3개 표시, 더보기 기능 */}
+      {/* 댓글 목록 */}
       <div className="space-y-0">
         {comments.length === 0 ? (
           <div className="text-center py-6">
@@ -369,10 +288,8 @@ export default function Comments({ postId }: CommentsProps) {
           </div>
         ) : (
           <>
-            {/* 처음 3개 댓글 또는 모든 댓글 표시 */}
             {(showAllComments ? comments : comments.slice(0, INITIAL_COMMENT_COUNT)).map((comment) => renderComment(comment))}
             
-            {/* 더보기/접기 버튼 */}
             {comments.length > INITIAL_COMMENT_COUNT && (
               <div className="text-center pt-4 border-t border-gray-100 dark:border-gray-800 mt-4">
                 <button
@@ -400,105 +317,18 @@ export default function Comments({ postId }: CommentsProps) {
           </>
         )}
       </div>
+
+      {/* 댓글 모달 */}
+      <CommentModal
+        isOpen={modalOpen}
+        onClose={closeModal}
+        onSubmit={handleCreateComment}
+        onEdit={handleEditComment}
+        onDelete={handleDeleteComment}
+        mode={modalMode}
+        initialData={modalData}
+        submitting={submitting}
+      />
     </div>
-  );
-}
-
-// 현대적인 댓글 폼 컴포넌트
-interface ModernCommentFormProps {
-  formData: CommentFormData;
-  setFormData: (data: CommentFormData) => void;
-  onSubmit: (e: React.FormEvent) => void;
-  onCancel?: () => void;
-  submitting: boolean;
-  isReply?: boolean;
-}
-
-// ModernCommentForm을 제거하고 CompactCommentForm만 사용
-
-// 답글용 컴팩트 폼
-interface CompactCommentFormProps {
-  formData: CommentFormData;
-  setFormData: (data: CommentFormData) => void;
-  onSubmit: (e: React.FormEvent) => void;
-  onCancel?: () => void;
-  submitting: boolean;
-  isReply?: boolean;
-}
-
-function CompactCommentForm({ 
-  formData, 
-  setFormData, 
-  onSubmit, 
-  onCancel, 
-  submitting, 
-  isReply = false 
-}: CompactCommentFormProps) {
-  return (
-    <form onSubmit={onSubmit} className={isReply ? "bg-gray-50 dark:bg-slate-700/50 rounded-lg p-3 border border-gray-200 dark:border-slate-600" : ""}>
-      <div className="space-y-3">
-        <div className="grid grid-cols-2 gap-2">
-          <input
-            type="text"
-            placeholder="이름"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
-            required
-          />
-          <input
-            type="password"
-            placeholder="비밀번호"
-            value={formData.password}
-            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
-            required
-          />
-        </div>
-        <textarea
-          placeholder={isReply ? "답글을 입력하세요..." : "댓글을 입력하세요..."}
-          value={formData.content}
-          onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-          rows={isReply ? 3 : 4}
-          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none text-sm"
-          required
-        />
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <button
-              type="submit"
-              disabled={submitting}
-              className="inline-flex items-center space-x-1 px-4 py-2 bg-blue-500 text-white text-sm rounded-md hover:bg-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {submitting ? (
-                <>
-                  <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  <span>작성 중...</span>
-                </>
-              ) : (
-                <span>{isReply ? '답글 작성' : '댓글 작성'}</span>
-              )}
-            </button>
-            {onCancel && (
-              <button
-                type="button"
-                onClick={onCancel}
-                className="px-3 py-2 bg-gray-500 text-white text-sm rounded-md hover:bg-gray-600 transition-colors"
-              >
-                취소
-              </button>
-            )}
-          </div>
-          {!isReply && (
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              정중한 댓글 부탁드려요 😊
-            </span>
-          )}
-        </div>
-      </div>
-    </form>
   );
 }

@@ -2,9 +2,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { users } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
-import bcrypt from 'bcrypt';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import bcrypt from 'bcryptjs';
 
 // GET /api/users/[id] - 특정 사용자 조회
 export async function GET(
@@ -12,8 +10,22 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== 'admin') {
+    // 관리자 인증 확인
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const sessionId = authHeader.replace('Bearer ', '');
+    
+    // 세션 유효성 검사
+    const sessionResponse = await fetch(`${request.nextUrl.origin}/api/admin/me`, {
+      headers: {
+        'Authorization': `Bearer ${sessionId}`
+      }
+    });
+
+    if (!sessionResponse.ok) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -49,8 +61,22 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== 'admin') {
+    // 관리자 인증 확인
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const sessionId = authHeader.replace('Bearer ', '');
+    
+    // 세션 유효성 검사
+    const sessionResponse = await fetch(`${request.nextUrl.origin}/api/admin/me`, {
+      headers: {
+        'Authorization': `Bearer ${sessionId}`
+      }
+    });
+
+    if (!sessionResponse.ok) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -129,8 +155,22 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session || session.user.role !== 'admin') {
+    // 관리자 인증 확인
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const sessionId = authHeader.replace('Bearer ', '');
+    
+    // 세션 유효성 검사
+    const sessionResponse = await fetch(`${request.nextUrl.origin}/api/admin/me`, {
+      headers: {
+        'Authorization': `Bearer ${sessionId}`
+      }
+    });
+
+    if (!sessionResponse.ok) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

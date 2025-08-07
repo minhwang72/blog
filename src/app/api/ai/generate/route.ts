@@ -1,19 +1,23 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-
-interface SessionUser {
-  name?: string | null;
-  email?: string | null;
-  image?: string | null;
-  role?: string;
-}
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    // 관리자 인증 확인
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return new NextResponse('Unauthorized', { status: 401 });
+    }
 
-    if (!session?.user || (session.user as SessionUser).role !== 'admin') {
+    const sessionId = authHeader.replace('Bearer ', '');
+    
+    // 세션 유효성 검사
+    const sessionResponse = await fetch(`${req.nextUrl.origin}/api/admin/me`, {
+      headers: {
+        'Authorization': `Bearer ${sessionId}`
+      }
+    });
+
+    if (!sessionResponse.ok) {
       return new NextResponse('Unauthorized', { status: 401 });
     }
 

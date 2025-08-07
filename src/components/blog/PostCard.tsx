@@ -37,7 +37,7 @@ export default function PostCard({ post }: PostCardProps) {
         )}
 
         {/* 제목 */}
-        <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2">
+                        <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-3 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 line-clamp-2">
           {post.title}
         </h3>
 

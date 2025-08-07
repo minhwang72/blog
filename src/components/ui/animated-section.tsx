@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { ReactNode, CSSProperties } from 'react';
 
 interface AnimatedSectionProps {
@@ -11,14 +10,11 @@ interface AnimatedSectionProps {
 
 export function AnimatedSection({ children, className = '', style }: AnimatedSectionProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-      className={className}
+    <div
+      className={`animate-fade-in-up ${className}`}
       style={style}
     >
       {children}
-    </motion.div>
+    </div>
   );
 } 

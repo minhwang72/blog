@@ -14,7 +14,7 @@ export async function GET(
     
     if (isNaN(postId)) {
       return NextResponse.json(
-        { error: 'Invalid post ID' },
+        { error: '잘못된 포스트 ID입니다.' },
         { status: 400 }
       );
     }
@@ -38,7 +38,7 @@ export async function GET(
   } catch (error) {
     console.error('댓글 조회 오류:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch comments' },
+      { error: '댓글을 불러오는데 실패했습니다.' },
       { status: 500 }
     );
   }
@@ -56,14 +56,14 @@ export async function POST(
 
     if (isNaN(postId)) {
       return NextResponse.json(
-        { error: 'Invalid post ID' },
+        { error: '잘못된 포스트 ID입니다.' },
         { status: 400 }
       );
     }
 
     if (!content || !name || !password) {
       return NextResponse.json(
-        { error: 'Content, name, and password are required' },
+        { error: '내용, 이름, 비밀번호를 모두 입력해주세요.' },
         { status: 400 }
       );
     }
@@ -83,12 +83,12 @@ export async function POST(
     return NextResponse.json({ 
       success: true, 
       id: newComment.insertId,
-      message: 'Comment created successfully'
+      message: '댓글이 성공적으로 작성되었습니다.'
     });
   } catch (error) {
     console.error('댓글 작성 오류:', error);
     return NextResponse.json(
-      { error: 'Failed to create comment' },
+      { error: '댓글 작성에 실패했습니다.' },
       { status: 500 }
     );
   }
@@ -106,14 +106,14 @@ export async function PUT(
 
     if (isNaN(postId) || !commentId) {
       return NextResponse.json(
-        { error: 'Invalid post ID or comment ID' },
+        { error: '잘못된 포스트 ID 또는 댓글 ID입니다.' },
         { status: 400 }
       );
     }
 
     if (!content || !password) {
       return NextResponse.json(
-        { error: 'Content and password are required' },
+        { error: '내용과 비밀번호를 입력해주세요.' },
         { status: 400 }
       );
     }
@@ -127,7 +127,7 @@ export async function PUT(
 
     if (comment.length === 0) {
       return NextResponse.json(
-        { error: 'Comment not found' },
+        { error: '댓글을 찾을 수 없습니다.' },
         { status: 404 }
       );
     }
@@ -136,7 +136,7 @@ export async function PUT(
     const isPasswordValid = await bcrypt.compare(password, comment[0].password);
     if (!isPasswordValid) {
       return NextResponse.json(
-        { error: 'Invalid password' },
+        { error: '비밀번호가 일치하지 않습니다.' },
         { status: 401 }
       );
     }
@@ -152,12 +152,12 @@ export async function PUT(
 
     return NextResponse.json({ 
       success: true, 
-      message: 'Comment updated successfully'
+      message: '댓글이 성공적으로 수정되었습니다.'
     });
   } catch (error) {
     console.error('댓글 수정 오류:', error);
     return NextResponse.json(
-      { error: 'Failed to update comment' },
+      { error: '댓글 수정에 실패했습니다.' },
       { status: 500 }
     );
   }
@@ -175,14 +175,14 @@ export async function DELETE(
 
     if (isNaN(postId) || !commentId) {
       return NextResponse.json(
-        { error: 'Invalid post ID or comment ID' },
+        { error: '잘못된 포스트 ID 또는 댓글 ID입니다.' },
         { status: 400 }
       );
     }
 
     if (!password) {
       return NextResponse.json(
-        { error: 'Password is required' },
+        { error: '비밀번호를 입력해주세요.' },
         { status: 400 }
       );
     }
@@ -196,7 +196,7 @@ export async function DELETE(
 
     if (comment.length === 0) {
       return NextResponse.json(
-        { error: 'Comment not found' },
+        { error: '댓글을 찾을 수 없습니다.' },
         { status: 404 }
       );
     }
@@ -205,7 +205,7 @@ export async function DELETE(
     const isPasswordValid = await bcrypt.compare(password, comment[0].password);
     if (!isPasswordValid) {
       return NextResponse.json(
-        { error: 'Invalid password' },
+        { error: '비밀번호가 일치하지 않습니다.' },
         { status: 401 }
       );
     }
@@ -217,12 +217,12 @@ export async function DELETE(
 
     return NextResponse.json({ 
       success: true, 
-      message: 'Comment deleted successfully'
+      message: '댓글이 성공적으로 삭제되었습니다.'
     });
   } catch (error) {
     console.error('댓글 삭제 오류:', error);
     return NextResponse.json(
-      { error: 'Failed to delete comment' },
+      { error: '댓글 삭제에 실패했습니다.' },
       { status: 500 }
     );
   }
