@@ -98,30 +98,16 @@ export default async function CategoryPage({ params }: PageProps) {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-1">
         <div className="space-y-12">
           {/* 헤더 섹션 */}
-          <div className="space-y-6">
-            <div className="flex items-center gap-3">
-              <Link
-                href="/categories"
-                className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-                카테고리
-              </Link>
+          <div className="text-center space-y-6">
+            <div className="relative">
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sky-400 via-slate-500 to-gray-600 bg-clip-text text-transparent">
+                {category.name}
+              </h1>
+              <div className="absolute -inset-x-6 -inset-y-3 bg-gradient-to-r from-sky-100/50 via-slate-100/50 to-gray-100/50 dark:from-sky-900/20 dark:via-slate-900/20 dark:to-gray-900/20 rounded-3xl blur-3xl -z-10 opacity-30"></div>
             </div>
-            
-            <div className="text-center space-y-6">
-              <div className="relative">
-                <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sky-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
-                  {category.name}
-                </h1>
-                <div className="absolute -inset-x-6 -inset-y-3 bg-gradient-to-r from-sky-100/50 via-indigo-100/50 to-purple-100/50 dark:from-sky-900/20 dark:via-indigo-900/20 dark:to-purple-900/20 rounded-3xl blur-3xl -z-10 opacity-30"></div>
-              </div>
-              <p className="text-xl text-slate-600 dark:text-slate-400">
-                {categoryPosts.length}개의 포스트
-              </p>
-            </div>
+            <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+              {category.name} 카테고리의 포스트들을 확인하세요.
+            </p>
           </div>
 
           {/* 포스트 목록 */}

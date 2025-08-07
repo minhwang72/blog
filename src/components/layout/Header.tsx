@@ -19,7 +19,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md">
       <div className="w-full flex h-16 items-center px-6">
         {/* 로고 */}
-        <Link href="/" className="logo text-2xl font-bold tracking-tight hover:opacity-80 transition-opacity bg-gradient-to-r from-violet-600 via-fuchsia-600 to-pink-600 bg-clip-text text-transparent">
+        <Link href="/" className="logo text-2xl font-bold tracking-tight hover:opacity-80 transition-opacity bg-gradient-to-r from-sky-400 via-slate-500 to-gray-600 bg-clip-text text-transparent">
           min.log
         </Link>
 
@@ -32,7 +32,7 @@ export default function Header() {
               className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all duration-200 relative group py-2"
             >
               {item.name}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-violet-500 to-pink-500 transition-all duration-300 group-hover:w-full"></span>
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-sky-400 to-gray-500 transition-all duration-300 group-hover:w-full"></span>
             </Link>
           ))}
           <ThemeToggle />

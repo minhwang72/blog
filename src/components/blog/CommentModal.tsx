@@ -134,7 +134,7 @@ export default function CommentModal({
         {/* 헤더 */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
-            <div className="p-2 bg-gradient-to-r from-violet-500 to-pink-500 rounded-lg">
+            <div className="p-2 bg-gradient-to-r from-sky-500 to-gray-600 rounded-lg">
               {getIcon()}
             </div>
             <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
@@ -158,7 +158,7 @@ export default function CommentModal({
                 placeholder="이름"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm"
+                className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm"
                 required
               />
               <input
@@ -166,7 +166,7 @@ export default function CommentModal({
                 placeholder="비밀번호"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm"
+                className="px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm"
                 required
               />
             </div>
@@ -178,7 +178,7 @@ export default function CommentModal({
               value={formData.content}
               onChange={(e) => setFormData({ ...formData, content: e.target.value })}
               rows={4}
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 resize-none text-sm"
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 resize-none text-sm"
               required
             />
           )}
@@ -197,7 +197,7 @@ export default function CommentModal({
               placeholder="비밀번호"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm"
+              className="w-full px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 text-sm"
               required
             />
           )}
@@ -217,7 +217,7 @@ export default function CommentModal({
               className={`inline-flex items-center space-x-2 px-4 py-2 text-white text-sm rounded-lg transition-all duration-200 focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed ${
                 mode === 'delete' 
                   ? 'bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 focus:ring-red-500' 
-                  : 'bg-gradient-to-r from-violet-500 to-pink-500 hover:from-violet-600 hover:to-pink-600 focus:ring-violet-500'
+                  : 'bg-gradient-to-r from-sky-500 to-gray-600 hover:from-sky-600 hover:to-gray-700 focus:ring-sky-500'
               }`}
             >
               {submitting ? (

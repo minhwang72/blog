@@ -20,7 +20,7 @@ export default function Footer() {
             {/* 로고 및 소개 */}
             <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
               <div className="flex items-center space-x-2">
-                <span className="text-lg font-bold bg-gradient-to-r from-violet-600 via-fuchsia-600 to-pink-600 bg-clip-text text-transparent">
+                <span className="text-lg font-bold bg-gradient-to-r from-sky-400 via-slate-500 to-gray-600 bg-clip-text text-transparent">
                   min.log
                 </span>
               </div>

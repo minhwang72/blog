@@ -88,13 +88,13 @@ export default async function CategoriesPage() {
           {/* 헤더 섹션 */}
           <div className="text-center space-y-6">
             <div className="relative">
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sky-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sky-400 via-slate-500 to-gray-600 bg-clip-text text-transparent">
                 카테고리
               </h1>
-              <div className="absolute -inset-x-6 -inset-y-3 bg-gradient-to-r from-sky-100/50 via-indigo-100/50 to-purple-100/50 dark:from-sky-900/20 dark:via-indigo-900/20 dark:to-purple-900/20 rounded-3xl blur-3xl -z-10 opacity-30"></div>
+              <div className="absolute -inset-x-6 -inset-y-3 bg-gradient-to-r from-sky-100/50 via-slate-100/50 to-gray-100/50 dark:from-sky-900/20 dark:via-slate-900/20 dark:to-gray-900/20 rounded-3xl blur-3xl -z-10 opacity-30"></div>
             </div>
             <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-              주제별로 분류된 포스트들을 확인하세요.
+              주제별로 정리된 포스트들을 확인하세요.
             </p>
           </div>
 

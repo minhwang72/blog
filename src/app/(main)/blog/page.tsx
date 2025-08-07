@@ -83,10 +83,10 @@ export default function BlogPage() {
           {/* 헤더 섹션 */}
           <div className="text-center space-y-6">
             <div className="relative">
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-violet-600 via-fuchsia-600 to-pink-600 bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-sky-400 via-slate-500 to-gray-600 bg-clip-text text-transparent">
                 블로그
               </h1>
-              <div className="absolute -inset-x-6 -inset-y-3 bg-gradient-to-r from-violet-100/50 via-fuchsia-100/50 to-pink-100/50 dark:from-violet-900/20 dark:via-fuchsia-900/20 dark:to-pink-900/20 rounded-3xl blur-3xl -z-10 opacity-30"></div>
+              <div className="absolute -inset-x-6 -inset-y-3 bg-gradient-to-r from-sky-100/50 via-slate-100/50 to-gray-100/50 dark:from-sky-900/20 dark:via-slate-900/20 dark:to-gray-900/20 rounded-3xl blur-3xl -z-10 opacity-30"></div>
             </div>
             <p className="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
               개발과 일상에 대한 모든 포스트를 확인하세요.
@@ -106,7 +106,7 @@ export default function BlogPage() {
                 </p>
                 <Link 
                   href="/admin/posts/new" 
-                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-violet-500 to-pink-500 hover:from-violet-600 hover:to-pink-600 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-sky-500 to-gray-600 hover:from-sky-600 hover:to-gray-700 text-white font-medium rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   포스트 작성하기
                 </Link>
@@ -116,12 +116,12 @@ export default function BlogPage() {
                 {paginatedPosts.map((post) => (
                   <div key={post.id} className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 p-6 h-full flex flex-col relative overflow-hidden group">
                     {/* 배경 그라데이션 효과 */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-violet-50/50 via-fuchsia-50/30 to-pink-50/50 dark:from-violet-900/10 dark:via-fuchsia-900/5 dark:to-pink-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute inset-0 bg-gradient-to-br from-sky-50/50 via-slate-50/30 to-gray-50/50 dark:from-sky-900/10 dark:via-slate-900/5 dark:to-gray-900/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     
                     {/* 카테고리 태그 */}
                     {post.categoryName && (
                       <div className="mb-4 relative z-10">
-                        <span className="inline-block px-3 py-1 text-xs font-medium bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300 rounded-full border border-violet-200 dark:border-violet-800">
+                        <span className="inline-block px-3 py-1 text-xs font-medium bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300 rounded-full border border-sky-200 dark:border-sky-800">
                           {post.categoryName}
                         </span>
                       </div>
@@ -129,7 +129,7 @@ export default function BlogPage() {
 
                     {/* 제목 */}
                     <Link href={`/blog/${post.id}`} className="relative z-10">
-                      <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors duration-200 line-clamp-2">
+                      <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-4 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors duration-200 line-clamp-2">
                         {post.title}
                       </h3>
                     </Link>
@@ -145,7 +145,7 @@ export default function BlogPage() {
                     <div className="mt-auto space-y-3 relative z-10">
                       <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
                         <div className="flex items-center gap-2">
-                          <svg className="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-4 h-4 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                           </svg>
                           <span>{new Date(post.createdAt).toLocaleDateString('ko-KR', {
@@ -158,7 +158,7 @@ export default function BlogPage() {
                     </div>
 
                     {/* 우상단 장식 요소 */}
-                    <div className="absolute top-4 right-4 w-2 h-2 bg-gradient-to-r from-violet-400 to-pink-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute top-4 right-4 w-2 h-2 bg-gradient-to-r from-sky-400 to-gray-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
                 ))}
               </div>
@@ -174,7 +174,7 @@ export default function BlogPage() {
                   <select
                     value={postsPerPage}
                     onChange={(e) => handlePostsPerPageChange(Number(e.target.value))}
-                    className="text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                    className="text-sm border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-sky-500"
                   >
                     <option value={5}>5개</option>
                     <option value={10}>10개</option>
