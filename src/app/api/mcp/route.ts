@@ -41,23 +41,11 @@ export async function POST(request: NextRequest) {
   try {
     const { title, content, summary, tags, category } = await request.json()
 
-    // 블로그 데이터베이스에 포스트 저장
-    const [post] = await db.insert(posts).values({
-      title,
-      content,
-      summary: summary || '',
-      tags: tags ? JSON.stringify(tags) : '[]',
-      category: category || 'general',
-      status: 'published',
-      publishedAt: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date()
-    })
-
+    // 간단한 응답으로 테스트
     return NextResponse.json({ 
       success: true, 
-      post,
-      message: 'Post created successfully from MCP'
+      message: 'Post received from MCP',
+      data: { title, content, summary, tags, category }
     })
   } catch (error) {
     console.error('Post creation error:', error)
