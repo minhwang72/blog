@@ -4,24 +4,24 @@ import { posts, users, categories } from '@/lib/db/schema'
 import { eq } from 'drizzle-orm'
 
 const MCP_SERVER_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://mcp.eungming.com/mcp'
-  : 'http://localhost:3003/mcp'
-const MCP_TOKEN = process.env.MCP_TOKEN || 'test-token'
+  ? 'https://mcp.eungming.com'
+  : 'http://localhost:3000'
+const MCP_TOKEN = process.env.MCP_TOKEN || '0a295dd2818cb5eb5cfcae08b94b39b9620221b35bd2379294f9cf12fcae9e92'
 
 export async function GET() {
   try {
     console.log(`MCP 서버에 연결 시도: ${MCP_SERVER_URL}`)
-    // MCP 서버에서 포스트 목록 가져오기
+    
+    // MCP 표준 프로토콜로 tools/list 요청
     const response = await fetch(MCP_SERVER_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${MCP_TOKEN}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        id: 'sync-posts',
-        tool: 'post.list',
-        params: { status: 'published' }
+        jsonrpc: '2.0',
+        id: 'list-tools',
+        method: 'tools/list'
       })
     })
 
