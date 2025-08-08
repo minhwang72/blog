@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
       publishedAt: new Date(),
       createdAt: new Date(),
       updatedAt: new Date()
-    }).returning()
+    })
 
     return NextResponse.json({ 
       success: true, 
