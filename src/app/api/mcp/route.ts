@@ -94,30 +94,11 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // MCP 서버 연결 시도 (action이 있을 때만)
-    console.log(`MCP 서버에 연결 시도: ${MCP_SERVER_URL}`)
-    
-    const response = await fetch(MCP_SERVER_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id: 'list-tools',
-        method: 'tools/list'
-      })
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error(`MCP 서버 오류: ${response.status} - ${errorText}`)
-      throw new Error(`MCP server error: ${response.status} - ${errorText}`)
-    }
-
-    const data = await response.json()
-    console.log('MCP 서버 응답:', data)
-    return NextResponse.json(data)
+    // action이 있지만 처리되지 않은 경우
+    return NextResponse.json({
+      error: 'Invalid action',
+      available_actions: ['posts', 'post']
+    }, { status: 400 })
   } catch (error) {
     console.error('MCP API error:', error)
     return NextResponse.json(
