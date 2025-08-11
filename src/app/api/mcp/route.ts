@@ -13,14 +13,19 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const path = request.nextUrl.pathname
+    const action = searchParams.get('action')
 
-    // /api/mcp/posts - 포스트 목록 조회
-    if (path === '/api/mcp/posts') {
+    console.log('MCP API GET 요청:', { path, action, searchParams: Object.fromEntries(searchParams) })
+
+    // /api/mcp?action=posts - 포스트 목록 조회
+    if (action === 'posts' || path.endsWith('/posts')) {
       const q = searchParams.get('q')
       const tag = searchParams.get('tag')
       const status = searchParams.get('status')
       const limit = parseInt(searchParams.get('limit') || '50')
       const offset = parseInt(searchParams.get('offset') || '0')
+
+      console.log('포스트 목록 조회:', { q, tag, status, limit, offset })
 
       let postsList
       
@@ -49,6 +54,8 @@ export async function GET(request: NextRequest) {
           .orderBy(desc(posts.createdAt))
       }
 
+      console.log(`포스트 목록 조회 완료: ${postsList.length}개`)
+
       return NextResponse.json({
         posts: postsList,
         total: postsList.length,
@@ -56,12 +63,14 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // /api/mcp/post/{slug} - 특정 포스트 조회
-    if (path.startsWith('/api/mcp/post/')) {
-      const slug = path.split('/').pop()
+    // /api/mcp?action=post&slug={slug} - 특정 포스트 조회
+    if (action === 'post') {
+      const slug = searchParams.get('slug')
       if (!slug) {
         return NextResponse.json({ error: 'Slug is required' }, { status: 400 })
       }
+
+      console.log('특정 포스트 조회:', slug)
 
       const [post] = await db.select().from(posts).where(eq(posts.slug, slug))
       if (!post) {
