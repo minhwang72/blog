@@ -81,6 +81,20 @@ export async function GET(request: NextRequest) {
     }
 
     // 기본 GET 요청 - MCP 프로토콜 응답
+    console.log(`MCP API 기본 요청 - action: ${action}`)
+    
+    if (!action) {
+      return NextResponse.json({
+        message: 'MCP API is running',
+        available_actions: ['posts', 'post'],
+        usage: {
+          posts: '/api/mcp?action=posts',
+          post: '/api/mcp?action=post&slug={slug}'
+        }
+      })
+    }
+
+    // MCP 서버 연결 시도 (action이 있을 때만)
     console.log(`MCP 서버에 연결 시도: ${MCP_SERVER_URL}`)
     
     const response = await fetch(MCP_SERVER_URL, {
