@@ -1,20 +1,224 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { posts, users, categories } from '@/lib/db/schema'
-import { eq } from 'drizzle-orm'
+import { eq, like, desc, and } from 'drizzle-orm'
 
 const MCP_SERVER_URL = process.env.NODE_ENV === 'production' 
   ? 'https://mcp.eungming.com/mcp'
   : 'http://localhost:8787/mcp'
 const MCP_TOKEN = process.env.MCP_TOKEN || '0a295dd2818cb5eb5cfcae08b94b39b9620221b35bd2379294f9cf12fcae9e92'
 
-// Streamable HTTP MCP 엔드포인트 - 단일 엔드포인트로 모든 요청 처리
+// GET 요청 처리 - 포스트 목록 조회
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const path = request.nextUrl.pathname
+
+    // /api/mcp/posts - 포스트 목록 조회
+    if (path === '/api/mcp/posts') {
+      const q = searchParams.get('q')
+      const tag = searchParams.get('tag')
+      const status = searchParams.get('status')
+      const limit = parseInt(searchParams.get('limit') || '50')
+      const offset = parseInt(searchParams.get('offset') || '0')
+
+      let postsList
+      
+      if (q && status === 'published') {
+        postsList = await db.select().from(posts)
+          .where(and(like(posts.title, `%${q}%`), eq(posts.published, true)))
+          .limit(limit)
+          .offset(offset)
+          .orderBy(desc(posts.createdAt))
+      } else if (q) {
+        postsList = await db.select().from(posts)
+          .where(like(posts.title, `%${q}%`))
+          .limit(limit)
+          .offset(offset)
+          .orderBy(desc(posts.createdAt))
+      } else if (status === 'published') {
+        postsList = await db.select().from(posts)
+          .where(eq(posts.published, true))
+          .limit(limit)
+          .offset(offset)
+          .orderBy(desc(posts.createdAt))
+      } else {
+        postsList = await db.select().from(posts)
+          .limit(limit)
+          .offset(offset)
+          .orderBy(desc(posts.createdAt))
+      }
+
+      return NextResponse.json({
+        posts: postsList,
+        total: postsList.length,
+        success: true
+      })
+    }
+
+    // /api/mcp/post/{slug} - 특정 포스트 조회
+    if (path.startsWith('/api/mcp/post/')) {
+      const slug = path.split('/').pop()
+      if (!slug) {
+        return NextResponse.json({ error: 'Slug is required' }, { status: 400 })
+      }
+
+      const [post] = await db.select().from(posts).where(eq(posts.slug, slug))
+      if (!post) {
+        return NextResponse.json({ error: 'Post not found' }, { status: 404 })
+      }
+
+      return NextResponse.json(post)
+    }
+
+    // 기본 GET 요청 - MCP 프로토콜 응답
+    console.log(`MCP 서버에 연결 시도: ${MCP_SERVER_URL}`)
+    
+    const response = await fetch(MCP_SERVER_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 'list-tools',
+        method: 'tools/list'
+      })
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error(`MCP 서버 오류: ${response.status} - ${errorText}`)
+      throw new Error(`MCP server error: ${response.status} - ${errorText}`)
+    }
+
+    const data = await response.json()
+    console.log('MCP 서버 응답:', data)
+    return NextResponse.json(data)
+  } catch (error) {
+    console.error('MCP API error:', error)
+    return NextResponse.json(
+      { error: 'Failed to process request', details: (error as Error).message },
+      { status: 500 }
+    )
+  }
+}
+
+// POST 요청 처리
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    console.log('MCP Streamable HTTP 요청:', body)
+    const path = request.nextUrl.pathname
+    console.log('MCP API 요청:', { path, body })
 
-    // MCP 프로토콜 메시지 처리
+    // /api/mcp/draft - 초안 저장
+    if (path === '/api/mcp/draft') {
+      const { slug, title, content, summary, tags, category } = body
+      
+      // 기본 사용자 확인/생성
+      let defaultUser = await db.select().from(users).where(eq(users.id, 1)).limit(1)
+      if (defaultUser.length === 0) {
+        await db.insert(users).values({
+          name: 'Admin',
+          email: 'admin@eungming.com',
+          password: 'dummy',
+          role: 'admin'
+        })
+      }
+
+      // 기본 카테고리 확인/생성
+      let defaultCategory = await db.select().from(categories).where(eq(categories.id, 1)).limit(1)
+      if (defaultCategory.length === 0) {
+        await db.insert(categories).values({
+          name: '기본',
+          slug: 'default',
+          description: '기본 카테고리'
+        })
+      }
+
+      // 기존 포스트 확인
+      const existingPost = await db.select().from(posts).where(eq(posts.slug, slug)).limit(1)
+      
+      if (existingPost.length > 0) {
+        // 기존 포스트 업데이트
+        await db.update(posts)
+          .set({
+            title,
+            content,
+            excerpt: summary || '',
+            updatedAt: new Date()
+          })
+          .where(eq(posts.slug, slug))
+        
+        return NextResponse.json({
+          success: true,
+          message: 'Draft updated successfully',
+          slug
+        })
+      } else {
+        // 새 포스트 생성 (초안 상태)
+        const [post] = await db.insert(posts).values({
+          title,
+          slug,
+          content,
+          excerpt: summary || '',
+          published: false, // 초안 상태
+          authorId: 1,
+          categoryId: 1,
+          viewCount: 0,
+          createdAt: new Date(),
+          updatedAt: new Date()
+        })
+
+        return NextResponse.json({
+          success: true,
+          message: 'Draft saved successfully',
+          post
+        })
+      }
+    }
+
+    // /api/mcp/publish - 포스트 발행
+    if (path === '/api/mcp/publish') {
+      const { slug, publishedAt } = body
+      
+      await db.update(posts)
+        .set({
+          published: true,
+          updatedAt: new Date()
+        })
+        .where(eq(posts.slug, slug))
+
+      const [post] = await db.select().from(posts).where(eq(posts.slug, slug))
+
+      if (!post) {
+        return NextResponse.json({ error: 'Post not found' }, { status: 404 })
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: 'Post published successfully',
+        post
+      })
+    }
+
+    // /api/mcp/publish-to-blog - 블로그에 발행 (이미 발행된 상태이므로 성공 응답)
+    if (path === '/api/mcp/publish-to-blog') {
+      const { slug } = body
+      
+      const [post] = await db.select().from(posts).where(eq(posts.slug, slug))
+      if (!post) {
+        return NextResponse.json({ error: 'Post not found' }, { status: 404 })
+      }
+
+      return NextResponse.json({
+        success: true,
+        message: 'Post already published to blog',
+        post
+      })
+    }
+
+    // MCP 프로토콜 메시지 처리 (기존 로직)
     if (body.method) {
       switch (body.method) {
         case 'initialize':
@@ -276,41 +480,5 @@ async function handleToolCall(name: string, args: any) {
 
     default:
       throw new Error(`Unknown tool: ${name}`)
-  }
-}
-
-// GET 요청 처리 (하위 호환성)
-export async function GET() {
-  try {
-    console.log(`MCP 서버에 연결 시도: ${MCP_SERVER_URL}`)
-    
-    // MCP 표준 프로토콜로 tools/list 요청
-    const response = await fetch(MCP_SERVER_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        jsonrpc: '2.0',
-        id: 'list-tools',
-        method: 'tools/list'
-      })
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error(`MCP 서버 오류: ${response.status} - ${errorText}`)
-      throw new Error(`MCP server error: ${response.status} - ${errorText}`)
-    }
-
-    const data = await response.json()
-    console.log('MCP 서버 응답:', data)
-    return NextResponse.json(data)
-  } catch (error) {
-    console.error('MCP sync error:', error)
-    return NextResponse.json(
-      { error: 'Failed to sync with MCP server', details: (error as Error).message },
-      { status: 500 }
-    )
   }
 }
