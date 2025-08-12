@@ -3,13 +3,13 @@
 import GoogleAdsense from './GoogleAdsense';
 
 interface ArticleAdProps {
-  position?: 'top' | 'middle' | 'bottom';
+  position?: 'top' | 'middle' | 'bottom' | 'auto';
   postId?: number;
   contentLength?: number;
 }
 
 export default function ArticleAd({ 
-  position = 'middle', 
+  position = 'auto', 
   postId,
   contentLength = 0 
 }: ArticleAdProps) {
@@ -45,8 +45,27 @@ export default function ArticleAd({
     return true;
   };
 
+  // 글 길이에 따른 자동 광고 배치 로직
+  const getAutoPosition = () => {
+    if (position !== 'auto') return position;
+    
+    // 글 길이에 따른 광고 배치 전략
+    if (contentLength < 2000) {
+      // 짧은 글: 하단에만 광고
+      return 'bottom';
+    } else if (contentLength < 5000) {
+      // 중간 길이: 하단과 중간에 광고
+      return 'middle';
+    } else {
+      // 긴 글: 상단, 중간, 하단에 광고
+      return 'top';
+    }
+  };
+
   const getAdSlot = () => {
-    switch (position) {
+    const actualPosition = getAutoPosition();
+    
+    switch (actualPosition) {
       case 'top':
         return process.env.NEXT_PUBLIC_ADSENSE_TOP_SLOT || 'YOUR_TOP_AD_SLOT';
       case 'middle':
@@ -63,11 +82,16 @@ export default function ArticleAd({
     return null;
   }
 
+  const actualPosition = getAutoPosition();
+  const adSlot = getAdSlot();
+
   return (
     <div className="my-8 text-center">
-      <div className="text-xs text-gray-400 mb-2">광고</div>
+      <div className="text-xs text-gray-400 mb-2">
+        광고 {actualPosition === 'top' ? '(상단)' : actualPosition === 'middle' ? '(중간)' : '(하단)'}
+      </div>
       <GoogleAdsense 
-        adSlot={getAdSlot()}
+        adSlot={adSlot}
         style={{ 
           display: 'block',
           minHeight: '280px',

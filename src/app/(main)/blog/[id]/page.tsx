@@ -20,463 +20,12 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
-    if (process.env.SKIP_DATABASE_CONNECTION === 'true') {
-      return {
-        title: '찾을 수 없음 - min.log',
-        description: '요청하신 페이지를 찾을 수 없습니다.',
-      };
-    }
-
-    const post = await db
-      .select({
-        id: posts.id,
-        title: posts.title,
-        slug: posts.slug,
-        excerpt: posts.excerpt,
-        content: posts.content,
-        createdAt: posts.createdAt,
-        updatedAt: posts.updatedAt,
-        authorId: posts.authorId,
-        authorName: users.name,
-        categoryId: posts.categoryId,
-        categoryName: categories.name,
-        categorySlug: categories.slug,
-      })
-      .from(posts)
-      .leftJoin(users, eq(posts.authorId, users.id))
-      .leftJoin(categories, eq(posts.categoryId, categories.id))
-      .where(eq(posts.id, parseInt(params.id)));
-
-    if (!post[0]) {
-      return {
-        title: '찾을 수 없음 - min.log',
-        description: '요청하신 페이지를 찾을 수 없습니다.',
-      };
-    }
-
-    const postData = post[0];
-    const description = postData.excerpt || 
-      postData.content.replace(/<[^>]*>/g, '').substring(0, 200) + '...';
-
-    // 키워드 생성
-    const keywords = [
-      postData.title,
-      postData.categoryName,
-      '황민',
-      '블로그',
-      '개발',
-      '프로그래밍',
-      '일상',
-      '학습',
-      'Next.js',
-      'React',
-      'TypeScript',
-      'JavaScript',
-      'Node.js',
-      '풀스택',
-      '웹개발',
-      '프론트엔드',
-      '백엔드',
-      'AI',
-      '자동화',
-      'RPA',
-      'UiPath',
-      'Python',
-      '데이터베이스',
-      'MySQL',
-      'Docker',
-      'DevOps',
-      '클라우드',
-      'AWS',
-      'Azure',
-      'Git',
-      'CI/CD',
-      '테스트',
-      '품질관리',
-      '코딩',
-      '알고리즘',
-      '자료구조',
-      '디자인패턴',
-      '아키텍처',
-      '마이크로서비스',
-      'API',
-      'REST',
-      'GraphQL',
-      '상태관리',
-      'Redux',
-      'Zustand',
-      '스타일링',
-      'TailwindCSS',
-      'StyledComponents',
-      '성능최적화',
-      'SEO',
-      '접근성',
-      '반응형',
-      '모바일',
-      '크로스브라우징',
-      '타입스크립트',
-      '타입안전성',
-      '테스트주도개발',
-      'TDD',
-      'BDD',
-      '단위테스트',
-      '통합테스트',
-      'E2E테스트',
-      'Jest',
-      'Vitest',
-      'Cypress',
-      'Playwright',
-      '코드리뷰',
-      '페어프로그래밍',
-      '애자일',
-      '스크럼',
-      '칸반',
-      '지속적통합',
-      '지속적배포',
-      '모니터링',
-      '로깅',
-      '에러처리',
-      '보안',
-      '인증',
-      '권한관리',
-      'OAuth',
-      'JWT',
-      '세션관리',
-      '암호화',
-      'HTTPS',
-      'SSL',
-      '인증서',
-      '방화벽',
-      '백업',
-      '복구',
-      '로드밸런싱',
-      '캐싱',
-      'CDN',
-      'Redis',
-      '메모리관리',
-      '가비지컬렉션',
-      '메모리릭',
-      '성능프로파일링',
-      '번들분석',
-      '코드분할',
-      '지연로딩',
-      '이미지최적화',
-      '폰트최적화',
-      '서비스워커',
-      'PWA',
-      '오프라인지원',
-      '푸시알림',
-      '웹소켓',
-      '실시간통신',
-      'SSE',
-      '폴링',
-      '웹훅',
-      '마이크로프론트엔드',
-      '모듈페더레이션',
-      '모노레포',
-      '워크스페이스',
-      '패키지관리',
-      'npm',
-      'yarn',
-      'pnpm',
-      '버전관리',
-      '시맨틱버저닝',
-      '브랜치전략',
-      'Git Flow',
-      'GitHub Flow',
-      '코드품질',
-      'ESLint',
-      'Prettier',
-      'Husky',
-      'lint-staged',
-      '커밋메시지',
-      '컨벤션',
-      '문서화',
-      'JSDoc',
-      'Storybook',
-      'API문서',
-      'Swagger',
-      'OpenAPI',
-      'Postman',
-      'Insomnia',
-      '데이터베이스설계',
-      '정규화',
-      '인덱싱',
-      '쿼리최적화',
-      '트랜잭션',
-      'ACID',
-      '일관성',
-      '격리성',
-      '지속성',
-      '데드락',
-      '락킹',
-      '동시성제어',
-      '레플리케이션',
-      '샤딩',
-      '파티셔닝',
-      '백업전략',
-      '복구전략',
-      '데이터마이그레이션',
-      '스키마변경',
-      '버전관리',
-      'ORM',
-      '쿼리빌더',
-      '마이그레이션',
-      '시드데이터',
-      '팩토리',
-      '테스트데이터',
-      '모킹',
-      '스터빙',
-      '인터셉터',
-      '가짜객체',
-      '더미데이터',
-      '랜덤데이터',
-      '테스트커버리지',
-      '코드커버리지',
-      '브랜치커버리지',
-      '함수커버리지',
-      '라인커버리지',
-      '조건커버리지',
-      '경로커버리지',
-      '순환복잡도',
-      '코드스멜',
-      '리팩토링',
-      '클린코드',
-      'SOLID원칙',
-      'DRY원칙',
-      'KISS원칙',
-      'YAGNI원칙',
-      '의존성주입',
-      '제어역전',
-      '의존성역전',
-      '인터페이스분리',
-      '단일책임',
-      '개방폐쇄',
-      '리스코프치환',
-      '의존성관리',
-      '의존성그래프',
-      '순환의존성',
-      '순환참조',
-      '메모리누수',
-      '가비지컬렉션',
-      '메모리프로파일링',
-      '힙덤프',
-      '스택트레이스',
-      '에러로그',
-      '디버깅',
-      '브레이크포인트',
-      '스텝오버',
-      '스텝인',
-      '스텝아웃',
-      '조건부브레이크포인트',
-      '로그포인트',
-      '워치',
-      '콜스택',
-      '스택프레임',
-      '레지스터',
-      '어셈블리',
-      '바이트코드',
-      '컴파일',
-      '인터프리트',
-      'JIT컴파일',
-      'AOT컴파일',
-      '트랜스파일',
-      '바벨',
-      '웹팩',
-      '롤업',
-      '파셀',
-      '스노우팩',
-      '터보팩',
-      '번들러',
-      '모듈번들러',
-      '청크',
-      '스플리팅',
-      '코드분할',
-      '트리쉐이킹',
-      '데드코드제거',
-      '미니피케이션',
-      '압축',
-      '난독화',
-      '소스맵',
-      '디버깅정보',
-      '개발도구',
-      '브라우저개발자도구',
-      '크롬개발자도구',
-      '파이어폭스개발자도구',
-      '사파리개발자도구',
-      '엣지개발자도구',
-      '네트워크탭',
-      '콘솔탭',
-      '소스탭',
-      '애플리케이션탭',
-      '성능탭',
-      '메모리탭',
-      '보안탭',
-      '접근성탭',
-      '오디트탭',
-      '렌더링탭',
-      '레이어탭',
-      '3D뷰',
-      '타임라인',
-      '프로파일러',
-      '힙스냅샷',
-      '메모리힙',
-      '가비지컬렉션',
-      '메모리누수',
-      '성능분석',
-      '병목지점',
-      '최적화',
-      '캐싱',
-      '메모이제이션',
-      '메모이제이션패턴',
-      '메모이제이션함수',
-      '메모이제이션훅',
-      '메모이제이션컴포넌트',
-      '메모이제이션값',
-      '메모이제이션결과',
-      '메모이제이션키',
-      '메모이제이션의존성',
-      '메모이제이션조건',
-      '메모이제이션무효화',
-      '메모이제이션정책',
-      '메모이제이션전략',
-      '메모이제이션알고리즘',
-      '메모이제이션구현',
-      '메모이제이션예제',
-      '메모이제이션사용법',
-      '메모이제이션팁',
-      '메모이제이션트릭',
-      '메모이제이션베스트프랙티스',
-      '메모이제이션안티패턴',
-      '메모이제이션주의사항',
-      '메모이제이션한계',
-      '메모이제이션장점',
-      '메모이제이션단점',
-      '메모이제이션비교',
-      '메모이제이션대안',
-      '메모이제이션선택',
-      '메모이제이션결정',
-      '메모이제이션분석',
-      '메모이제이션평가',
-      '메모이제이션검증',
-      '메모이제이션테스트',
-      '메모이제이션디버깅',
-      '메모이제이션프로파일링',
-      '메모이제이션모니터링',
-      '메모이제이션로깅',
-      '메모이제이션추적',
-      '메모이제이션측정',
-      '메모이제이션벤치마크',
-      '메모이제이션성능',
-      '메모이제이션효율성',
-      '메모이제이션속도',
-      '메모이제이션메모리',
-      '메모이제이션공간',
-      '메모이제이션시간',
-      '메모이제이션복잡도',
-      '메모이제이션알고리즘',
-      '메모이제이션자료구조',
-      '메모이제이션해시테이블',
-      '메모이제이션맵',
-      '메모이제이션객체',
-      '메모이제이션배열',
-      '메모이제이션리스트',
-      '메모이제이션트리',
-      '메모이제이션그래프',
-      '메모이제이션네트워크',
-      '메모이제이션그리드',
-      '메모이제이션매트릭스',
-      '메모이제이션벡터',
-      '메모이제이션스칼라',
-      '메모이제이션텐서',
-      '메모이제이션행렬',
-      '메모이제이션다차원',
-      '메모이제이션중첩',
-      '메모이제이션재귀',
-      '메모이제이션반복',
-      '메모이제이션순환',
-      '메모이제이션반복문',
-      '메모이제이션조건문',
-      '메모이제이션분기',
-      '메모이제이션선택',
-      '메모이제이션결정',
-      '메모이제이션분석',
-      '메모이제이션평가',
-      '메모이제이션검증',
-      '메모이제이션테스트',
-      '메모이제이션디버깅',
-      '메모이제이션프로파일링',
-      '메모이제이션모니터링',
-      '메모이제이션로깅',
-      '메모이제이션추적',
-      '메모이제이션측정',
-      '메모이제이션벤치마크',
-      '메모이제이션성능',
-      '메모이제이션효율성',
-      '메모이제이션속도',
-      '메모이제이션메모리',
-      '메모이제이션공간',
-      '메모이제이션시간',
-      '메모이제이션복잡도',
-    ].filter(Boolean);
-
-    return {
-      title: `${postData.title} - min.log`,
-      description,
-      keywords: keywords.join(','),
-      authors: [{ name: postData.authorName || '황민' }],
-      creator: postData.authorName || '황민',
-      publisher: '황민',
-      robots: 'index, follow',
-      openGraph: {
-        title: postData.title,
-        description,
-        type: 'article',
-        publishedTime: postData.createdAt.toISOString(),
-        modifiedTime: postData.updatedAt?.toISOString() || postData.createdAt.toISOString(),
-        authors: [postData.authorName || '황민'],
-        url: `https://eungming.com/blog/${postData.slug}`,
-        siteName: 'min.log',
-        locale: 'ko_KR',
-        images: [
-          {
-            url: 'https://eungming.com/og-image.jpg',
-            width: 1200,
-            height: 630,
-            alt: postData.title,
-          },
-        ],
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title: postData.title,
-        description,
-        creator: '@minhwang72',
-        images: ['https://eungming.com/og-image.jpg'],
-      },
-      alternates: {
-        canonical: `https://eungming.com/blog/${postData.slug}`,
-      },
-    };
-  } catch (error) {
-    console.error('Error generating metadata:', error);
-    return {
-      title: '찾을 수 없음 - min.log',
-      description: '요청하신 페이지를 찾을 수 없습니다.',
-    };
-  }
-}
-
-async function getPost(id: string) {
-  try {
-    if (process.env.SKIP_DATABASE_CONNECTION === 'true') {
-      return null;
-    }
-
-    // ID를 숫자로 변환
-    const postId = parseInt(id);
+    const postId = parseInt(params.id);
     if (isNaN(postId)) {
-      return null;
+      return {
+        title: '잘못된 요청 - min.log',
+        description: '잘못된 포스트 ID입니다.',
+      };
     }
 
     const post = await db
@@ -484,8 +33,8 @@ async function getPost(id: string) {
         id: posts.id,
         title: posts.title,
         slug: posts.slug,
-        content: posts.content,
         excerpt: posts.excerpt,
+        content: posts.content,
         createdAt: posts.createdAt,
         updatedAt: posts.updatedAt,
         authorId: posts.authorId,
@@ -498,12 +47,473 @@ async function getPost(id: string) {
       .leftJoin(users, eq(posts.authorId, users.id))
       .leftJoin(categories, eq(posts.categoryId, categories.id))
       .where(eq(posts.id, postId));
+
+    if (!post[0]) {
+      return {
+        title: '찾을 수 없음 - min.log',
+        description: '요청하신 페이지를 찾을 수 없습니다.',
+      };
+    }
+
+    const postData = post[0];
+    const description = postData.excerpt || 
+      postData.content.replace(/<[^>]*>/g, '').substring(0, 200) + '...';
+
+    return {
+      title: `${postData.title} - min.log`,
+      description,
+              keywords: [
+          postData.title,
+          postData.categoryName,
+          '황민',
+          '블로그',
+          '개발',
+          '프로그래밍',
+          '일상',
+          '학습',
+          'Next.js',
+          'React',
+          'TypeScript',
+          'JavaScript',
+          'Node.js',
+          '풀스택',
+          '웹개발',
+          '프론트엔드',
+          '백엔드',
+          'AI',
+          '자동화',
+          'RPA',
+          'UiPath',
+          'Python',
+          '데이터베이스',
+          'MySQL',
+          'Docker',
+          'DevOps',
+          '클라우드',
+          'AWS',
+          'Azure',
+          'Git',
+          'CI/CD',
+          '테스트',
+          '품질관리',
+          '코딩',
+          '알고리즘',
+          '자료구조',
+          '디자인패턴',
+          '아키텍처',
+          '마이크로서비스',
+          'API',
+          'REST',
+          'GraphQL',
+          '상태관리',
+          'Redux',
+          'Zustand',
+          '스타일링',
+          'TailwindCSS',
+          'StyledComponents',
+          '성능최적화',
+          'SEO',
+          '접근성',
+          '반응형',
+          '모바일',
+          '크로스브라우징',
+          '타입스크립트',
+          '타입안전성',
+          '테스트주도개발',
+          'TDD',
+          'BDD',
+          '단위테스트',
+          '통합테스트',
+          'E2E테스트',
+          'Jest',
+          'Vitest',
+          'Cypress',
+          'Playwright',
+          '코드리뷰',
+          '페어프로그래밍',
+          '애자일',
+          '스크럼',
+          '칸반',
+          '지속적통합',
+          '지속적배포',
+          '모니터링',
+          '로깅',
+          '에러처리',
+          '보안',
+          '인증',
+          '권한관리',
+          'OAuth',
+          'JWT',
+          '세션관리',
+          '암호화',
+          'HTTPS',
+          'SSL',
+          '인증서',
+          '방화벽',
+          '백업',
+          '복구',
+          '로드밸런싱',
+          '캐싱',
+          'CDN',
+          'Redis',
+          '메모리관리',
+          '가비지컬렉션',
+          '메모리릭',
+          '성능프로파일링',
+          '번들분석',
+          '코드분할',
+          '지연로딩',
+          '이미지최적화',
+          '폰트최적화',
+          '서비스워커',
+          'PWA',
+          '오프라인지원',
+          '푸시알림',
+          '웹소켓',
+          '실시간통신',
+          'SSE',
+          '폴링',
+          '웹훅',
+          '마이크로프론트엔드',
+          '모듈페더레이션',
+          '모노레포',
+          '워크스페이스',
+          '패키지관리',
+          'npm',
+          'yarn',
+          'pnpm',
+          '버전관리',
+          '시맨틱버저닝',
+          '브랜치전략',
+          'Git Flow',
+          'GitHub Flow',
+          '코드품질',
+          'ESLint',
+          'Prettier',
+          'Husky',
+          'lint-staged',
+          '커밋메시지',
+          '컨벤션',
+          '문서화',
+          'JSDoc',
+          'Storybook',
+          'API문서',
+          'Swagger',
+          'OpenAPI',
+          'Postman',
+          'Insomnia',
+          '데이터베이스설계',
+          '정규화',
+          '인덱싱',
+          '쿼리최적화',
+          '트랜잭션',
+          'ACID',
+          '일관성',
+          '격리성',
+          '지속성',
+          '데드락',
+          '락킹',
+          '동시성제어',
+          '레플리케이션',
+          '샤딩',
+          '파티셔닝',
+          '백업전략',
+          '복구전략',
+          '데이터마이그레이션',
+          '스키마변경',
+          '버전관리',
+          'ORM',
+          '쿼리빌더',
+          '마이그레이션',
+          '시드데이터',
+          '팩토리',
+          '테스트데이터',
+          '모킹',
+          '스터빙',
+          '인터셉터',
+          '가짜객체',
+          '더미데이터',
+          '랜덤데이터',
+          '테스트커버리지',
+          '코드커버리지',
+          '브랜치커버리지',
+          '함수커버리지',
+          '라인커버리지',
+          '조건커버리지',
+          '경로커버리지',
+          '순환복잡도',
+          '코드스멜',
+          '리팩토링',
+          '클린코드',
+          'SOLID원칙',
+          'DRY원칙',
+          'KISS원칙',
+          'YAGNI원칙',
+          '의존성주입',
+          '제어역전',
+          '의존성역전',
+          '인터페이스분리',
+          '단일책임',
+          '개방폐쇄',
+          '리스코프치환',
+          '의존성관리',
+          '의존성그래프',
+          '순환의존성',
+          '순환참조',
+          '메모리누수',
+          '가비지컬렉션',
+          '메모리프로파일링',
+          '힙덤프',
+          '스택트레이스',
+          '에러로그',
+          '디버깅',
+          '브레이크포인트',
+          '스텝오버',
+          '스텝인',
+          '스텝아웃',
+          '조건부브레이크포인트',
+          '로그포인트',
+          '워치',
+          '콜스택',
+          '스택프레임',
+          '레지스터',
+          '어셈블리',
+          '바이트코드',
+          '컴파일',
+          '인터프리트',
+          'JIT컴파일',
+          'AOT컴파일',
+          '트랜스파일',
+          '바벨',
+          '웹팩',
+          '롤업',
+          '파셀',
+          '스노우팩',
+          '터보팩',
+          '번들러',
+          '모듈번들러',
+          '청크',
+          '스플리팅',
+          '코드분할',
+          '트리쉐이킹',
+          '데드코드제거',
+          '미니피케이션',
+          '압축',
+          '난독화',
+          '소스맵',
+          '디버깅정보',
+          '개발도구',
+          '브라우저개발자도구',
+          '크롬개발자도구',
+          '파이어폭스개발자도구',
+          '사파리개발자도구',
+          '엣지개발자도구',
+          '네트워크탭',
+          '콘솔탭',
+          '소스탭',
+          '애플리케이션탭',
+          '성능탭',
+          '메모리탭',
+          '보안탭',
+          '접근성탭',
+          '오디트탭',
+          '렌더링탭',
+          '레이어탭',
+          '3D뷰',
+          '타임라인',
+          '프로파일러',
+          '힙스냅샷',
+          '메모리힙',
+          '가비지컬렉션',
+          '메모리누수',
+          '성능분석',
+          '병목지점',
+          '최적화',
+          '캐싱',
+          '메모이제이션',
+          '메모이제이션패턴',
+          '메모이제이션함수',
+          '메모이제이션훅',
+          '메모이제이션컴포넌트',
+          '메모이제이션값',
+          '메모이제이션결과',
+          '메모이제이션키',
+          '메모이제이션의존성',
+          '메모이제이션조건',
+          '메모이제이션무효화',
+          '메모이제이션정책',
+          '메모이제이션전략',
+          '메모이제이션알고리즘',
+          '메모이제이션구현',
+          '메모이제이션예제',
+          '메모이제이션사용법',
+          '메모이제이션팁',
+          '메모이제이션트릭',
+          '메모이제이션베스트프랙티스',
+          '메모이제이션안티패턴',
+          '메모이제이션주의사항',
+          '메모이제이션한계',
+          '메모이제이션장점',
+          '메모이제이션단점',
+          '메모이제이션비교',
+          '메모이제이션대안',
+          '메모이제이션선택',
+          '메모이제이션결정',
+          '메모이제이션분석',
+          '메모이제이션평가',
+          '메모이제이션검증',
+          '메모이제이션테스트',
+          '메모이제이션디버깅',
+          '메모이제이션프로파일링',
+          '메모이제이션모니터링',
+          '메모이제이션로깅',
+          '메모이제이션추적',
+          '메모이제이션측정',
+          '메모이제이션벤치마크',
+          '메모이제이션성능',
+          '메모이제이션효율성',
+          '메모이제이션속도',
+          '메모이제이션메모리',
+          '메모이제이션공간',
+          '메모이제이션시간',
+          '메모이제이션복잡도',
+          '메모이제이션알고리즘',
+          '메모이제이션자료구조',
+          '메모이제이션해시테이블',
+          '메모이제이션맵',
+          '메모이제이션객체',
+          '메모이제이션배열',
+          '메모이제이션리스트',
+          '메모이제이션트리',
+          '메모이제이션그래프',
+          '메모이제이션네트워크',
+          '메모이제이션그리드',
+          '메모이제이션매트릭스',
+          '메모이제이션벡터',
+          '메모이제이션스칼라',
+          '메모이제이션텐서',
+          '메모이제이션행렬',
+          '메모이제이션다차원',
+          '메모이제이션중첩',
+          '메모이제이션재귀',
+          '메모이제이션반복',
+          '메모이제이션순환',
+          '메모이제이션반복문',
+          '메모이제이션조건문',
+          '메모이제이션분기',
+          '메모이제이션선택',
+          '메모이제이션결정',
+          '메모이제이션분석',
+          '메모이제이션평가',
+          '메모이제이션검증',
+          '메모이제이션테스트',
+          '메모이제이션디버깅',
+          '메모이제이션프로파일링',
+          '메모이제이션모니터링',
+          '메모이제이션로깅',
+          '메모이제이션추적',
+          '메모이제이션측정',
+          '메모이제이션벤치마크',
+          '메모이제이션성능',
+          '메모이제이션효율성',
+          '메모이제이션속도',
+          '메모이제이션메모리',
+          '메모이제이션공간',
+          '메모이제이션시간',
+          '메모이제이션복잡도',
+        ].filter(Boolean) as string[],
+      authors: [{ name: postData.authorName || '황민' }],
+      creator: postData.authorName || '황민',
+      publisher: '황민',
+      robots: 'index, follow',
+      openGraph: {
+        title: postData.title,
+        description,
+        url: `https://eungming.com/blog/${postData.id}`,
+        siteName: 'min.log',
+        locale: 'ko_KR',
+        type: 'article',
+        publishedTime: postData.createdAt.toISOString(),
+        modifiedTime: postData.updatedAt?.toISOString() || postData.createdAt.toISOString(),
+        authors: [postData.authorName || '황민'],
+        tags: [postData.categoryName, '개발', '블로그'].filter(Boolean),
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: postData.title,
+        description,
+        creator: '@minhwang72',
+      },
+      alternates: {
+        canonical: `https://eungming.com/blog/${postData.id}`,
+      },
+    };
+  } catch (error) {
+    console.error('Error generating metadata:', error);
+    return {
+      title: '오류 - min.log',
+      description: '페이지를 불러오는 중 오류가 발생했습니다.',
+    };
+  }
+}
+
+async function getPost(id: string) {
+  try {
+    const postId = parseInt(id);
+    if (isNaN(postId)) {
+      return null;
+    }
+
+    const post = await db
+      .select({
+        id: posts.id,
+        title: posts.title,
+        slug: posts.slug,
+        excerpt: posts.excerpt,
+        content: posts.content,
+        createdAt: posts.createdAt,
+        updatedAt: posts.updatedAt,
+        authorId: posts.authorId,
+        authorName: users.name,
+        categoryId: posts.categoryId,
+        categoryName: categories.name,
+        categorySlug: categories.slug,
+        viewCount: posts.viewCount,
+      })
+      .from(posts)
+      .leftJoin(users, eq(posts.authorId, users.id))
+      .leftJoin(categories, eq(posts.categoryId, categories.id))
+      .where(eq(posts.id, postId));
     
     return post[0];
   } catch (error) {
     console.error('Error fetching post:', error);
     return null;
   }
+}
+
+// 글 길이에 따른 광고 배치 전략
+function getAdPositions(contentLength: number) {
+  const positions: Array<{ position: 'top' | 'middle' | 'bottom', priority: number }> = [];
+  
+  if (contentLength >= 1000) {
+    // 최소 1000자 이상이어야 광고 표시
+    if (contentLength >= 5000) {
+      // 긴 글: 상단, 중간, 하단
+      positions.push({ position: 'top', priority: 1 });
+      positions.push({ position: 'middle', priority: 2 });
+      positions.push({ position: 'bottom', priority: 3 });
+    } else if (contentLength >= 2000) {
+      // 중간 길이: 중간, 하단
+      positions.push({ position: 'middle', priority: 1 });
+      positions.push({ position: 'bottom', priority: 2 });
+    } else {
+      // 짧은 글: 하단만
+      positions.push({ position: 'bottom', priority: 1 });
+    }
+  }
+  
+  return positions;
 }
 
 export default async function BlogPostPage({
@@ -536,9 +546,9 @@ export default async function BlogPostPage({
     "dateModified": post.updatedAt?.toISOString() || post.createdAt.toISOString(),
     "mainEntityOfPage": {
       "@type": "WebPage",
-      "@id": `https://eungming.com/blog/${post.slug}`
+      "@id": `https://eungming.com/blog/${post.id}`
     },
-    "url": `https://eungming.com/blog/${post.slug}`,
+    "url": `https://eungming.com/blog/${post.id}`,
     "image": "https://eungming.com/og-image.jpg",
     "articleSection": post.categoryName,
     "keywords": [
@@ -551,9 +561,12 @@ export default async function BlogPostPage({
     ].filter(Boolean)
   };
 
+  // 글 길이에 따른 광고 배치 결정
+  const adPositions = getAdPositions(post.content.length);
+
   return (
-    <div className="flex-1 flex flex-col">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <ViewCounter postId={post.id} />
         <Script
           id="structured-data"
@@ -563,15 +576,15 @@ export default async function BlogPostPage({
           }}
         />
         
-        <article className="prose prose-lg dark:prose-invert max-w-none">
+        <article className="prose prose-lg dark:prose-invert max-w-none min-w-0">
           <header className="mb-8">
             <div className="flex justify-between items-start mb-4">
-              <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl break-words">
                 {post.title}
               </h1>
               <a
                 href={`/admin/posts/${post.id}/edit`}
-                className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors opacity-70 hover:opacity-100"
+                className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors opacity-70 hover:opacity-100 flex-shrink-0 ml-4"
                 title="관리자 편집"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -579,37 +592,57 @@ export default async function BlogPostPage({
                 </svg>
               </a>
             </div>
-            <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
               <time dateTime={post.createdAt.toISOString()}>
                 {format(post.createdAt, 'PPP', { locale: ko })}
               </time>
               {post.categoryName && (
-                <span className="bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-800/50">
+                <span className="bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-800/50 whitespace-nowrap">
                   {post.categoryName}
                 </span>
               )}
             </div>
             {post.excerpt && (
-              <p className="text-lg text-gray-600 dark:text-gray-400 italic border-l-4 border-blue-500 pl-4 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-r-lg">
+              <p className="text-lg text-gray-600 dark:text-gray-400 italic border-l-4 border-blue-500 pl-4 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-r-lg break-words">
                 {post.excerpt}
               </p>
             )}
           </header>
 
+          {/* 상단 광고 */}
+          {adPositions.some(p => p.position === 'top') && (
+            <ArticleAd 
+              position="top" 
+              postId={post.id}
+              contentLength={post.content.length}
+            />
+          )}
+
           <MarkdownRenderer content={post.content} />
 
-          {/* 하단 광고 - 게시글 바로 아래 (애드센스 정책 준수) */}
-          <ArticleAd 
-            position="bottom" 
-            postId={post.id}
-            contentLength={post.content.length}
-          />
+          {/* 중간 광고 */}
+          {adPositions.some(p => p.position === 'middle') && (
+            <ArticleAd 
+              position="middle" 
+              postId={post.id}
+              contentLength={post.content.length}
+            />
+          )}
+
+          {/* 하단 광고 */}
+          {adPositions.some(p => p.position === 'bottom') && (
+            <ArticleAd 
+              position="bottom" 
+              postId={post.id}
+              contentLength={post.content.length}
+            />
+          )}
 
           {/* 관련 포스트 - 부드러운 스타일 */}
           <RelatedPosts 
             currentPostId={post.id} 
-            categoryId={post.categoryId} 
-            categoryName={post.categoryName}
+            categoryId={post.categoryId || undefined} 
+            categoryName={post.categoryName || undefined}
           />
 
           {/* 댓글 시스템 */}

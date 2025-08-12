@@ -1,60 +1,31 @@
-import { db } from '@/lib/db';
-import { categories, posts, users } from '@/lib/db/schema';
-import { desc, eq, and } from 'drizzle-orm';
 import Link from 'next/link';
-import { Metadata } from 'next';
+import { db } from '@/lib/db';
+import { posts, categories, users } from '@/lib/db/schema';
+import { eq, desc, and } from 'drizzle-orm';
+import { format } from 'date-fns';
+import { ko } from 'date-fns/locale';
 import PostCard from '@/components/blog/PostCard';
 
-export const dynamic = 'force-dynamic';
-
-export const metadata: Metadata = {
-  title: 'min.log',
-  description: '개발자의 기술과 배움을 기록하는 블로그입니다. 새로운 기술을 탐구하고 경험을 공유하는 지식의 공간입니다.',
-  keywords: '블로그,개발,프로그래밍,기술,학습,Next.js,React,TypeScript,JavaScript,Node.js,풀스택,웹개발,프론트엔드,백엔드,AI,자동화,RPA,UiPath,Python,데이터베이스,MySQL,Docker,DevOps,클라우드,AWS,Azure,Git,CI/CD,테스트,품질관리,코딩,알고리즘,자료구조,디자인패턴,아키텍처,마이크로서비스,API,REST,GraphQL,상태관리,Redux,Zustand,스타일링,TailwindCSS,StyledComponents,성능최적화,SEO,접근성,반응형,모바일,크로스브라우징,타입스크립트,타입안전성,테스트주도개발,TDD,BDD,단위테스트,통합테스트,E2E테스트,Jest,Vitest,Cypress,Playwright,코드리뷰,페어프로그래밍,애자일,스크럼,칸반,지속적통합,지속적배포,모니터링,로깅,에러처리,보안,인증,권한관리,OAuth,JWT,세션관리,암호화,HTTPS,SSL,인증서,방화벽,백업,복구,로드밸런싱,캐싱,CDN,Redis,메모리관리,가비지컬렉션,메모리릭,성능프로파일링,번들분석,코드분할,지연로딩,이미지최적화,폰트최적화,서비스워커,PWA,오프라인지원,푸시알림,웹소켓,실시간통신,SSE,폴링,웹훅,마이크로프론트엔드,모듈페더레이션,모노레포,워크스페이스,패키지관리,npm,yarn,pnpm,버전관리,시맨틱버저닝,브랜치전략,Git Flow,GitHub Flow,코드품질,ESLint,Prettier,Husky,lint-staged,커밋메시지,컨벤션,문서화,JSDoc,Storybook,API문서,Swagger,OpenAPI,Postman,Insomnia,데이터베이스설계,정규화,인덱싱,쿼리최적화,트랜잭션,ACID,일관성,격리성,지속성,데드락,락킹,동시성제어,레플리케이션,샤딩,파티셔닝,백업전략,복구전략,데이터마이그레이션,스키마변경,버전관리,ORM,쿼리빌더,마이그레이션,시드데이터,팩토리,테스트데이터,모킹,스터빙,인터셉터,가짜객체,더미데이터,랜덤데이터,테스트커버리지,코드커버리지,브랜치커버리지,함수커버리지,라인커버리지,조건커버리지,경로커버리지,순환복잡도,코드스멜,리팩토링,클린코드,SOLID원칙,DRY원칙,KISS원칙,YAGNI원칙,의존성주입,제어역전,의존성역전,인터페이스분리,단일책임,개방폐쇄,리스코프치환,의존성관리,의존성그래프,순환의존성,순환참조,메모리누수,가비지컬렉션,메모리프로파일링,힙덤프,스택트레이스,에러로그,디버깅,브레이크포인트,스텝오버,스텝인,스텝아웃,조건부브레이크포인트,로그포인트,워치,콜스택,스택프레임,레지스터,어셈블리,바이트코드,컴파일,인터프리트,JIT컴파일,AOT컴파일,트랜스파일,바벨,웹팩,롤업,파셀,스노우팩,터보팩,번들러,모듈번들러,청크,스플리팅,코드분할,트리쉐이킹,데드코드제거,미니피케이션,압축,난독화,소스맵,디버깅정보,개발도구,브라우저개발자도구,크롬개발자도구,파이어폭스개발자도구,사파리개발자도구,엣지개발자도구,네트워크탭,콘솔탭,소스탭,애플리케이션탭,성능탭,메모리탭,보안탭,접근성탭,오디트탭,렌더링탭,레이어탭,3D뷰,타임라인,프로파일러,힙스냅샷,메모리힙,가비지컬렉션,메모리누수,성능분석,병목지점,최적화,캐싱,메모이제이션,메모이제이션패턴,메모이제이션함수,메모이제이션훅,메모이제이션컴포넌트,메모이제이션값,메모이제이션결과,메모이제이션키,메모이제이션의존성,메모이제이션조건,메모이제이션무효화,메모이제이션정책,메모이제이션전략,메모이제이션알고리즘,메모이제이션구현,메모이제이션예제,메모이제이션사용법,메모이제이션팁,메모이제이션트릭,메모이제이션베스트프랙티스,메모이제이션안티패턴,메모이제이션주의사항,메모이제이션한계,메모이제이션장점,메모이제이션단점,메모이제이션비교,메모이제이션대안,메모이제이션선택,메모이제이션결정,메모이제이션분석,메모이제이션평가,메모이제이션검증,메모이제이션테스트,메모이제이션디버깅,메모이제이션프로파일링,메모이제이션모니터링,메모이제이션로깅,메모이제이션추적,메모이제이션측정,메모이제이션벤치마크,메모이제이션성능,메모이제이션효율성,메모이제이션속도,메모이제이션메모리,메모이제이션공간,메모이제이션시간,메모이제이션복잡도,메모이제이션알고리즘,메모이제이션자료구조,메모이제이션해시테이블,메모이제이션맵,메모이제이션객체,메모이제이션배열,메모이제이션리스트,메모이제이션트리,메모이제이션그래프,메모이제이션네트워크,메모이제이션그리드,메모이제이션매트릭스,메모이제이션벡터,메모이제이션스칼라,메모이제이션텐서,메모이제이션행렬,메모이제이션다차원,메모이제이션중첩,메모이제이션재귀,메모이제이션반복,메모이제이션순환,메모이제이션반복문,메모이제이션조건문,메모이제이션분기,메모이제이션선택,메모이제이션결정,메모이제이션분석,메모이제이션평가,메모이제이션검증,메모이제이션테스트,메모이제이션디버깅,메모이제이션프로파일링,메모이제이션모니터링,메모이제이션로깅,메모이제이션추적,메모이제이션측정,메모이제이션벤치마크,메모이제이션성능,메모이제이션효율성,메모이제이션속도,메모이제이션메모리,메모이제이션공간,메모이제이션시간,메모이제이션복잡도',
-  authors: [{ name: '개발자' }],
-  creator: '개발자',
-  publisher: '개발자',
-  robots: 'index, follow',
-  openGraph: {
-    title: 'min.log - 개발자의 기록 공간',
-    description: '개발자의 기술과 배움을 기록하는 블로그입니다. 새로운 기술을 탐구하고 경험을 공유하는 지식의 공간입니다.',
-    url: 'https://eungming.com',
-    siteName: 'min.log',
-    locale: 'ko_KR',
-    type: 'website',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'min.log - 개발자의 기록 공간',
-    description: '개발자의 기술과 배움을 기록하는 블로그입니다. 새로운 기술을 탐구하고 경험을 공유하는 지식의 공간입니다.',
-    creator: '@minhwang72',
-  },
-  alternates: {
-    canonical: 'https://eungming.com',
-  },
-};
-
-async function getPosts(categorySlug?: string) {
+async function getPosts(categorySlug: string = 'all') {
   try {
-    // 기본 쿼리 구성
     let whereConditions = [eq(posts.published, true)];
     
-    // 카테고리 필터링 추가
-    if (categorySlug && categorySlug !== 'all') {
+    if (categorySlug !== 'all') {
       whereConditions.push(eq(categories.slug, categorySlug));
     }
 
-    // Drizzle ORM 타입 문제로 인해 any 사용
-    const allPosts: any = await db
+    const allPosts = await db
       .select({
         id: posts.id,
         title: posts.title,
         slug: posts.slug,
         excerpt: posts.excerpt,
+        content: posts.content,
         createdAt: posts.createdAt,
         updatedAt: posts.updatedAt,
         authorId: posts.authorId,
         authorName: users.name,
+        categoryId: posts.categoryId,
         categoryName: categories.name,
         categorySlug: categories.slug,
         viewCount: posts.viewCount,
@@ -100,112 +71,188 @@ export default async function Home({ searchParams }: PageProps) {
   const posts = await getPosts(categorySlug);
   const categories = await getCategories();
 
+  // 최신 포스트 6개
+  const recentPosts = posts.slice(0, 6);
+  // 인기 포스트 (조회수 기준) 4개
+  const popularPosts = [...posts]
+    .sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))
+    .slice(0, 4);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Hero Section - 더 간결하고 임팩트 있게 */}
-        <section className="py-16 md:py-24">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-gray-50 to-slate-200 dark:from-slate-800 dark:via-slate-900 dark:to-slate-800">
+      {/* Hero Section - 시크한 색상으로 변경 */}
+      <section className="relative py-20 md:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-200/40 via-gray-100/30 to-slate-300/40 dark:from-slate-700/40 dark:via-slate-800/30 dark:to-slate-900/40"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-8">
             <div className="relative">
-              <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent leading-tight tracking-tight">
+              <h1 className="text-6xl md:text-8xl font-black bg-gradient-to-r from-slate-600 via-gray-500 to-slate-700 bg-clip-text text-transparent leading-none tracking-tight">
                 min.log
               </h1>
-              <div className="absolute -inset-x-8 -inset-y-4 bg-gradient-to-r from-sky-100/50 via-blue-100/50 to-indigo-100/50 dark:from-sky-900/20 dark:via-blue-900/20 dark:to-indigo-900/20 rounded-3xl blur-3xl -z-10 opacity-40"></div>
+              <div className="absolute -inset-x-12 -inset-y-6 bg-gradient-to-r from-slate-200/60 via-gray-100/40 to-slate-300/60 dark:from-slate-700/40 dark:via-slate-800/30 dark:to-slate-900/40 rounded-3xl blur-3xl -z-10 opacity-50"></div>
             </div>
-            <div className="space-y-4 max-w-3xl mx-auto">
-              <p className="text-xl md:text-2xl text-slate-700 dark:text-slate-200 font-medium">
+            <div className="space-y-6 max-w-4xl mx-auto">
+              <p className="text-2xl md:text-3xl text-slate-700 dark:text-slate-200 font-semibold leading-relaxed">
                 개발자의 기술과 배움을 기록하는 공간
               </p>
-              <p className="text-lg text-slate-600 dark:text-slate-400">
+              <p className="text-xl text-slate-600 dark:text-slate-300 leading-relaxed">
                 새로운 기술을 탐구하고, 경험을 공유하며, 함께 성장하는 지식의 공간입니다.
               </p>
+              <div className="flex flex-wrap justify-center gap-4 pt-4">
+                <Link
+                  href="/blog"
+                  className="px-8 py-4 bg-gradient-to-r from-slate-600 to-gray-600 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+                >
+                  블로그 둘러보기
+                </Link>
+                <Link
+                  href="/categories"
+                  className="px-8 py-4 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold rounded-full border-2 border-slate-300 dark:border-slate-600 hover:border-slate-400 dark:hover:border-slate-500 transition-all duration-300"
+                >
+                  카테고리 보기
+                </Link>
+              </div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* 카테고리 네비게이션 */}
-        <section className="mb-12">
-          <div className="flex flex-wrap justify-center gap-3">
-            <Link
-              href="/"
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                categorySlug === 'all'
-                  ? 'bg-sky-600 text-white shadow-lg'
-                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
-              }`}
-            >
-              전체
-            </Link>
-            {categories.map((category) => (
-              <Link
-                key={category.id}
-                href={`/?category=${category.slug}`}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
-                  categorySlug === category.slug
-                    ? 'bg-sky-600 text-white shadow-lg'
-                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
-                }`}
-              >
-                {category.name}
-              </Link>
-            ))}
-          </div>
-        </section>
-
-        {/* 통계 카드 - 더 컴팩트하게 */}
-        <section className="mb-16">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 text-center">
-              <div className="text-3xl font-bold text-sky-600 dark:text-sky-400 mb-1">{posts.length}</div>
-              <div className="text-sm text-slate-600 dark:text-slate-400">총 포스트</div>
+      {/* 통계 섹션 - 시크한 색상으로 변경 */}
+      <section className="py-16 bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="text-center">
+              <div className="text-4xl md:text-5xl font-black text-slate-600 dark:text-slate-300 mb-2">
+                {posts.length}
+              </div>
+              <div className="text-lg font-semibold text-slate-700 dark:text-slate-300">총 포스트</div>
             </div>
-            
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 text-center">
-              <div className="text-3xl font-bold text-slate-600 dark:text-slate-400 mb-1">
+            <div className="text-center">
+              <div className="text-4xl md:text-5xl font-black text-gray-600 dark:text-gray-300 mb-2">
                 {posts.reduce((sum, post: any) => sum + (post.viewCount || 0), 0).toLocaleString()}
               </div>
-              <div className="text-sm text-slate-600 dark:text-slate-400">총 조회수</div>
+              <div className="text-lg font-semibold text-slate-700 dark:text-slate-300">총 조회수</div>
             </div>
-            
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 text-center">
-              <div className="text-3xl font-bold text-slate-600 dark:text-slate-400 mb-1">
+            <div className="text-center">
+              <div className="text-4xl md:text-5xl font-black text-slate-500 dark:text-slate-400 mb-2">
                 {new Set(posts.map((post: any) => post.categoryName)).size}
               </div>
-              <div className="text-sm text-slate-600 dark:text-slate-400">카테고리</div>
+              <div className="text-lg font-semibold text-slate-700 dark:text-slate-300">카테고리</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl md:text-5xl font-black text-gray-500 dark:text-gray-400 mb-2">
+                {Math.floor(posts.reduce((sum, post: any) => sum + (post.content?.length || 0), 0) / 1000)}
+              </div>
+              <div className="text-lg font-semibold text-slate-700 dark:text-slate-300">총 글자수(K)</div>
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Posts Grid - 더 풍성한 레이아웃 */}
-        <section className="pb-16">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
-              {categorySlug === 'all' ? '최근 포스트' : `${posts[0]?.categoryName || '카테고리'} 포스트`}
-            </h2>
-            <span className="text-sm text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-3 py-1 rounded-full">
-              {posts.length}개의 포스트
-            </span>
-          </div>
-
-          {posts.length === 0 ? (
-            <div className="text-center py-20">
-              <div className="text-6xl mb-6">📝</div>
-              <h3 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-4">
-                아직 포스트가 없습니다
-              </h3>
-              <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto">
-                첫 번째 포스트를 기다리고 있습니다.
+      {/* 최신 포스트 섹션 - 시크한 색상으로 변경 */}
+      <section className="py-16 bg-gradient-to-br from-slate-50 to-gray-100 dark:from-slate-900 dark:to-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between mb-12">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-2">
+                최신 포스트
+              </h2>
+              <p className="text-lg text-slate-600 dark:text-slate-400">
+                가장 최근에 작성된 포스트들을 확인하세요
               </p>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {posts.map((post: any) => (
-                <PostCard key={post.id} post={post} />
+            <Link
+              href="/blog"
+              className="px-6 py-3 bg-slate-600 text-white font-semibold rounded-full hover:bg-slate-700 transition-colors"
+            >
+              전체 보기
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {recentPosts.map((post: any) => (
+              <PostCard key={post.id} post={post} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 인기 포스트 섹션 - 시크한 색상으로 변경 */}
+      {popularPosts.length > 0 && (
+        <section className="py-16 bg-white/60 dark:bg-slate-800/60">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-800 dark:text-slate-100 mb-4">
+                인기 포스트
+              </h2>
+              <p className="text-lg text-slate-600 dark:text-slate-400">
+                많은 분들이 읽고 있는 인기 포스트입니다
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {popularPosts.map((post: any) => (
+                <div key={post.id} className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-slate-200 dark:border-slate-700">
+                  <div className="p-8">
+                    <div className="flex items-center gap-3 mb-4">
+                      <span className="px-3 py-1 text-sm font-medium bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-full">
+                        🔥 인기
+                      </span>
+                      {post.categoryName && (
+                        <span className="px-3 py-1 text-sm font-medium bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-full">
+                          {post.categoryName}
+                        </span>
+                      )}
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-slate-100 mb-3 line-clamp-2">
+                      <Link href={`/blog/${post.id}`} className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
+                        {post.title}
+                      </Link>
+                    </h3>
+                    {post.excerpt && (
+                      <p className="text-slate-600 dark:text-slate-400 mb-4 line-clamp-3">
+                        {post.excerpt}
+                      </p>
+                    )}
+                    <div className="flex items-center justify-between text-sm text-slate-500 dark:text-slate-400">
+                      <time dateTime={post.createdAt.toISOString()}>
+                        {format(new Date(post.createdAt), 'PPP', { locale: ko })}
+                      </time>
+                      <div className="flex items-center gap-2">
+                        <span>👁️ {post.viewCount?.toLocaleString() || 0}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               ))}
             </div>
-          )}
+          </div>
         </section>
-      </div>
+      )}
+
+      {/* CTA 섹션 - 시크한 색상으로 변경 */}
+      <section className="py-20 bg-gradient-to-r from-slate-600 via-gray-600 to-slate-700">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            개발 지식을 공유하고 함께 성장하세요
+          </h2>
+          <p className="text-xl text-slate-200 mb-8">
+            새로운 기술과 경험을 블로그에 기록하고, 다른 개발자들과 소통해보세요
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/blog"
+              className="px-8 py-4 bg-white text-slate-700 font-semibold rounded-full hover:bg-slate-100 transition-colors"
+            >
+              블로그 둘러보기
+            </Link>
+            <Link
+              href="/search"
+              className="px-8 py-4 border-2 border-white text-white font-semibold rounded-full hover:bg-white hover:text-slate-700 transition-colors"
+            >
+              검색하기
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 } 

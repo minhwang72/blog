@@ -64,7 +64,7 @@ export default function Footer() {
                   Tailwind CSS, MySQL
                 </p>
                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                  Drizzle ORM, Vercel
+                  Prisma ORM, AWS
                 </p>
               </div>
             </div>
@@ -79,17 +79,28 @@ export default function Footer() {
                 </p>
               </div>
               <div className="flex items-center space-x-6 text-xs text-slate-500 dark:text-slate-400">
-                <Link href="/privacy" className="hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
-                  개인정보처리방침
-                </Link>
-                <Link href="/terms" className="hover:text-slate-700 dark:hover:text-slate-300 transition-colors">
-                  이용약관
-                </Link>
                 <a 
-                  href="mailto:contact@eungming.com" 
+                  href="https://github.com/minhwang72" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
                   className="hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
                 >
-                  문의하기
+                  GitHub
+                </a>
+                <a 
+                  href="https://linkedin.com/in/minhwang72" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+                >
+                  LinkedIn
+                </a>
+                <a 
+                  href="https://eungming.com/admin" 
+                  rel="noopener noreferrer"
+                  className="hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
+                >
+                  settings
                 </a>
               </div>
             </div>

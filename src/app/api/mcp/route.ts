@@ -8,6 +8,30 @@ const MCP_SERVER_URL = process.env.NODE_ENV === 'production'
   : 'http://localhost:8787/mcp'
 const MCP_TOKEN = process.env.MCP_TOKEN || '0a295dd2818cb5eb5cfcae08b94b39b9620221b35bd2379294f9cf12fcae9e92'
 
+// 글 길이에 따른 광고 배치 전략
+function getAdPositions(contentLength: number) {
+  const positions: Array<{ position: 'top' | 'middle' | 'bottom', priority: number }> = [];
+  
+  if (contentLength >= 1000) {
+    // 최소 1000자 이상이어야 광고 표시
+    if (contentLength >= 5000) {
+      // 긴 글: 상단, 중간, 하단
+      positions.push({ position: 'top', priority: 1 });
+      positions.push({ position: 'middle', priority: 2 });
+      positions.push({ position: 'bottom', priority: 3 });
+    } else if (contentLength >= 2000) {
+      // 중간 길이: 중간, 하단
+      positions.push({ position: 'middle', priority: 1 });
+      positions.push({ position: 'bottom', priority: 2 });
+    } else {
+      // 짧은 글: 하단만
+      positions.push({ position: 'bottom', priority: 1 });
+    }
+  }
+  
+  return positions;
+}
+
 // GET 요청 처리 - 포스트 목록 조회
 export async function GET(request: NextRequest) {
   try {
@@ -77,7 +101,27 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ error: 'Post not found' }, { status: 404 })
       }
 
-      return NextResponse.json(post)
+      // 광고 배치 정보 추가
+      const adPositions = getAdPositions(post.content.length)
+      const postWithAds = {
+        ...post,
+        adPositions,
+        contentLength: post.content.length,
+        adStrategy: {
+          totalAds: adPositions.length,
+          positions: adPositions.map(p => p.position),
+          recommendations: adPositions.length > 0 ? [
+            '글 길이에 따라 자동으로 광고가 배치됩니다.',
+            `현재 ${post.content.length}자로 ${adPositions.length}개의 광고가 배치됩니다.`,
+            '광고는 사용자 경험을 해치지 않도록 적절한 간격으로 배치됩니다.'
+          ] : [
+            '글 길이가 1000자 미만이어서 광고가 배치되지 않습니다.',
+            '더 많은 광고를 표시하려면 글을 길게 작성하세요.'
+          ]
+        }
+      }
+
+      return NextResponse.json(postWithAds)
     }
 
     // 기본 GET 요청 - MCP 프로토콜 응답
@@ -101,10 +145,7 @@ export async function GET(request: NextRequest) {
     }, { status: 400 })
   } catch (error) {
     console.error('MCP API error:', error)
-    return NextResponse.json(
-      { error: 'Failed to process request', details: (error as Error).message },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -154,19 +195,36 @@ export async function POST(request: NextRequest) {
           })
           .where(eq(posts.slug, slug))
         
+        // 광고 배치 정보 추가
+        const adPositions = getAdPositions(content.length)
+        
         return NextResponse.json({
           success: true,
           message: 'Draft updated successfully',
-          slug
+          slug,
+          adPositions,
+          contentLength: content.length,
+          adStrategy: {
+            totalAds: adPositions.length,
+            positions: adPositions.map(p => p.position),
+            recommendations: adPositions.length > 0 ? [
+              '글 길이에 따라 자동으로 광고가 배치됩니다.',
+              `현재 ${content.length}자로 ${adPositions.length}개의 광고가 배치됩니다.`,
+              '광고는 사용자 경험을 해치지 않도록 적절한 간격으로 배치됩니다.'
+            ] : [
+              '글 길이가 1000자 미만이어서 광고가 배치되지 않습니다.',
+              '더 많은 광고를 표시하려면 글을 길게 작성하세요.'
+            ]
+          }
         })
       } else {
         // 새 포스트 생성 (초안 상태)
-        const [post] = await db.insert(posts).values({
+        await db.insert(posts).values({
           title,
           slug,
           content,
           excerpt: summary || '',
-          published: false, // 초안 상태
+          published: false,
           authorId: 1,
           categoryId: 1,
           viewCount: 0,
@@ -174,18 +232,48 @@ export async function POST(request: NextRequest) {
           updatedAt: new Date()
         })
 
+        // 생성된 포스트 조회
+        const [createdPost] = await db.select().from(posts).where(eq(posts.slug, slug))
+
+        // 광고 배치 정보 추가
+        const adPositions = getAdPositions(content.length)
+        
         return NextResponse.json({
           success: true,
-          message: 'Draft saved successfully',
-          post
+          message: 'Draft created successfully',
+          slug,
+          postId: createdPost?.id,
+          adPositions,
+          contentLength: content.length,
+          adStrategy: {
+            totalAds: adPositions.length,
+            positions: adPositions.map(p => p.position),
+            recommendations: adPositions.length > 0 ? [
+              '글 길이에 따라 자동으로 광고가 배치됩니다.',
+              `현재 ${content.length}자로 ${adPositions.length}개의 광고가 배치됩니다.`,
+              '광고는 사용자 경험을 해치지 않도록 적절한 간격으로 배치됩니다.'
+            ] : [
+              '글 길이가 1000자 미만이어서 광고가 배치되지 않습니다.',
+              '더 많은 광고를 표시하려면 글을 길게 작성하세요.'
+            ]
+          }
         })
       }
     }
 
     // /api/mcp/publish - 포스트 발행
     if (path === '/api/mcp/publish') {
-      const { slug, publishedAt } = body
+      const { slug } = body
       
+      if (!slug) {
+        return NextResponse.json({ error: 'Slug is required' }, { status: 400 })
+      }
+
+      const [post] = await db.select().from(posts).where(eq(posts.slug, slug)).limit(1)
+      if (!post) {
+        return NextResponse.json({ error: 'Post not found' }, { status: 404 })
+      }
+
       await db.update(posts)
         .set({
           published: true,
@@ -193,225 +281,41 @@ export async function POST(request: NextRequest) {
         })
         .where(eq(posts.slug, slug))
 
-      const [post] = await db.select().from(posts).where(eq(posts.slug, slug))
-
-      if (!post) {
-        return NextResponse.json({ error: 'Post not found' }, { status: 404 })
-      }
-
+      // 광고 배치 정보 추가
+      const adPositions = getAdPositions(post.content.length)
+      
       return NextResponse.json({
         success: true,
         message: 'Post published successfully',
-        post
+        slug,
+        adPositions,
+        contentLength: post.content.length,
+        adStrategy: {
+          totalAds: adPositions.length,
+          positions: adPositions.map(p => p.position),
+          recommendations: adPositions.length > 0 ? [
+            '글 길이에 따라 자동으로 광고가 배치됩니다.',
+            `현재 ${post.content.length}자로 ${adPositions.length}개의 광고가 배치됩니다.`,
+            '광고는 사용자 경험을 해치지 않도록 적절한 간격으로 배치됩니다.'
+          ] : [
+            '글 길이가 1000자 미만이어서 광고가 배치되지 않습니다.',
+            '더 많은 광고를 표시하려면 글을 길게 작성하세요.'
+          ]
+        }
       })
     }
 
-    // /api/mcp/publish-to-blog - 블로그에 발행 (이미 발행된 상태이므로 성공 응답)
-    if (path === '/api/mcp/publish-to-blog') {
-      const { slug } = body
-      
-      const [post] = await db.select().from(posts).where(eq(posts.slug, slug))
-      if (!post) {
-        return NextResponse.json({ error: 'Post not found' }, { status: 404 })
-      }
-
-      return NextResponse.json({
-        success: true,
-        message: 'Post already published to blog',
-        post
-      })
-    }
-
-    // MCP 프로토콜 메시지 처리 (기존 로직)
-    if (body.method) {
-      switch (body.method) {
-        case 'initialize':
-          const initResponse = {
-            jsonrpc: '2.0',
-            id: body.id,
-            result: {
-              protocolVersion: '2024-11-05',
-              capabilities: {
-                tools: {
-                  listChanged: true,
-                  call: true
-                }
-              },
-              serverInfo: {
-                name: 'blog-mcp-server',
-                version: '1.0.0',
-                capabilities: {
-                  tools: {
-                    listChanged: true,
-                    call: true
-                  }
-                }
-              }
-            }
-          }
-          return NextResponse.json(initResponse)
-
-        case 'tools/list':
-          const toolsResponse = {
-            jsonrpc: '2.0',
-            id: body.id,
-            result: {
-              tools: [
-                {
-                  name: 'blog.createPost',
-                  description: '블로그에 새 포스트 생성',
-                  inputSchema: {
-                    type: 'object',
-                    properties: {
-                      title: {
-                        type: 'string',
-                        description: '포스트 제목'
-                      },
-                      content: {
-                        type: 'string',
-                        description: '포스트 내용 (Markdown 지원)'
-                      },
-                      summary: {
-                        type: 'string',
-                        description: '포스트 요약'
-                      },
-                      tags: {
-                        type: 'array',
-                        items: { type: 'string' },
-                        description: '태그 목록'
-                      },
-                      category: {
-                        type: 'string',
-                        description: '카테고리'
-                      },
-                      slug: {
-                        type: 'string',
-                        description: '포스트 슬러그 (선택사항)'
-                      }
-                    },
-                    required: ['title', 'content']
-                  }
-                },
-                {
-                  name: 'blog.getPosts',
-                  description: '블로그 포스트 목록 조회',
-                  inputSchema: {
-                    type: 'object',
-                    properties: {
-                      limit: {
-                        type: 'number',
-                        description: '조회할 포스트 수 (기본값: 10)'
-                      },
-                      offset: {
-                        type: 'number',
-                        description: '시작 위치 (기본값: 0)'
-                      }
-                    }
-                  }
-                }
-              ]
-            }
-          }
-          return NextResponse.json(toolsResponse)
-
-        case 'tools/call':
-          try {
-            const result = await handleToolCall(body.params.name, body.params.arguments)
-            const callResponse = {
-              jsonrpc: '2.0',
-              id: body.id,
-              result: {
-                content: [
-                  {
-                    type: 'text',
-                    text: typeof result === 'string' ? result : JSON.stringify(result, null, 2)
-                  }
-                ]
-              }
-            }
-            return NextResponse.json(callResponse)
-          } catch (error) {
-            console.error('Tool call error:', error)
-            const errorResponse = {
-              jsonrpc: '2.0',
-              id: body.id,
-              error: {
-                code: -32603,
-                message: (error as Error).message
-              }
-            }
-            return NextResponse.json(errorResponse)
-          }
-
-        default:
-          const defaultResponse = {
-            jsonrpc: '2.0',
-            id: body.id,
-            error: {
-              code: -32601,
-              message: `Method not found: ${body.method}`
-            }
-          }
-          return NextResponse.json(defaultResponse)
-      }
-    }
-
-    // 기존 블로그 포스트 생성 로직 (하위 호환성)
-    const { title, content, summary, tags, category, slug, publishedAt } = body
-    console.log('블로그 API에 포스트 생성 요청:', { title, slug, summary })
-
-    // slug 생성 (제공되지 않은 경우)
-    const finalSlug = slug || title.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-')
-
-    // 기본 사용자 확인/생성
-    let defaultUser = await db.select().from(users).where(eq(users.id, 1)).limit(1)
-    if (defaultUser.length === 0) {
-      console.log('기본 사용자 생성 중...')
-      await db.insert(users).values({
-        name: 'Admin',
-        email: 'admin@eungming.com',
-        password: 'dummy', // 실제 환경에서는 해시된 비밀번호 사용
-        role: 'admin'
-      })
-    }
-
-    // 기본 카테고리 확인/생성
-    let defaultCategory = await db.select().from(categories).where(eq(categories.id, 1)).limit(1)
-    if (defaultCategory.length === 0) {
-      console.log('기본 카테고리 생성 중...')
-      await db.insert(categories).values({
-        name: '기본',
-        slug: 'default',
-        description: '기본 카테고리'
-      })
-    }
-
-    // 블로그 데이터베이스에 포스트 저장
-    const [post] = await db.insert(posts).values({
-      title,
-      slug: finalSlug,
-      content,
-      excerpt: summary || '',
-      published: true,
-      authorId: 1, // 기본 작성자 ID
-      categoryId: 1, // 기본 카테고리 ID
-      viewCount: 0,
-      createdAt: new Date(),
-      updatedAt: new Date()
-    })
-
-    console.log('포스트 생성 성공:', post)
-    return NextResponse.json({ 
-      success: true, 
-      post,
-      message: 'Post created successfully from MCP'
+    // 기본 POST 요청 처리
+    console.log('MCP API 기본 POST 요청:', body)
+    
+    return NextResponse.json({
+      message: 'MCP API POST endpoint',
+      received: body,
+      available_endpoints: ['/api/mcp/draft', '/api/mcp/publish']
     })
   } catch (error) {
-    console.error('MCP API error:', error)
-    return NextResponse.json(
-      { error: 'Failed to process MCP request', details: (error as Error).message },
-      { status: 500 }
-    )
+    console.error('MCP API POST error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
@@ -455,8 +359,8 @@ async function handleToolCall(name: string, args: any) {
         content,
         excerpt: summary || '',
         published: true,
-        authorId: 1,
-        categoryId: 1,
+        authorId: 1, // 기본 작성자 ID
+        categoryId: 1, // 기본 카테고리 ID
         viewCount: 0,
         createdAt: new Date(),
         updatedAt: new Date()

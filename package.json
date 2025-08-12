@@ -10,17 +10,17 @@
     "db:generate": "drizzle-kit generate:mysql",
     "db:push": "drizzle-kit push:mysql",
     "db:studio": "drizzle-kit studio",
-    "db:fix": "ts-node -r tsconfig-paths/register scripts/run-db-fix-simple.ts",
-    "db:reset": "ts-node -r tsconfig-paths/register scripts/run-db-fix.ts && drizzle-kit generate:mysql",
-    "seed": "ts-node -r tsconfig-paths/register scripts/seed.ts",
-    "generate:mcp-token": "ts-node -r tsconfig-paths/register scripts/generate-mcp-token.ts",
-    "db:setup-remote": "ts-node -r tsconfig-paths/register scripts/setup-remote-db.ts",
-    "db:debug": "ts-node -r tsconfig-paths/register scripts/debug-db-connection.ts",
-    "setup:admin-tables": "ts-node -r tsconfig-paths/register scripts/setup-admin-tables.ts",
-    "setup:ads-tables": "ts-node -r tsconfig-paths/register scripts/setup-admin-ads-tables.ts",
-    "setup:about-content": "ts-node -r tsconfig-paths/register scripts/setup-about-content-direct.ts",
-    "analyze:db": "ts-node -r tsconfig-paths/register scripts/analyze-db-status.ts",
-    "create:admin": "ts-node -r tsconfig-paths/register scripts/create-admin.ts"
+    "db:fix": "tsx scripts/run-db-fix-simple.ts",
+    "db:reset": "tsx scripts/run-db-fix.ts && drizzle-kit generate:mysql",
+    "seed": "tsx scripts/seed.ts",
+    "generate:mcp-token": "tsx scripts/generate-mcp-token.ts",
+    "db:setup-remote": "tsx scripts/setup-remote-db.ts",
+    "db:debug": "tsx scripts/debug-db-connection.ts",
+    "setup:admin-tables": "tsx scripts/setup-admin-tables.ts",
+    "setup:ads-tables": "tsx scripts/setup-admin-ads-tables.ts",
+    "setup:about-content": "tsx scripts/setup-about-content-direct.ts",
+    "analyze:db": "tsx scripts/analyze-db-status.ts",
+    "create:admin": "tsx scripts/create-admin.ts"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -53,9 +53,8 @@
     "postcss": "^8",
     "postcss-preset-env": "^10.1.6",
     "tailwindcss": "^3.3.0",
-    "ts-node": "^10.9.2",
-    "tsconfig-paths": "^4.2.0",
     "tsx": "^4.19.4",
     "typescript": "^5"
-  }
+  },
+  "packageManager": "yarn@1.22.19"
 }
