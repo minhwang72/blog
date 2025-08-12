@@ -470,10 +470,10 @@ export default function NewPostPage() {
             <div>
               <div className="flex justify-between items-center mb-2">
                 <label htmlFor="content" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  내용 * (리치 에디터)
+                  내용 *
                 </label>
                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                  TinyMCE 에디터로 작성하세요
+                  에디터로 작성하세요
                 </div>
               </div>
               
@@ -511,14 +511,15 @@ export default function NewPostPage() {
                     placeholder="포스트 내용을 입력하세요..."
                     style={{ height: '400px' }}
                   />
-                  <div className="mt-2">
+                  <div className="mt-2 flex justify-end">
                     <button
                       type="button"
                       onClick={() => {
                         const adHtml = '<div class="ad-placeholder" style="background: #f3f4f6; border: 2px dashed #d1d5db; padding: 20px; text-align: center; margin: 20px 0; color: #6b7280;">광고 위치</div>';
-                        setFormData(prev => ({ ...prev, content: prev.content + adHtml }));
+                        const newContent = formData.content + adHtml;
+                        setFormData(prev => ({ ...prev, content: newContent }));
                       }}
-                      className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                      className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200 font-medium"
                     >
                       광고 삽입
                     </button>
@@ -526,10 +527,7 @@ export default function NewPostPage() {
                 </div>
               )}
               
-              <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                HTML 태그를 사용할 수 있습니다. 예: &lt;h2&gt;, &lt;p&gt;, &lt;img&gt;, &lt;a&gt; 등<br />
-                광고 삽입: &lt;div class='ad-placeholder'&gt;광고 위치&lt;/div&gt;
-              </div>
+
             </div>
 
             {/* 발행 설정 */}
