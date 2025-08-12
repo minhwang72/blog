@@ -2,7 +2,93 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Editor } from '@tinymce/tinymce-react';
+import dynamic from 'next/dynamic';
+
+// Quill 에디터를 동적으로 import (SSR 문제 방지)
+const ReactQuill = dynamic(() => import('react-quill'), {
+  ssr: false,
+  loading: () => <p>에디터 로딩 중...</p>,
+});
+
+import 'react-quill/dist/quill.snow.css';
+
+// Quill 에디터 커스텀 스타일
+const quillStyles = `
+  .quill-editor-container .ql-editor {
+    min-height: 400px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #374151;
+  }
+  
+  .quill-editor-container .ql-toolbar {
+    border-top: 1px solid #d1d5db;
+    border-left: 1px solid #d1d5db;
+    border-right: 1px solid #d1d5db;
+    border-bottom: none;
+    background: #f9fafb;
+  }
+  
+  .quill-editor-container .ql-container {
+    border: 1px solid #d1d5db;
+    border-top: none;
+  }
+  
+  .quill-editor-container .ql-editor h1 {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin: 1em 0 0.5em 0;
+  }
+  
+  .quill-editor-container .ql-editor h2 {
+    font-size: 1.25em;
+    font-weight: bold;
+    margin: 1em 0 0.5em 0;
+  }
+  
+  .quill-editor-container .ql-editor h3 {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin: 1em 0 0.5em 0;
+  }
+  
+  .quill-editor-container .ql-editor code {
+    background-color: #f3f4f6;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: monospace;
+  }
+  
+  .quill-editor-container .ql-editor pre {
+    background-color: #f3f4f6;
+    padding: 1em;
+    border-radius: 4px;
+    overflow-x: auto;
+  }
+  
+  .quill-editor-container .ql-editor .ad-placeholder {
+    background: #f3f4f6;
+    border: 2px dashed #d1d5db;
+    padding: 20px;
+    text-align: center;
+    margin: 20px 0;
+    color: #6b7280;
+  }
+  
+  .dark .quill-editor-container .ql-toolbar {
+    background: #374151;
+    border-color: #4b5563;
+  }
+  
+  .dark .quill-editor-container .ql-container {
+    border-color: #4b5563;
+  }
+  
+  .dark .quill-editor-container .ql-editor {
+    color: #f3f4f6;
+  }
+`;
 
 interface Category {
   id: number;
@@ -217,6 +303,7 @@ export default function NewPostPage() {
 
   return (
     <div className="space-y-6">
+      <style dangerouslySetInnerHTML={{ __html: quillStyles }} />
       {/* 헤더 */}
       <div className="flex justify-between items-center">
         <div>
@@ -395,60 +482,48 @@ export default function NewPostPage() {
                   <div dangerouslySetInnerHTML={{ __html: formData.content }} />
                 </div>
               ) : (
-                <Editor
-                  value={formData.content}
-                  init={{
-                    height: 500,
-                    menubar: true,
-                    plugins: [
-                      'advlist autolink lists link image charmap print preview anchor',
-                      'searchreplace visualblocks code fullscreen',
-                      'insertdatetime media table paste code help wordcount',
-                      'codesample'
-                    ],
-                    toolbar: [
-                      'undo redo | formatselect | bold italic underline strikethrough | forecolor backcolor',
-                      'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
-                      'link image media table | code codesample adplaceholder | fullscreen'
-                    ].join(' | '),
-                    content_style: `
-                      body { 
-                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
-                        font-size: 14px; 
-                        line-height: 1.6;
-                        color: #374151;
+                <div className="quill-editor-container">
+                  <ReactQuill
+                    value={formData.content}
+                    onChange={handleContentChange}
+                    modules={{
+                      toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'align': [] }],
+                        ['link', 'image', 'code-block'],
+                        ['clean']
+                      ],
+                      clipboard: {
+                        matchVisual: false,
                       }
-                      .ad-placeholder {
-                        background: #f3f4f6;
-                        border: 2px dashed #d1d5db;
-                        padding: 20px;
-                        text-align: center;
-                        margin: 20px 0;
-                        color: #6b7280;
-                      }
-                    `,
-                    formats: {
-                      h2: { block: 'h2', styles: { 'font-size': '1.5em', 'font-weight': 'bold', 'margin': '1em 0 0.5em 0' } },
-                      h3: { block: 'h3', styles: { 'font-size': '1.25em', 'font-weight': 'bold', 'margin': '1em 0 0.5em 0' } },
-                      code: { inline: 'code', styles: { 'background-color': '#f3f4f6', 'padding': '2px 4px', 'border-radius': '3px', 'font-family': 'monospace' } }
-                    },
-                    paste_as_text: false,
-                    paste_enable_default_filters: true,
-                    paste_word_valid_elements: 'b,strong,i,em,h1,h2,h3,h4,h5,h6',
-                    paste_retain_style_properties: 'color background-color font-size font-weight',
-                    setup: function(editor) {
-                      // 광고 삽입 버튼 추가
-                      editor.ui.registry.addButton('adplaceholder', {
-                        text: '광고',
-                        tooltip: '광고 위치 삽입',
-                        onAction: function() {
-                          editor.insertContent('<div class="ad-placeholder">광고 위치</div>');
-                        }
-                      });
-                    }
-                  }}
-                  onEditorChange={handleContentChange}
-                />
+                    }}
+                    formats={[
+                      'header',
+                      'bold', 'italic', 'underline', 'strike',
+                      'color', 'background',
+                      'list', 'bullet',
+                      'align',
+                      'link', 'image', 'code-block'
+                    ]}
+                    placeholder="포스트 내용을 입력하세요..."
+                    style={{ height: '400px' }}
+                  />
+                  <div className="mt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const adHtml = '<div class="ad-placeholder" style="background: #f3f4f6; border: 2px dashed #d1d5db; padding: 20px; text-align: center; margin: 20px 0; color: #6b7280;">광고 위치</div>';
+                        setFormData(prev => ({ ...prev, content: prev.content + adHtml }));
+                      }}
+                      className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                    >
+                      광고 삽입
+                    </button>
+                  </div>
+                </div>
               )}
               
               <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
