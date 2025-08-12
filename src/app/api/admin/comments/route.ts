@@ -8,57 +8,88 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
-    const filter = searchParams.get('filter') || 'all'; // 'all', 'main', 'replies'
+    const filter = searchParams.get('filter') || 'all';
     const offset = (page - 1) * limit;
 
-    // 필터 조건 설정
-    let whereCondition;
-    switch (filter) {
-      case 'main':
-        whereCondition = isNull(comments.parentId);
-        break;
-      case 'replies':
-        whereCondition = isNotNull(comments.parentId);
-        break;
-      default:
-        whereCondition = undefined;
+    // 댓글 목록 조회
+    let commentsData;
+    let totalCountResult;
+
+    if (filter === 'comments') {
+      // 댓글만 (parentId가 null인 것)
+      commentsData = await db
+        .select({
+          id: comments.id,
+          content: comments.content,
+          name: comments.name,
+          password: comments.password,
+          createdAt: comments.createdAt,
+          postId: comments.postId,
+          parentId: comments.parentId,
+          postTitle: posts.title,
+        })
+        .from(comments)
+        .innerJoin(posts, eq(comments.postId, posts.id))
+        .where(isNull(comments.parentId))
+        .orderBy(desc(comments.createdAt))
+        .limit(limit)
+        .offset(offset);
+
+      totalCountResult = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(comments)
+        .innerJoin(posts, eq(comments.postId, posts.id))
+        .where(isNull(comments.parentId));
+    } else if (filter === 'replies') {
+      // 답글만 (parentId가 null이 아닌 것)
+      commentsData = await db
+        .select({
+          id: comments.id,
+          content: comments.content,
+          name: comments.name,
+          password: comments.password,
+          createdAt: comments.createdAt,
+          postId: comments.postId,
+          parentId: comments.parentId,
+          postTitle: posts.title,
+        })
+        .from(comments)
+        .innerJoin(posts, eq(comments.postId, posts.id))
+        .where(isNotNull(comments.parentId))
+        .orderBy(desc(comments.createdAt))
+        .limit(limit)
+        .offset(offset);
+
+      totalCountResult = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(comments)
+        .innerJoin(posts, eq(comments.postId, posts.id))
+        .where(isNotNull(comments.parentId));
+    } else {
+      // 전체
+      commentsData = await db
+        .select({
+          id: comments.id,
+          content: comments.content,
+          name: comments.name,
+          password: comments.password,
+          createdAt: comments.createdAt,
+          postId: comments.postId,
+          parentId: comments.parentId,
+          postTitle: posts.title,
+        })
+        .from(comments)
+        .innerJoin(posts, eq(comments.postId, posts.id))
+        .orderBy(desc(comments.createdAt))
+        .limit(limit)
+        .offset(offset);
+
+      totalCountResult = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(comments)
+        .innerJoin(posts, eq(comments.postId, posts.id));
     }
 
-    // 댓글 목록 조회 (관리자용)
-    const commentsQuery = db
-      .select({
-        id: comments.id,
-        content: comments.content,
-        name: comments.name,
-        email: comments.email,
-        createdAt: comments.createdAt,
-        postId: comments.postId,
-        parentId: comments.parentId,
-        postTitle: posts.title,
-      })
-      .from(comments)
-      .innerJoin(posts, eq(comments.postId, posts.id))
-      .orderBy(desc(comments.createdAt))
-      .limit(limit)
-      .offset(offset);
-
-    if (whereCondition) {
-      commentsQuery.where(whereCondition);
-    }
-
-    const commentsData = await commentsQuery;
-
-    // 전체 댓글 수 조회
-    const totalCountQuery = db
-      .select({ count: sql<number>`count(*)` })
-      .from(comments)
-      .innerJoin(posts, eq(comments.postId, posts.id));
-
-    if (whereCondition) {
-      totalCountQuery.where(whereCondition);
-    }
-
-    const totalCountResult = await totalCountQuery;
     const totalCount = totalCountResult[0]?.count || 0;
     const totalPages = Math.ceil(totalCount / limit);
 
@@ -67,7 +98,7 @@ export async function GET(request: NextRequest) {
         id: comment.id,
         content: comment.content,
         name: comment.name,
-        email: comment.email,
+        email: comment.password, // password 필드를 email로 사용
         createdAt: comment.createdAt?.toISOString(),
         postId: comment.postId,
         postTitle: comment.postTitle,
@@ -77,7 +108,6 @@ export async function GET(request: NextRequest) {
       totalPages,
       currentPage: page,
       totalCount,
-      filter,
     });
   } catch (error) {
     console.error('Comments fetch error:', error);

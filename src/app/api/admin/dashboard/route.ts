@@ -41,6 +41,7 @@ export async function GET(request: NextRequest) {
         content: comments.content,
         name: comments.name,
         createdAt: comments.createdAt,
+        postId: comments.postId,
         postTitle: posts.title,
       })
       .from(comments)
@@ -64,6 +65,7 @@ export async function GET(request: NextRequest) {
         content: comment.content,
         name: comment.name,
         createdAt: comment.createdAt?.toISOString() || '',
+        postId: comment.postId,
         postTitle: comment.postTitle,
       })),
     };

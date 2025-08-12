@@ -96,7 +96,7 @@ export default function Footer() {
                   LinkedIn
                 </a>
                 <a 
-                  href="https://eungming.com/admin" 
+                  href="/admin" 
                   rel="noopener noreferrer"
                   className="hover:text-slate-700 dark:hover:text-slate-300 transition-colors"
                 >

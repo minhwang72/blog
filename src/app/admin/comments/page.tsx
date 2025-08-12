@@ -1,6 +1,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { 
+  TrashIcon, 
+  ChatBubbleLeftRightIcon,
+  UserIcon,
+  CalendarIcon,
+  DocumentTextIcon,
+  FunnelIcon,
+  ArrowUturnLeftIcon
+} from '@heroicons/react/24/outline';
+import Link from 'next/link';
 
 interface Comment {
   id: number;
@@ -19,7 +29,7 @@ export default function AdminCommentsPage() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [filter, setFilter] = useState<'all' | 'main' | 'replies'>('all');
+  const [filter, setFilter] = useState<'all' | 'comments' | 'replies'>('all');
   const commentsPerPage = 20;
 
   useEffect(() => {
@@ -28,19 +38,20 @@ export default function AdminCommentsPage() {
 
   const fetchComments = async () => {
     try {
-      console.log('Fetching comments with params:', { page: currentPage, limit: commentsPerPage, filter });
-      const response = await fetch(`/api/admin/comments?page=${currentPage}&limit=${commentsPerPage}&filter=${filter}`);
-      console.log('Response status:', response.status);
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: commentsPerPage.toString(),
+        filter: filter
+      });
+      
+      const response = await fetch(`/api/admin/comments?${params}`);
       
       if (response.ok) {
         const data = await response.json();
-        console.log('Comments data:', data);
         setComments(data.comments);
         setTotalPages(data.totalPages);
       } else {
         console.error('Failed to fetch comments:', response.status, response.statusText);
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
       }
     } catch (error) {
       console.error('Failed to fetch comments:', error);
@@ -71,13 +82,15 @@ export default function AdminCommentsPage() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('ko-KR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) return '오늘';
+    if (diffDays === 2) return '어제';
+    if (diffDays <= 7) return `${diffDays - 1}일 전`;
+    return date.toLocaleDateString('ko-KR');
   };
 
   const truncateContent = (content: string, maxLength: number = 100) => {
@@ -96,250 +109,174 @@ export default function AdminCommentsPage() {
   return (
     <div className="space-y-6">
       {/* 헤더 */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">댓글 관리</h1>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            블로그에 작성된 모든 댓글을 관리할 수 있습니다.
-          </p>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">댓글 관리</h1>
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              사용자 댓글을 검토하고 관리할 수 있습니다.
+            </p>
+          </div>
+          
+          <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+            <ChatBubbleLeftRightIcon className="w-5 h-5" />
+            <span>총 {comments.length}개의 댓글</span>
+          </div>
         </div>
-        
-        {/* 필터 */}
-        <div className="flex space-x-2">
-          <button
-            onClick={() => {
-              setFilter('all');
-              setCurrentPage(1);
-            }}
-            className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-              filter === 'all'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-            }`}
-          >
-            전체
-          </button>
-          <button
-            onClick={() => {
-              setFilter('main');
-              setCurrentPage(1);
-            }}
-            className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-              filter === 'main'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-            }`}
-          >
-            메인 댓글
-          </button>
-          <button
-            onClick={() => {
-              setFilter('replies');
-              setCurrentPage(1);
-            }}
-            className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
-              filter === 'replies'
-                ? 'bg-blue-500 text-white'
-                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-            }`}
-          >
-            답글
-          </button>
+      </div>
+
+      {/* 필터 및 검색 */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="flex flex-col sm:flex-row gap-4">
+          {/* 필터 */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => setFilter('all')}
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center ${
+                filter === 'all'
+                  ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              <FunnelIcon className="w-4 h-4 mr-1" />
+              전체
+            </button>
+            <button
+              onClick={() => setFilter('comments')}
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center ${
+                filter === 'comments'
+                  ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              <ChatBubbleLeftRightIcon className="w-4 h-4 mr-1" />
+              댓글
+            </button>
+            <button
+              onClick={() => setFilter('replies')}
+              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 flex items-center ${
+                filter === 'replies'
+                  ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              }`}
+            >
+              <ArrowUturnLeftIcon className="w-4 h-4 mr-1" />
+              답글
+            </button>
+          </div>
         </div>
       </div>
 
       {/* 댓글 목록 */}
-      <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  작성자
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  댓글 내용
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  포스트
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  유형
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  작성일
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  액션
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {comments.length > 0 ? (
-                comments.map((comment) => (
-                  <tr key={comment.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td className="px-6 py-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        {comments.length > 0 ? (
+          <div className="divide-y divide-gray-200 dark:divide-gray-700">
+            {comments.map((comment) => (
+              <div key={comment.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-200">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-3">
                       <div className="flex items-center">
-                        <div className="flex-shrink-0">
-                          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
-                            {comment.name.charAt(0).toUpperCase()}
-                          </div>
-                        </div>
-                        <div className="ml-3">
-                          <div className="text-sm font-medium text-gray-900 dark:text-white">
-                            {comment.name}
-                          </div>
-                          <div className="text-sm text-gray-500 dark:text-gray-400">
-                            {comment.email}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900 dark:text-white max-w-md">
-                        {truncateContent(comment.content)}
-                      </div>
-                      {comment.content.length > 100 && (
-                        <button
-                          onClick={() => alert(comment.content)}
-                          className="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-1"
-                        >
-                          전체 보기
-                        </button>
-                      )}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-gray-900 dark:text-white">
-                        <a
-                          href={`/blog/${comment.postId}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 dark:text-blue-400 hover:underline"
-                        >
-                          {truncateContent(comment.postTitle, 40)}
-                        </a>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        comment.isReply
-                          ? 'bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200'
-                          : 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
-                      }`}>
-                        {comment.isReply ? (
-                          <>
-                            <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M7.707 3.293a1 1 0 010 1.414L5.414 7H11a7 7 0 017 7v2a1 1 0 11-2 0v-2a5 5 0 00-5-5H5.414l2.293 2.293a1 1 0 11-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                            </svg>
+                        <UserIcon className="w-4 h-4 text-gray-400 mr-2" />
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">
+                          {comment.name}
+                        </span>
+                        {comment.isReply && (
+                          <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300">
+                            <ArrowUturnLeftIcon className="w-3 h-3 mr-1" />
                             답글
-                          </>
-                        ) : (
-                          '메인 댓글'
+                          </span>
                         )}
+                      </div>
+                      <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                        <CalendarIcon className="w-3 h-3 mr-1" />
+                        {formatDate(comment.createdAt)}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                      {formatDate(comment.createdAt)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                      <a
-                        href={`/blog/${comment.postId}#comment-${comment.id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
-                      >
-                        보기
-                      </a>
-                      <button
-                        onClick={() => handleDelete(comment.id)}
-                        className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
-                      >
-                        삭제
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
-                    <div className="text-gray-500 dark:text-gray-400">
-                      <svg className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                      </svg>
-                      <h3 className="mt-2 text-sm font-medium">
-                        {filter === 'all' && '댓글이 없습니다'}
-                        {filter === 'main' && '메인 댓글이 없습니다'}
-                        {filter === 'replies' && '답글이 없습니다'}
-                      </h3>
-                      <p className="mt-1 text-sm">
-                        사용자들이 댓글을 작성하면 여기에 표시됩니다.
+                    </div>
+                    
+                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-3">
+                      <p className="text-sm text-gray-700 dark:text-gray-200 leading-relaxed">
+                        {comment.content}
                       </p>
                     </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
 
-        {/* 페이지네이션 */}
-        {totalPages > 1 && (
-          <div className="px-6 py-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-700 dark:text-gray-300">
-                페이지 {currentPage} / {totalPages}
+                    <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
+                      <Link 
+                        href={`/blog/${comment.postId}`}
+                        target="_blank"
+                        className="flex items-center text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors duration-200"
+                      >
+                        <DocumentTextIcon className="w-3 h-3 mr-1" />
+                        {comment.postTitle}
+                      </Link>
+                      <span className="text-blue-600 dark:text-blue-400">
+                        {comment.email}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 ml-4">
+                    <button
+                      onClick={() => handleDelete(comment.id)}
+                      className="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200"
+                      title="삭제"
+                    >
+                      <TrashIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  className="px-3 py-1 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  이전
-                </button>
-                <span className="px-3 py-1 text-sm text-gray-700 dark:text-gray-300">
-                  {currentPage} / {totalPages}
-                </span>
-                <button
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                  className="px-3 py-1 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  다음
-                </button>
-              </div>
-            </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <ChatBubbleLeftRightIcon className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+              댓글이 없습니다.
+            </p>
+            <p className="text-xs text-gray-400 dark:text-gray-500">
+              블로그 포스트에 댓글이 작성되면 여기에 표시됩니다.
+            </p>
           </div>
         )}
       </div>
 
-      {/* 통계 정보 */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {comments.filter(c => !c.isReply).length}
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">메인 댓글</div>
-          </div>
+      {/* 페이지네이션 */}
+      {totalPages > 1 && (
+        <div className="flex justify-center">
+          <nav className="flex items-center space-x-2">
+            <button
+              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              disabled={currentPage === 1}
+              className="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+            >
+              이전
+            </button>
+            
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => setCurrentPage(page)}
+                className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                  currentPage === page
+                    ? 'bg-blue-600 text-white'
+                    : 'text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+            
+            <button
+              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+              disabled={currentPage === totalPages}
+              className="px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+            >
+              다음
+            </button>
+          </nav>
         </div>
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">
-              {comments.filter(c => c.isReply).length}
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">답글</div>
-          </div>
-        </div>
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
-              {comments.length}
-            </div>
-            <div className="text-sm text-gray-600 dark:text-gray-400">총 댓글</div>
-          </div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }

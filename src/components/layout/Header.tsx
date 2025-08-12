@@ -37,7 +37,7 @@ export default function Header() {
           ))}
           <ThemeToggle />
           <Link
-            href="/admin/login"
+            href="/admin"
             className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors opacity-70 hover:opacity-100 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
             title="관리자 설정"
           >

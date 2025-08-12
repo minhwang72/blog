@@ -2,6 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { 
+  DocumentTextIcon, 
+  ChatBubbleLeftRightIcon, 
+  EyeIcon, 
+  PlusIcon,
+  ArrowTrendingUpIcon,
+  CalendarIcon,
+  UserIcon,
+  ClockIcon
+} from '@heroicons/react/24/outline';
 
 interface DashboardStats {
   totalPosts: number;
@@ -19,6 +29,7 @@ interface DashboardStats {
     name: string;
     createdAt: string;
     postTitle: string;
+    postId: number; // Added postId to the interface
   }>;
 }
 
@@ -65,114 +76,136 @@ export default function AdminDashboard() {
       name: '새 포스트 작성',
       description: '새로운 블로그 포스트를 작성합니다',
       href: '/admin/posts/new',
-      icon: '✍️',
-      color: 'bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30',
-      textColor: 'text-blue-900 dark:text-blue-100',
-      iconColor: 'text-blue-600 dark:text-blue-400'
+      icon: PlusIcon,
+      color: 'bg-gradient-to-br from-gray-100 to-gray-200 dark:from-blue-600 dark:to-indigo-700',
+      hoverColor: 'hover:from-gray-200 hover:to-gray-300 dark:hover:from-blue-700 dark:hover:to-indigo-800'
     },
     {
       name: '포스트 관리',
       description: '기존 포스트를 편집하거나 삭제합니다',
       href: '/admin/posts',
-      icon: '📝',
-      color: 'bg-green-50 dark:bg-green-900/20 hover:bg-green-100 dark:hover:bg-green-900/30',
-      textColor: 'text-green-900 dark:text-green-100',
-      iconColor: 'text-green-600 dark:text-green-400'
+      icon: DocumentTextIcon,
+      color: 'bg-gradient-to-br from-gray-100 to-gray-200 dark:from-green-600 dark:to-emerald-700',
+      hoverColor: 'hover:from-gray-200 hover:to-gray-300 dark:hover:from-green-700 dark:hover:to-emerald-800'
     },
     {
       name: '댓글 관리',
       description: '댓글을 검토하고 관리합니다',
       href: '/admin/comments',
-      icon: '💬',
-      color: 'bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/30',
-      textColor: 'text-yellow-900 dark:text-yellow-100',
-      iconColor: 'text-yellow-600 dark:text-yellow-400'
-    },
-    {
-      name: '광고 설정',
-      description: 'Google AdSense 광고를 관리합니다',
-      href: '/admin/ads',
-      icon: '📢',
-      color: 'bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 dark:hover:bg-purple-900/30',
-      textColor: 'text-purple-900 dark:text-purple-100',
-      iconColor: 'text-purple-600 dark:text-purple-400'
-    },
-    {
-      name: '소개페이지',
-      description: 'About 페이지 내용을 수정합니다',
-      href: '/admin/about',
-      icon: 'ℹ️',
-      color: 'bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-900/30',
-      textColor: 'text-indigo-900 dark:text-indigo-100',
-      iconColor: 'text-indigo-600 dark:text-indigo-400'
+      icon: ChatBubbleLeftRightIcon,
+      color: 'bg-gradient-to-br from-gray-100 to-gray-200 dark:from-purple-600 dark:to-violet-700',
+      hoverColor: 'hover:from-gray-200 hover:to-gray-300 dark:hover:from-purple-700 dark:hover:to-violet-800'
     }
   ];
 
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1) + 'M';
+    } else if (num >= 1000) {
+      return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toString();
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 1) return '오늘';
+    if (diffDays === 2) return '어제';
+    if (diffDays <= 7) return `${diffDays - 1}일 전`;
+    return date.toLocaleDateString('ko-KR');
+  };
+
   return (
     <div className="space-y-8">
-      {/* 페이지 헤더 */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          🛠️ 관리자 대시보드
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          블로그 현황을 한눈에 확인하고 관리할 수 있습니다.
-        </p>
+      {/* 환영 메시지 */}
+      <div className="bg-gradient-to-r from-gray-100 to-gray-200 dark:from-blue-600 dark:to-indigo-700 rounded-xl shadow-lg p-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">관리자 대시보드</h1>
+            <p className="text-gray-700 dark:text-blue-100 text-lg">
+              블로그 현황을 한눈에 확인하고 효율적으로 관리하세요
+            </p>
+          </div>
+          <div className="hidden md:block">
+            <div className="w-16 h-16 bg-gray-300 dark:bg-white/20 rounded-full flex items-center justify-center">
+              <ArrowTrendingUpIcon className="w-8 h-8 text-gray-700 dark:text-white" />
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 통계 카드 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-          <div className="flex items-center">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">총 포스트</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{formatNumber(stats.totalPosts)}</p>
+              <p className="text-xs text-green-600 dark:text-green-400 mt-1 flex items-center">
+                <ArrowTrendingUpIcon className="w-3 h-3 mr-1" />
+                활성 포스트
+              </p>
+            </div>
             <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
-              <span className="text-2xl">📝</span>
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">총 포스트</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.totalPosts}</p>
+              <DocumentTextIcon className="w-6 h-6 text-blue-600 dark:text-blue-400" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-          <div className="flex items-center">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">총 댓글</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{formatNumber(stats.totalComments)}</p>
+              <p className="text-xs text-blue-600 dark:text-blue-400 mt-1 flex items-center">
+                <ChatBubbleLeftRightIcon className="w-3 h-3 mr-1" />
+                사용자 참여
+              </p>
+            </div>
             <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
-              <span className="text-2xl">💬</span>
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">총 댓글</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.totalComments}</p>
+              <ChatBubbleLeftRightIcon className="w-6 h-6 text-green-600 dark:text-green-400" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-          <div className="flex items-center">
-            <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
-              <span className="text-2xl">👁️</span>
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">총 조회수</p>
+              <p className="text-3xl font-bold text-gray-900 dark:text-white">{formatNumber(stats.totalViews)}</p>
+              <p className="text-xs text-purple-600 dark:text-purple-400 mt-1 flex items-center">
+                <EyeIcon className="w-3 h-3 mr-1" />
+                페이지뷰
+              </p>
             </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-400">총 조회수</p>
-              <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.totalViews.toLocaleString()}</p>
+            <div className="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-lg">
+              <EyeIcon className="w-6 h-6 text-purple-600 dark:text-purple-400" />
             </div>
           </div>
         </div>
       </div>
 
       {/* 빠른 액션 */}
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">🚀 빠른 액션</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6 flex items-center">
+          <PlusIcon className="w-5 h-5 mr-2 text-blue-600" />
+          빠른 액션
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {quickActions.map((action) => (
             <Link
               key={action.name}
               href={action.href}
-              className={`flex items-center p-4 rounded-lg transition-colors ${action.color}`}
+              className={`group flex flex-col items-center p-6 rounded-xl transition-all duration-200 ${action.color} ${action.hoverColor} transform hover:scale-105 hover:shadow-lg`}
             >
-              <span className={`text-2xl mr-3 ${action.iconColor}`}>{action.icon}</span>
-              <div>
-                <p className={`text-sm font-medium ${action.textColor}`}>{action.name}</p>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">{action.description}</p>
+              <action.icon className="w-8 h-8 mb-3 text-gray-700 dark:text-white" />
+              <div className="text-center">
+                <p className="font-semibold text-sm mb-1 text-gray-900 dark:text-white">{action.name}</p>
+                <p className="text-xs text-gray-700 dark:text-white/90">{action.description}</p>
               </div>
             </Link>
           ))}
@@ -182,70 +215,96 @@ export default function AdminDashboard() {
       {/* 최근 활동 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 최근 포스트 */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">📝 최근 포스트</h3>
-            <Link href="/admin/posts" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+              <DocumentTextIcon className="w-5 h-5 mr-2 text-blue-600" />
+              최근 포스트
+            </h3>
+            <Link 
+              href="/admin/posts" 
+              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+            >
               모두 보기 →
             </Link>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {stats.recentPosts.length > 0 ? (
               stats.recentPosts.map((post) => (
-                <div key={post.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div key={post.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate mb-1">
                       {post.title}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {new Date(post.createdAt).toLocaleDateString('ko-KR')}
-                    </p>
-                  </div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400 ml-2">
-                    👁️ {post.viewCount}
+                    <div className="flex items-center text-xs text-gray-500 dark:text-gray-400 space-x-3">
+                      <span className="flex items-center">
+                        <CalendarIcon className="w-3 h-3 mr-1" />
+                        {formatDate(post.createdAt)}
+                      </span>
+                      <span className="flex items-center">
+                        <EyeIcon className="w-3 h-3 mr-1" />
+                        {formatNumber(post.viewCount)}
+                      </span>
+                    </div>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-                최근 포스트가 없습니다.
-              </p>
+              <div className="text-center py-8">
+                <DocumentTextIcon className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                <p className="text-sm text-gray-500 dark:text-gray-400">최근 포스트가 없습니다.</p>
+              </div>
             )}
           </div>
         </div>
 
         {/* 최근 댓글 */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">💬 최근 댓글</h3>
-            <Link href="/admin/comments" className="text-sm text-blue-600 dark:text-blue-400 hover:underline">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center">
+              <ChatBubbleLeftRightIcon className="w-5 h-5 mr-2 text-green-600" />
+              최근 댓글
+            </h3>
+            <Link 
+              href="/admin/comments" 
+              className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+            >
               모두 보기 →
             </Link>
           </div>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {stats.recentComments.length > 0 ? (
               stats.recentComments.map((comment) => (
-                <div key={comment.id} className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                <div key={comment.id} className="p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
-                      {comment.name}
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {new Date(comment.createdAt).toLocaleDateString('ko-KR')}
-                    </p>
+                    <div className="flex items-center">
+                      <UserIcon className="w-4 h-4 text-gray-400 mr-2" />
+                      <p className="text-sm font-medium text-gray-900 dark:text-white">
+                        {comment.name}
+                      </p>
+                    </div>
+                    <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center">
+                      <ClockIcon className="w-3 h-3 mr-1" />
+                      {formatDate(comment.createdAt)}
+                    </span>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2 mb-2">
                     {comment.content}
                   </p>
-                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                  <Link 
+                    href={`/blog/${comment.postId}`}
+                    target="_blank"
+                    className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium transition-colors duration-200"
+                  >
                     → {comment.postTitle}
-                  </p>
+                  </Link>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-                최근 댓글이 없습니다.
-              </p>
+              <div className="text-center py-8">
+                <ChatBubbleLeftRightIcon className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                <p className="text-sm text-gray-500 dark:text-gray-400">최근 댓글이 없습니다.</p>
+              </div>
             )}
           </div>
         </div>

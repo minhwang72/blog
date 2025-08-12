@@ -34,7 +34,8 @@ const poolConnection = (() => {
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      connectionLimit: 10,
+      connectionLimit: 5, // 연결 수를 5개로 제한
+      queueLimit: 0, // 대기열 제한 없음
     });
   } catch (error) {
     console.error('❌ 데이터베이스 연결 실패:', error);

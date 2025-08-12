@@ -1,6 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { 
+  PlusIcon, 
+  PencilIcon, 
+  TrashIcon, 
+  EyeIcon,
+  EyeSlashIcon,
+  MegaphoneIcon,
+  Cog6ToothIcon,
+  CalendarIcon,
+  CheckCircleIcon,
+  XCircleIcon
+} from '@heroicons/react/24/outline';
 
 interface AdSetting {
   id: number;
@@ -15,11 +27,11 @@ interface AdSetting {
 }
 
 const positionOptions = [
-  { value: 'top', label: '포스트 상단' },
-  { value: 'middle', label: '포스트 중간' },
-  { value: 'bottom', label: '포스트 하단' },
-  { value: 'sidebar', label: '사이드바' },
-  { value: 'inline', label: '인라인 (본문 중간)' },
+  { value: 'top', label: '포스트 상단', description: '포스트 제목 아래에 표시' },
+  { value: 'middle', label: '포스트 중간', description: '본문 중간에 표시' },
+  { value: 'bottom', label: '포스트 하단', description: '포스트 끝에 표시' },
+  { value: 'sidebar', label: '사이드바', description: '사이드바 영역에 표시' },
+  { value: 'inline', label: '인라인', description: '본문 내용 중간에 삽입' },
 ];
 
 export default function AdminAdsPage() {
@@ -97,7 +109,7 @@ export default function AdminAdsPage() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('정말 이 광고 설정을 삭제하시겠습니까?')) return;
+    if (!confirm('정말 이 광고 설정을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) return;
 
     try {
       const response = await fetch(`/api/admin/ads/${id}`, {
@@ -108,7 +120,8 @@ export default function AdminAdsPage() {
         alert('광고 설정이 삭제되었습니다.');
         fetchAdSettings();
       } else {
-        alert('광고 설정 삭제에 실패했습니다.');
+        const errorData = await response.json();
+        alert(errorData.message || '광고 설정 삭제에 실패했습니다.');
       }
     } catch (error) {
       console.error('Delete error:', error);
@@ -116,28 +129,29 @@ export default function AdminAdsPage() {
     }
   };
 
-  const toggleEnabled = async (id: number, enabled: boolean) => {
+  const toggleEnabled = async (id: number, currentStatus: boolean) => {
     try {
       const response = await fetch(`/api/admin/ads/${id}/toggle`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ enabled: !enabled }),
+        body: JSON.stringify({ enabled: !currentStatus }),
       });
 
       if (response.ok) {
         fetchAdSettings();
       } else {
-        alert('광고 상태 변경에 실패했습니다.');
+        alert('광고 활성화 상태 변경에 실패했습니다.');
       }
     } catch (error) {
       console.error('Toggle error:', error);
-      alert('광고 상태 변경 중 오류가 발생했습니다.');
+      alert('광고 활성화 상태 변경 중 오류가 발생했습니다.');
     }
   };
 
-  const openModal = () => {
+  const closeModal = () => {
+    setIsModalOpen(false);
     setEditingAd(null);
     setFormData({
       name: '',
@@ -147,29 +161,22 @@ export default function AdminAdsPage() {
       postTypes: 'all',
       displayRules: '',
     });
+  };
+
+  const openModal = () => {
     setIsModalOpen(true);
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setEditingAd(null);
-  };
-
-  const insertSampleAdCode = () => {
-    const sampleCode = `<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXX"
-     crossorigin="anonymous"></script>
-<!-- 샘플 광고 -->
-<ins class="adsbygoogle"
-     style="display:block"
-     data-ad-client="ca-pub-XXXXXXXXXXXXXXX"
-     data-ad-slot="XXXXXXXXXX"
-     data-ad-format="auto"
-     data-full-width-responsive="true"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>`;
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
-    setFormData({ ...formData, adCode: sampleCode });
+    if (diffDays === 1) return '오늘';
+    if (diffDays === 2) return '어제';
+    if (diffDays <= 7) return `${diffDays - 1}일 전`;
+    return date.toLocaleDateString('ko-KR');
   };
 
   if (loading) {
@@ -183,240 +190,219 @@ export default function AdminAdsPage() {
   return (
     <div className="space-y-6">
       {/* 헤더 */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">광고 설정</h1>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-            구글 애드센스 광고의 위치와 표시 규칙을 설정할 수 있습니다.
-          </p>
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">광고 설정</h1>
+            <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
+              Google AdSense 및 기타 광고를 관리할 수 있습니다.
+            </p>
+          </div>
+          
+          <button
+            onClick={openModal}
+            className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-medium rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 shadow-sm"
+          >
+            <PlusIcon className="w-4 h-4 mr-2" />
+            새 광고 설정
+          </button>
         </div>
-        
-        <button
-          onClick={openModal}
-          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-        >
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          새 광고 설정
-        </button>
       </div>
 
       {/* 광고 설정 목록 */}
-      <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  이름
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  위치
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  상태
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  포스트 타입
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  생성일
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  액션
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {adSettings.length > 0 ? (
-                adSettings.map((ad) => (
-                  <tr key={ad.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td className="px-6 py-4">
-                      <div className="text-sm font-medium text-gray-900 dark:text-white">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        {adSettings.length > 0 ? (
+          <div className="divide-y divide-gray-200 dark:divide-gray-700">
+            {adSettings.map((ad) => (
+              <div key={ad.id} className="p-6 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-3 mb-3">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                         {ad.name}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
-                        {positionOptions.find(p => p.value === ad.position)?.label || ad.position}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                      </h3>
                       <button
                         onClick={() => toggleEnabled(ad.id, ad.enabled)}
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors ${
                           ad.enabled
-                            ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
                         }`}
                       >
-                        {ad.enabled ? '활성' : '비활성'}
+                        {ad.enabled ? (
+                          <>
+                            <CheckCircleIcon className="w-3 h-3 mr-1" />
+                            활성
+                          </>
+                        ) : (
+                          <>
+                            <XCircleIcon className="w-3 h-3 mr-1" />
+                            비활성
+                          </>
+                        )}
                       </button>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                      {ad.postTypes === 'all' ? '모든 포스트' : '특정 포스트'}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                      {new Date(ad.createdAt).toLocaleDateString('ko-KR')}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                      <button
-                        onClick={() => handleEdit(ad)}
-                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
-                      >
-                        수정
-                      </button>
-                      <button
-                        onClick={() => handleDelete(ad.id)}
-                        className="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
-                      >
-                        삭제
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
-                    <div className="text-gray-500 dark:text-gray-400">
-                      <svg className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
-                      </svg>
-                      <h3 className="mt-2 text-sm font-medium">광고 설정이 없습니다</h3>
-                      <p className="mt-1 text-sm">새 광고 설정을 추가해보세요!</p>
                     </div>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+                    
+                    <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-3">
+                      <span className="flex items-center">
+                        <MegaphoneIcon className="w-4 h-4 mr-1" />
+                        {positionOptions.find(p => p.value === ad.position)?.label}
+                      </span>
+                      <span className="flex items-center">
+                        <Cog6ToothIcon className="w-4 h-4 mr-1" />
+                        {ad.postTypes === 'all' ? '모든 포스트' : '특정 포스트'}
+                      </span>
+                      <span className="flex items-center">
+                        <CalendarIcon className="w-4 h-4 mr-1" />
+                        {formatDate(ad.updatedAt)}
+                      </span>
+                    </div>
+
+                    {ad.displayRules && (
+                      <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 mb-3">
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                          <strong>표시 규칙:</strong> {ad.displayRules}
+                        </p>
+                      </div>
+                    )}
+
+                    <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3">
+                      <p className="text-xs text-gray-600 dark:text-gray-400 font-mono break-all">
+                        {ad.adCode.length > 100 ? `${ad.adCode.substring(0, 100)}...` : ad.adCode}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 ml-4">
+                    <button
+                      onClick={() => handleEdit(ad)}
+                      className="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors duration-200"
+                      title="편집"
+                    >
+                      <PencilIcon className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(ad.id)}
+                      className="p-2 text-gray-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200"
+                      title="삭제"
+                    >
+                      <TrashIcon className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <MegaphoneIcon className="w-12 h-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              광고 설정이 없습니다.
+            </p>
+            <button
+              onClick={openModal}
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              <PlusIcon className="w-4 h-4 mr-2" />
+              첫 광고 설정 추가하기
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 모달 */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-screen overflow-y-auto">
-            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
                 {editingAd ? '광고 설정 수정' : '새 광고 설정'}
-              </h3>
+              </h2>
             </div>
-            
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+
+            <form onSubmit={handleSubmit} className="p-6 space-y-6">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  광고 이름 *
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  광고 이름
                 </label>
                 <input
                   type="text"
-                  id="name"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                   placeholder="예: 포스트 상단 광고"
                 />
               </div>
 
               <div>
-                <label htmlFor="position" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  광고 위치 *
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  표시 위치
                 </label>
                 <select
-                  id="position"
                   value={formData.position}
                   onChange={(e) => setFormData({ ...formData, position: e.target.value as AdSetting['position'] })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 >
                   {positionOptions.map((option) => (
                     <option key={option.value} value={option.value}>
-                      {option.label}
+                      {option.label} - {option.description}
                     </option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <div className="flex justify-between items-center mb-1">
-                  <label htmlFor="adCode" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    광고 코드 *
-                  </label>
-                  <button
-                    type="button"
-                    onClick={insertSampleAdCode}
-                    className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 underline"
-                  >
-                    샘플 코드 삽입
-                  </button>
-                </div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  광고 코드
+                </label>
                 <textarea
-                  id="adCode"
                   required
-                  rows={8}
+                  rows={6}
                   value={formData.adCode}
                   onChange={(e) => setFormData({ ...formData, adCode: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm"
-                  placeholder="구글 애드센스 코드를 입력하세요"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white font-mono text-sm"
+                  placeholder="Google AdSense 코드를 여기에 붙여넣으세요..."
                 />
               </div>
 
               <div>
-                <label htmlFor="postTypes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  포스트 타입
-                </label>
-                <select
-                  id="postTypes"
-                  value={formData.postTypes}
-                  onChange={(e) => setFormData({ ...formData, postTypes: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                >
-                  <option value="all">모든 포스트</option>
-                  <option value="specific">특정 포스트</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="displayRules" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   표시 규칙 (선택사항)
                 </label>
                 <textarea
-                  id="displayRules"
                   rows={3}
                   value={formData.displayRules}
                   onChange={(e) => setFormData({ ...formData, displayRules: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="특별한 표시 규칙이 있다면 입력하세요"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  placeholder="특정 조건에서만 표시하고 싶은 경우 규칙을 입력하세요..."
                 />
               </div>
 
-              <div>
-                <div className="flex items-center">
-                  <input
-                    id="enabled"
-                    type="checkbox"
-                    checked={formData.enabled}
-                    onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded"
-                  />
-                  <label htmlFor="enabled" className="ml-2 block text-sm text-gray-900 dark:text-white">
-                    광고 활성화
-                  </label>
-                </div>
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="enabled"
+                  checked={formData.enabled}
+                  onChange={(e) => setFormData({ ...formData, enabled: e.target.checked })}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                />
+                <label htmlFor="enabled" className="ml-2 block text-sm text-gray-700 dark:text-gray-300">
+                  즉시 활성화
+                </label>
               </div>
 
               <div className="flex justify-end space-x-3 pt-4">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                 >
                   취소
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   {editingAd ? '수정' : '생성'}
                 </button>

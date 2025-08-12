@@ -31,10 +31,16 @@ export default function NewPostPage() {
 
   const fetchCategories = async () => {
     try {
+      console.log('카테고리 데이터 가져오는 중...');
       const response = await fetch('/api/categories');
+      console.log('카테고리 응답:', response.status, response.statusText);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('카테고리 데이터:', data);
         setCategories(data);
+      } else {
+        console.error('카테고리 가져오기 실패:', response.status);
       }
     } catch (error) {
       console.error('Failed to fetch categories:', error);
@@ -270,14 +276,14 @@ export default function NewPostPage() {
                     <button
                       type="button"
                       onClick={handleCreateCategory}
-                      className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
+                      className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors duration-200"
                     >
                       생성
                     </button>
                     <button
                       type="button"
                       onClick={() => setShowCategoryForm(false)}
-                      className="px-3 py-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
+                      className="px-3 py-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
                     >
                       취소
                     </button>
@@ -293,12 +299,20 @@ export default function NewPostPage() {
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               >
                 <option value="">카테고리 선택 (선택사항)</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
-                ))}
+                {categories.length > 0 ? (
+                  categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))
+                ) : (
+                  <option value="" disabled>카테고리 로딩 중...</option>
+                )}
               </select>
+              {/* 디버깅 정보 */}
+              <div className="mt-1 text-xs text-gray-500">
+                카테고리 개수: {categories.length}개
+              </div>
             </div>
 
             {/* 요약 */}

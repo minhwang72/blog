@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function AdminLoginPage() {
+  const router = useRouter();
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -35,7 +37,7 @@ export default function AdminLoginPage() {
     setError('');
 
     try {
-      console.log('로그인 시도 중...', formData);
+      console.log('🔐 로그인 시도 중...', formData);
       
       const response = await fetch('/api/admin/login', {
         method: 'POST',
@@ -46,19 +48,20 @@ export default function AdminLoginPage() {
       });
 
       console.log('로그인 응답:', response.status, response.statusText);
+      console.log('응답 헤더:', Object.fromEntries(response.headers.entries()));
 
       if (response.ok) {
         const data = await response.json();
-        console.log('로그인 성공:', data);
-        
-        // 로컬 스토리지에 세션 저장
-        localStorage.setItem('adminSession', data.sessionId);
+        console.log('✅ 로그인 성공:', data);
         
         // 성공 메시지 표시
         alert('로그인 성공! 관리자 페이지로 이동합니다.');
         
-        // 바로 관리자 페이지로 이동
-        window.location.href = '/admin';
+        // 쿠키 설정을 위한 약간의 지연 후 관리자 페이지로 이동
+        setTimeout(() => {
+          console.log('🔄 관리자 페이지로 이동 중...');
+          router.push('/admin');
+        }, 100);
         
       } else {
         const errorData = await response.json();
