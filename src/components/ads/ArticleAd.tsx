@@ -36,12 +36,6 @@ export default function ArticleAd({
       return false;
     }
     
-    // 5. 실제 광고 슬롯이 설정되어 있어야 함
-    const adSlot = getAdSlot();
-    if (adSlot.includes('YOUR_') || adSlot.includes('DEFAULT')) {
-      return false;
-    }
-    
     return true;
   };
 
@@ -62,19 +56,10 @@ export default function ArticleAd({
     }
   };
 
+  // 자동 광고 사용 (실제 슬롯 ID 대신)
   const getAdSlot = () => {
-    const actualPosition = getAutoPosition();
-    
-    switch (actualPosition) {
-      case 'top':
-        return process.env.NEXT_PUBLIC_ADSENSE_TOP_SLOT || 'YOUR_TOP_AD_SLOT';
-      case 'middle':
-        return process.env.NEXT_PUBLIC_ADSENSE_MIDDLE_SLOT || 'YOUR_MIDDLE_AD_SLOT';
-      case 'bottom':
-        return process.env.NEXT_PUBLIC_ADSENSE_BOTTOM_SLOT || 'YOUR_BOTTOM_AD_SLOT';
-      default:
-        return process.env.NEXT_PUBLIC_ADSENSE_DEFAULT_SLOT || 'YOUR_DEFAULT_AD_SLOT';
-    }
+    // 자동 광고를 위한 특별한 슬롯 ID 사용
+    return 'auto';
   };
 
   // 광고 표시 조건을 만족하지 않으면 아무것도 렌더링하지 않음
@@ -83,7 +68,6 @@ export default function ArticleAd({
   }
 
   const actualPosition = getAutoPosition();
-  const adSlot = getAdSlot();
 
   return (
     <div className="my-8 text-center">
@@ -91,13 +75,14 @@ export default function ArticleAd({
         광고 {actualPosition === 'top' ? '(상단)' : actualPosition === 'middle' ? '(중간)' : '(하단)'}
       </div>
       <GoogleAdsense 
-        adSlot={adSlot}
+        adSlot="auto"
         style={{ 
           display: 'block',
           minHeight: '280px',
           textAlign: 'center'
         }}
         className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4"
+        format="auto"
       />
     </div>
   );
