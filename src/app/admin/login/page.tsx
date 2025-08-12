@@ -11,6 +11,7 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isDark, setIsDark] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
 
   // 다크모드 감지
   useEffect(() => {
@@ -33,6 +34,7 @@ export default function AdminLoginPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setLoginSuccess(false);
 
     try {
       console.log('로그인 시도 중...', formData);
@@ -54,12 +56,11 @@ export default function AdminLoginPage() {
         // 로컬 스토리지에 세션 저장
         localStorage.setItem('adminSession', data.sessionId);
         
+        // 로그인 성공 상태로 변경
+        setLoginSuccess(true);
+        
         // 성공 메시지 표시
         alert('로그인 성공! 관리자 페이지로 이동합니다.');
-        
-        // 즉시 페이지 이동 (미들웨어 비활성화 상태)
-        console.log('즉시 페이지 이동 시도...');
-        window.location.href = '/admin';
         
       } else {
         const errorData = await response.json();
@@ -73,6 +74,74 @@ export default function AdminLoginPage() {
       setLoading(false);
     }
   };
+
+  const handleAdminRedirect = () => {
+    // 여러 방법으로 관리자 페이지 접근 시도
+    console.log('관리자 페이지 접근 시도...');
+    
+    // 방법 1: 새 창에서 열기
+    window.open('/admin', '_blank');
+    
+    // 방법 2: 현재 창에서 이동
+    setTimeout(() => {
+      window.location.href = '/admin';
+    }, 500);
+    
+    // 방법 3: replace로 이동
+    setTimeout(() => {
+      window.location.replace('/admin');
+    }, 1000);
+  };
+
+  if (loginSuccess) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: isDark ? '#111827' : '#ffffff' }}>
+        <div style={{ width: '400px', maxWidth: '100%' }}>
+          <div className="text-center mb-6">
+            <h1 className="text-xl font-bold mb-1" style={{ color: isDark ? '#ffffff' : '#111827' }}>
+              ✅ 로그인 성공!
+            </h1>
+            <p className="text-sm" style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>
+              관리자 페이지로 이동하세요
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <button
+              onClick={handleAdminRedirect}
+              className="w-full py-3 px-4 bg-green-600 text-white rounded-md font-medium hover:bg-green-700 transition-colors"
+            >
+              🚀 관리자 페이지로 이동
+            </button>
+            
+            <button
+              onClick={() => window.open('/admin', '_blank')}
+              className="w-full py-3 px-4 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition-colors"
+            >
+              🔗 새 창에서 관리자 페이지 열기
+            </button>
+            
+            <Link
+              href="/admin"
+              className="block w-full py-3 px-4 bg-gray-600 text-white text-center rounded-md font-medium hover:bg-gray-700 transition-colors"
+            >
+              📝 링크로 관리자 페이지 접근
+            </Link>
+          </div>
+
+          <div className="text-center mt-6">
+            <button
+              onClick={() => setLoginSuccess(false)}
+              className="text-sm"
+              style={{ color: isDark ? '#9ca3af' : '#6b7280' }}
+            >
+              다시 로그인하기
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: isDark ? '#111827' : '#ffffff' }}>
