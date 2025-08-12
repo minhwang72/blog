@@ -16,7 +16,7 @@ import 'react-quill/dist/quill.snow.css';
 const quillStyles = `
   .quill-editor-container .ql-editor {
     min-height: 400px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: "굴림", Gulim, "Malgun Gothic", sans-serif;
     font-size: 14px;
     line-height: 1.6;
     color: #374151;
@@ -102,7 +102,7 @@ export default function NewPostPage() {
     content: '',
     excerpt: '',
     categoryId: '',
-    published: false,
+    published: true,
   });
   const [categories, setCategories] = useState<Category[]>([]);
   const [newCategory, setNewCategory] = useState({ name: '', slug: '' });
@@ -483,6 +483,19 @@ export default function NewPostPage() {
                 </div>
               ) : (
                 <div className="quill-editor-container">
+                  <div className="mb-2 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const adHtml = '<div class="ad-placeholder" style="background: #f3f4f6; border: 2px dashed #d1d5db; padding: 20px; text-align: center; margin: 20px 0; color: #6b7280;">광고 위치</div>';
+                        const newContent = formData.content + adHtml;
+                        setFormData(prev => ({ ...prev, content: newContent }));
+                      }}
+                      className="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                    >
+                      광고 삽입
+                    </button>
+                  </div>
                   <ReactQuill
                     value={formData.content}
                     onChange={handleContentChange}
@@ -511,19 +524,6 @@ export default function NewPostPage() {
                     placeholder="포스트 내용을 입력하세요..."
                     style={{ height: '400px' }}
                   />
-                  <div className="mt-2 flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const adHtml = '<div class="ad-placeholder" style="background: #f3f4f6; border: 2px dashed #d1d5db; padding: 20px; text-align: center; margin: 20px 0; color: #6b7280;">광고 위치</div>';
-                        const newContent = formData.content + adHtml;
-                        setFormData(prev => ({ ...prev, content: newContent }));
-                      }}
-                      className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200 font-medium"
-                    >
-                      광고 삽입
-                    </button>
-                  </div>
                 </div>
               )}
               
