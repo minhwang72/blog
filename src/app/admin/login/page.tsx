@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function AdminLoginPage() {
@@ -13,7 +12,6 @@ export default function AdminLoginPage() {
   const [error, setError] = useState('');
   const [isDark, setIsDark] = useState(false);
   const [showManualLink, setShowManualLink] = useState(false);
-  const router = useRouter();
 
   // 다크모드 감지
   useEffect(() => {
@@ -61,20 +59,27 @@ export default function AdminLoginPage() {
         // 성공 메시지 표시
         alert('로그인 성공! 관리자 페이지로 이동합니다.');
         
-        // Next.js router를 사용한 페이지 이동
+        // 강제 페이지 이동
         setTimeout(() => {
-          console.log('페이지 이동 시도 중...');
+          console.log('강제 페이지 이동 시도...');
           try {
-            router.push('/admin');
-            console.log('router.push 호출 완료');
+            // 방법 1: window.location.href로 강제 이동
+            window.location.href = '/admin';
+            console.log('window.location.href 호출 완료');
             
-            // 3초 후에도 이동이 안 되면 수동 링크 표시
+            // 2초 후에도 이동이 안 되면 새로고침과 함께 이동
+            setTimeout(() => {
+              console.log('새로고침과 함께 이동 시도...');
+              window.location.replace('/admin');
+            }, 2000);
+            
+            // 4초 후에도 안 되면 수동 링크 표시
             setTimeout(() => {
               console.log('수동 링크 표시');
               setShowManualLink(true);
-            }, 3000);
+            }, 4000);
           } catch (error) {
-            console.error('router.push 에러:', error);
+            console.error('페이지 이동 에러:', error);
             setShowManualLink(true);
           }
         }, 1000);
