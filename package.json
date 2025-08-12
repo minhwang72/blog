@@ -11,15 +11,12 @@
     "db:push": "drizzle-kit push:mysql",
     "db:studio": "drizzle-kit studio",
     "db:fix": "tsx scripts/run-db-fix-simple.ts",
-    "db:reset": "tsx scripts/run-db-fix.ts && drizzle-kit generate:mysql",
     "seed": "tsx scripts/seed.ts",
     "generate:mcp-token": "tsx scripts/generate-mcp-token.ts",
     "db:setup-remote": "tsx scripts/setup-remote-db.ts",
-    "db:debug": "tsx scripts/debug-db-connection.ts",
     "setup:admin-tables": "tsx scripts/setup-admin-tables.ts",
     "setup:ads-tables": "tsx scripts/setup-admin-ads-tables.ts",
     "setup:about-content": "tsx scripts/setup-about-content-direct.ts",
-    "analyze:db": "tsx scripts/analyze-db-status.ts",
     "create:admin": "tsx scripts/create-admin.ts"
   },
   "dependencies": {
