@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { Editor } from '@tinymce/tinymce-react';
 
 interface Category {
   id: number;
@@ -55,6 +56,16 @@ export default function NewPostPage() {
       return;
     }
 
+    // slug 자동 생성 로직 개선
+    const generateSlug = (name: string) => {
+      return name
+        .toLowerCase()
+        .replace(/[^\w\s-]/g, '') // 특수문자 제거
+        .replace(/\s+/g, '-') // 공백을 하이픈으로
+        .replace(/-+/g, '-') // 연속된 하이픈을 하나로
+        .trim();
+    };
+
     try {
       const response = await fetch('/api/categories', {
         method: 'POST',
@@ -63,7 +74,7 @@ export default function NewPostPage() {
         },
         body: JSON.stringify({
           name: newCategory.name,
-          slug: newCategory.slug || newCategory.name.toLowerCase().replace(/\s+/g, '-'),
+          slug: newCategory.slug || generateSlug(newCategory.name),
         }),
       });
 
@@ -81,6 +92,31 @@ export default function NewPostPage() {
     } catch (error) {
       console.error('Category creation error:', error);
       alert('카테고리 생성 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 요약 자동 생성 함수
+  const generateExcerpt = (content: string) => {
+    // HTML 태그 제거
+    const plainText = content.replace(/<[^>]*>/g, '');
+    // 150자로 제한하고 마지막 단어가 잘리지 않도록 조정
+    if (plainText.length <= 150) {
+      return plainText;
+    }
+    const truncated = plainText.substring(0, 150);
+    const lastSpace = truncated.lastIndexOf(' ');
+    return lastSpace > 0 ? truncated.substring(0, lastSpace) + '...' : truncated + '...';
+  };
+
+  // 내용이 변경될 때 요약 자동 생성
+  const handleContentChange = (content: string) => {
+    setFormData({ ...formData, content });
+    
+    // 요약이 비어있거나 사용자가 수동으로 입력하지 않은 경우에만 자동 생성
+    if (!formData.excerpt || formData.excerpt === generateExcerpt(formData.content)) {
+      setFormData(prev => ({ ...prev, content, excerpt: generateExcerpt(content) }));
+    } else {
+      setFormData(prev => ({ ...prev, content }));
     }
   };
 
@@ -317,9 +353,18 @@ export default function NewPostPage() {
 
             {/* 요약 */}
             <div>
-              <label htmlFor="excerpt" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                요약 (선택사항)
-              </label>
+              <div className="flex justify-between items-center mb-2">
+                <label htmlFor="excerpt" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  요약 (자동 생성됨)
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, excerpt: generateExcerpt(formData.content) })}
+                  className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+                >
+                  다시 생성
+                </button>
+              </div>
               <textarea
                 id="excerpt"
                 name="excerpt"
@@ -327,40 +372,21 @@ export default function NewPostPage() {
                 value={formData.excerpt}
                 onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                placeholder="포스트 요약을 입력하세요 (자동 생성됨)"
+                placeholder="내용을 입력하면 자동으로 요약이 생성됩니다"
               />
+              <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                내용을 입력하면 자동으로 150자 요약이 생성됩니다. 수동으로 수정할 수도 있습니다.
+              </div>
             </div>
 
             {/* 내용 */}
             <div>
               <div className="flex justify-between items-center mb-2">
                 <label htmlFor="content" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  내용 * (HTML 지원)
+                  내용 * (리치 에디터)
                 </label>
-                <div className="flex space-x-1">
-                  {[
-                    { tag: 'h2', label: 'H2' },
-                    { tag: 'h3', label: 'H3' },
-                    { tag: 'p', label: 'P' },
-                    { tag: 'img', label: 'IMG' },
-                    { tag: 'a', label: 'A' },
-                    { tag: 'code', label: 'CODE' },
-                    { tag: 'pre', label: 'PRE' },
-                    { tag: 'blockquote', label: 'QUOTE' },
-                    { tag: 'ul', label: 'UL' },
-                    { tag: 'ol', label: 'OL' },
-                    { tag: 'table', label: 'TABLE' },
-                  ].map(({ tag, label }) => (
-                    <button
-                      key={tag}
-                      type="button"
-                      onClick={() => insertHtmlTag(tag)}
-                      className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600"
-                      title={`${label} 태그 삽입`}
-                    >
-                      {label}
-                    </button>
-                  ))}
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  TinyMCE 에디터로 작성하세요
                 </div>
               </div>
               
@@ -369,15 +395,59 @@ export default function NewPostPage() {
                   <div dangerouslySetInnerHTML={{ __html: formData.content }} />
                 </div>
               ) : (
-                <textarea
-                  id="content"
-                  name="content"
-                  rows={20}
-                  required
+                <Editor
                   value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white font-mono text-sm"
-                  placeholder="HTML 형식으로 포스트 내용을 입력하세요. 광고는 &lt;div class='ad-placeholder'&gt;광고 위치&lt;/div&gt; 형태로 삽입하세요."
+                  init={{
+                    height: 500,
+                    menubar: true,
+                    plugins: [
+                      'advlist autolink lists link image charmap print preview anchor',
+                      'searchreplace visualblocks code fullscreen',
+                      'insertdatetime media table paste code help wordcount',
+                      'codesample'
+                    ],
+                    toolbar: [
+                      'undo redo | formatselect | bold italic underline strikethrough | forecolor backcolor',
+                      'alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
+                      'link image media table | code codesample adplaceholder | fullscreen'
+                    ].join(' | '),
+                    content_style: `
+                      body { 
+                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; 
+                        font-size: 14px; 
+                        line-height: 1.6;
+                        color: #374151;
+                      }
+                      .ad-placeholder {
+                        background: #f3f4f6;
+                        border: 2px dashed #d1d5db;
+                        padding: 20px;
+                        text-align: center;
+                        margin: 20px 0;
+                        color: #6b7280;
+                      }
+                    `,
+                    formats: {
+                      h2: { block: 'h2', styles: { 'font-size': '1.5em', 'font-weight': 'bold', 'margin': '1em 0 0.5em 0' } },
+                      h3: { block: 'h3', styles: { 'font-size': '1.25em', 'font-weight': 'bold', 'margin': '1em 0 0.5em 0' } },
+                      code: { inline: 'code', styles: { 'background-color': '#f3f4f6', 'padding': '2px 4px', 'border-radius': '3px', 'font-family': 'monospace' } }
+                    },
+                    paste_as_text: false,
+                    paste_enable_default_filters: true,
+                    paste_word_valid_elements: 'b,strong,i,em,h1,h2,h3,h4,h5,h6',
+                    paste_retain_style_properties: 'color background-color font-size font-weight',
+                    setup: function(editor) {
+                      // 광고 삽입 버튼 추가
+                      editor.ui.registry.addButton('adplaceholder', {
+                        text: '광고',
+                        tooltip: '광고 위치 삽입',
+                        onAction: function() {
+                          editor.insertContent('<div class="ad-placeholder">광고 위치</div>');
+                        }
+                      });
+                    }
+                  }}
+                  onEditorChange={handleContentChange}
                 />
               )}
               
