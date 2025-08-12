@@ -3,7 +3,6 @@ import "./globals.css";
 import { Providers } from './providers';
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
-import { usePathname } from 'next/navigation';
 import Script from 'next/script';
 
 export const metadata: Metadata = {
@@ -89,7 +88,11 @@ export default function RootLayout({
       <body className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 font-sans">
         <Providers>
           <div className="flex min-h-screen flex-col">
-            {children}
+            <Header />
+            <main className="flex-1">
+              {children}
+            </main>
+            <Footer />
           </div>
         </Providers>
         
