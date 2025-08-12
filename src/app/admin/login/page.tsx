@@ -11,7 +11,6 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isDark, setIsDark] = useState(false);
-  const [showManualLink, setShowManualLink] = useState(false);
 
   // 다크모드 감지
   useEffect(() => {
@@ -34,7 +33,6 @@ export default function AdminLoginPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setShowManualLink(false);
 
     try {
       console.log('로그인 시도 중...', formData);
@@ -59,26 +57,10 @@ export default function AdminLoginPage() {
         // 성공 메시지 표시
         alert('로그인 성공! 관리자 페이지로 이동합니다.');
         
-        // 쿠키 설정을 기다린 후 페이지 이동
-        setTimeout(() => {
-          console.log('쿠키 설정 대기 후 페이지 이동...');
-          
-          // 현재 페이지를 새로고침하여 쿠키가 적용되도록 함
-          window.location.reload();
-          
-          // 새로고침 후 1초 뒤에 관리자 페이지로 이동
-          setTimeout(() => {
-            console.log('관리자 페이지로 이동...');
-            window.location.href = '/admin';
-          }, 1000);
-          
-        }, 2000); // 2초 대기
+        // 즉시 페이지 이동 (미들웨어 비활성화 상태)
+        console.log('즉시 페이지 이동 시도...');
+        window.location.href = '/admin';
         
-        // 6초 후에도 안 되면 수동 링크 표시
-        setTimeout(() => {
-          console.log('수동 링크 표시');
-          setShowManualLink(true);
-        }, 6000);
       } else {
         const errorData = await response.json();
         console.error('로그인 실패:', errorData);
@@ -157,20 +139,6 @@ export default function AdminLoginPage() {
             {loading ? '로그인 중...' : '로그인'}
           </button>
         </form>
-
-        {showManualLink && (
-          <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
-            <p className="text-xs text-yellow-800 dark:text-yellow-200 mb-2">
-              자동 이동이 안 되었습니다. 아래 링크를 클릭하세요:
-            </p>
-            <Link
-              href="/admin"
-              className="block w-full py-2 px-4 bg-yellow-600 text-white text-sm text-center rounded-md hover:bg-yellow-700"
-            >
-              관리자 페이지로 이동
-            </Link>
-          </div>
-        )}
 
         <div className="text-center mt-4">
           <Link
