@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function AdminLoginPage() {
@@ -11,6 +12,8 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [isDark, setIsDark] = useState(false);
+  const [showManualLink, setShowManualLink] = useState(false);
+  const router = useRouter();
 
   // 다크모드 감지
   useEffect(() => {
@@ -33,8 +36,11 @@ export default function AdminLoginPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
+    setShowManualLink(false);
 
     try {
+      console.log('로그인 시도 중...', formData);
+      
       const response = await fetch('/api/admin/login', {
         method: 'POST',
         headers: {
@@ -43,8 +49,11 @@ export default function AdminLoginPage() {
         body: JSON.stringify(formData),
       });
 
+      console.log('로그인 응답:', response.status, response.statusText);
+
       if (response.ok) {
         const data = await response.json();
+        console.log('로그인 성공:', data);
         
         // 로컬 스토리지에 세션 저장
         localStorage.setItem('adminSession', data.sessionId);
@@ -52,39 +61,30 @@ export default function AdminLoginPage() {
         // 성공 메시지 표시
         alert('로그인 성공! 관리자 페이지로 이동합니다.');
         
-        // 여러 방법으로 페이지 이동 시도
+        // Next.js router를 사용한 페이지 이동
         setTimeout(() => {
-          // 방법 1: window.location.replace
+          console.log('페이지 이동 시도 중...');
           try {
-            window.location.replace('/admin');
-          } catch (error) {
-            console.error('replace 실패:', error);
+            router.push('/admin');
+            console.log('router.push 호출 완료');
             
-            // 방법 2: window.location.href
-            try {
-              window.location.href = '/admin';
-            } catch (error) {
-              console.error('href 실패:', error);
-              
-              // 방법 3: window.location.assign
-              try {
-                window.location.assign('/admin');
-              } catch (error) {
-                console.error('assign 실패:', error);
-                
-                // 방법 4: 직접 링크 클릭
-                const link = document.createElement('a');
-                link.href = '/admin';
-                link.click();
-              }
-            }
+            // 3초 후에도 이동이 안 되면 수동 링크 표시
+            setTimeout(() => {
+              console.log('수동 링크 표시');
+              setShowManualLink(true);
+            }, 3000);
+          } catch (error) {
+            console.error('router.push 에러:', error);
+            setShowManualLink(true);
           }
         }, 1000);
       } else {
         const errorData = await response.json();
+        console.error('로그인 실패:', errorData);
         setError(errorData.message || '로그인에 실패했습니다.');
       }
     } catch (error) {
+      console.error('로그인 에러:', error);
       setError('로그인 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
@@ -156,6 +156,20 @@ export default function AdminLoginPage() {
             {loading ? '로그인 중...' : '로그인'}
           </button>
         </form>
+
+        {showManualLink && (
+          <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-md">
+            <p className="text-xs text-yellow-800 dark:text-yellow-200 mb-2">
+              자동 이동이 안 되었습니다. 아래 링크를 클릭하세요:
+            </p>
+            <Link
+              href="/admin"
+              className="block w-full py-2 px-4 bg-yellow-600 text-white text-sm text-center rounded-md hover:bg-yellow-700"
+            >
+              관리자 페이지로 이동
+            </Link>
+          </div>
+        )}
 
         <div className="text-center mt-4">
           <Link
