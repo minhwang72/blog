@@ -21,42 +21,37 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       return;
     }
 
-    const checkAuth = () => {
-      const sessionId = localStorage.getItem('adminSession');
-      if (!sessionId) {
-        router.push('/admin/login');
-        return;
-      }
-
-      // 세션 유효성 검사
-      fetch('/api/admin/me', {
-        headers: {
-          'Authorization': `Bearer ${sessionId}`
-        }
-      })
-      .then(response => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch('/api/admin/me');
         if (response.ok) {
           setIsAuthenticated(true);
         } else {
+          // 세션이 만료되었거나 유효하지 않음
           localStorage.removeItem('adminSession');
           router.push('/admin/login');
         }
-      })
-      .catch(() => {
+      } catch (error) {
+        console.error('Auth check error:', error);
         localStorage.removeItem('adminSession');
         router.push('/admin/login');
-      })
-      .finally(() => {
+      } finally {
         setIsLoading(false);
-      });
+      }
     };
 
     checkAuth();
   }, [router, pathname]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminSession');
-    router.push('/admin/login');
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/logout', { method: 'POST' });
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      localStorage.removeItem('adminSession');
+      router.push('/admin/login');
+    }
   };
 
   // 로그인 페이지인 경우 바로 렌더링
@@ -66,10 +61,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-100 via-sky-50 to-gray-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">로딩 중...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sky-600 mx-auto"></div>
+          <p className="mt-4 text-slate-600 dark:text-slate-400">로딩 중...</p>
         </div>
       </div>
     );
@@ -88,13 +83,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* 헤더 */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+      <header className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl shadow-sm border-b border-slate-200 dark:border-slate-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-8">
-              <Link href="/admin" className="text-xl font-bold text-gray-900 dark:text-white">
+              <Link href="/admin" className="text-xl font-bold text-slate-900 dark:text-white hover:text-sky-600 dark:hover:text-sky-400 transition-colors">
                 🛠️ 관리자 대시보드
               </Link>
               <nav className="hidden md:flex space-x-1">
