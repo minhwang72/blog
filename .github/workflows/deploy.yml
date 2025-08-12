@@ -148,9 +148,24 @@ jobs:
           echo "Checking container status..."
           docker ps -a | grep blog
           
+          # Wait a moment for container to start
+          sleep 5
+          
           # Check container logs
           echo "Container logs:"
-          docker logs blog --tail 20
+          docker logs blog --tail 50
+          
+          # Check if container is running
+          if docker ps | grep -q blog; then
+            echo "✅ Container is running successfully!"
+          else
+            echo "❌ Container failed to start!"
+            echo "Container status:"
+            docker ps -a | grep blog
+            echo "Container logs:"
+            docker logs blog
+            exit 1
+          fi
           
           echo "Deployment completed!"
         EOF

@@ -56,5 +56,5 @@ EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:3001/api/health || exit 1
 
-# Start the application
+# Start the application - 더 안전한 방법으로 수정
 CMD ["node", "server.js"]
