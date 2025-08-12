@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 export default function AdminLoginPage() {
@@ -11,9 +10,7 @@ export default function AdminLoginPage() {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
   const [isDark, setIsDark] = useState(false);
-  const router = useRouter();
 
   // 다크모드 감지
   useEffect(() => {
@@ -36,7 +33,6 @@ export default function AdminLoginPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
-    setSuccess(false);
 
     try {
       const response = await fetch('/api/admin/login', {
@@ -49,14 +45,15 @@ export default function AdminLoginPage() {
 
       if (response.ok) {
         const data = await response.json();
-        localStorage.setItem('adminSession', data.sessionId);
-        setSuccess(true);
-        setFormData({ username: '', password: '' });
         
-        // 1초 후 자동으로 관리자 페이지로 이동
-        setTimeout(() => {
-          window.location.href = '/admin';
-        }, 1000);
+        // 로컬 스토리지에 세션 저장
+        localStorage.setItem('adminSession', data.sessionId);
+        
+        // 성공 메시지 표시
+        alert('로그인 성공! 관리자 페이지로 이동합니다.');
+        
+        // 즉시 관리자 페이지로 이동
+        window.location.href = '/admin';
       } else {
         const errorData = await response.json();
         setError(errorData.message || '로그인에 실패했습니다.');
@@ -80,12 +77,6 @@ export default function AdminLoginPage() {
           </p>
         </div>
 
-        {success && (
-          <div className="mb-4 p-3 rounded-md text-center" style={{ backgroundColor: isDark ? '#065f46' : '#d1fae5', color: isDark ? '#6ee7b7' : '#065f46' }}>
-            <p className="text-sm">로그인 성공! 관리자 페이지로 이동합니다...</p>
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
             <input
@@ -101,7 +92,6 @@ export default function AdminLoginPage() {
                 border: `1px solid ${isDark ? '#4b5563' : '#d1d5db'}`,
                 borderColor: isDark ? '#4b5563' : '#d1d5db'
               }}
-              disabled={success}
             />
           </div>
 
@@ -119,7 +109,6 @@ export default function AdminLoginPage() {
                 border: `1px solid ${isDark ? '#4b5563' : '#d1d5db'}`,
                 borderColor: isDark ? '#4b5563' : '#d1d5db'
               }}
-              disabled={success}
             />
           </div>
 
@@ -131,14 +120,14 @@ export default function AdminLoginPage() {
 
           <button
             type="submit"
-            disabled={loading || success}
+            disabled={loading}
             className="w-full py-2 px-4 rounded-md font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
               backgroundColor: isDark ? '#ffffff' : '#111827',
               color: isDark ? '#111827' : '#ffffff'
             }}
           >
-            {loading ? '로그인 중...' : success ? '로그인 성공!' : '로그인'}
+            {loading ? '로그인 중...' : '로그인'}
           </button>
         </form>
 

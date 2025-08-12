@@ -4,22 +4,13 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 관리자 페이지 접근 시 인증 확인
+  // 관리자 페이지 접근 시에만 인증 확인
   if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
     const adminSession = request.cookies.get('adminSession');
     
     // 세션이 없으면 로그인 페이지로 리다이렉트
     if (!adminSession || !adminSession.value) {
       return NextResponse.redirect(new URL('/admin/login', request.url));
-    }
-  }
-
-  // 로그인된 상태에서 로그인 페이지 접근 시 관리자 페이지로 리다이렉트
-  if (pathname === '/admin/login') {
-    const adminSession = request.cookies.get('adminSession');
-    
-    if (adminSession && adminSession.value) {
-      return NextResponse.redirect(new URL('/admin', request.url));
     }
   }
 
