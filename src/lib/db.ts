@@ -8,7 +8,7 @@ dotenv.config({ path: '.env.local' });
 
 // DB 호스트 자동 감지
 const isProduction = process.env.NODE_ENV === 'production';
-const DB_HOST = isProduction ? '192.168.0.19' : (process.env.DB_HOST || 'monsilserver.iptime.org');
+const DB_HOST = process.env.DB_HOST || (isProduction ? '192.168.0.19' : 'monsilserver.iptime.org');
 
 // 환경변수 검증
 function validateDatabaseEnvs() {

@@ -38,7 +38,7 @@ jobs:
         echo "HOST=0.0.0.0" >> $GITHUB_ENV
         echo "NODE_ENV=production" >> $GITHUB_ENV
         echo "NEXT_TELEMETRY_DISABLED=1" >> $GITHUB_ENV
-        echo "SKIP_DATABASE_CONNECTION=true" >> $GITHUB_ENV
+        echo "SKIP_DATABASE_CONNECTION=false" >> $GITHUB_ENV
         # Database Configuration
         echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
         echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV

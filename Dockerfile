@@ -12,7 +12,7 @@ COPY . .
 
 # Set build environment variables
 ENV NODE_ENV=production
-ENV SKIP_DATABASE_CONNECTION=true
+ENV SKIP_DATABASE_CONNECTION=false
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Build application with optimizations
