@@ -1,73 +1,40 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 
-// Quill 에디터를 동적으로 import (SSR 문제 방지)
-const ReactQuill = dynamic(() => import('react-quill'), {
+// Toast UI Editor를 동적으로 import (SSR 문제 방지)
+const Editor = dynamic(() => import('@toast-ui/react-editor').then(mod => mod.Editor), {
   ssr: false,
   loading: () => <p>에디터 로딩 중...</p>,
 });
 
-import 'react-quill/dist/quill.snow.css';
+import '@toast-ui/editor/dist/toastui-editor.css';
 
-// Quill 에디터 커스텀 스타일
-const quillStyles = `
-  .quill-editor-container .ql-editor {
-    min-height: 400px;
+// Toast UI Editor 커스텀 스타일
+const editorStyles = `
+  .toastui-editor-container {
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+  }
+  
+  .toastui-editor-defaultUI {
+    border: none;
+  }
+  
+  .toastui-editor-defaultUI-toolbar {
+    background: #f9fafb;
+    border-bottom: 1px solid #d1d5db;
+  }
+  
+  .toastui-editor-contents {
     font-family: "굴림", Gulim, "Malgun Gothic", sans-serif;
     font-size: 14px;
     line-height: 1.6;
-    color: #374151;
   }
   
-  .quill-editor-container .ql-toolbar {
-    border-top: 1px solid #d1d5db;
-    border-left: 1px solid #d1d5db;
-    border-right: 1px solid #d1d5db;
-    border-bottom: none;
-    background: #f9fafb;
-  }
-  
-  .quill-editor-container .ql-container {
-    border: 1px solid #d1d5db;
-    border-top: none;
-  }
-  
-  .quill-editor-container .ql-editor h1 {
-    font-size: 1.5em;
-    font-weight: bold;
-    margin: 1em 0 0.5em 0;
-  }
-  
-  .quill-editor-container .ql-editor h2 {
-    font-size: 1.25em;
-    font-weight: bold;
-    margin: 1em 0 0.5em 0;
-  }
-  
-  .quill-editor-container .ql-editor h3 {
-    font-size: 1.1em;
-    font-weight: bold;
-    margin: 1em 0 0.5em 0;
-  }
-  
-  .quill-editor-container .ql-editor code {
-    background-color: #f3f4f6;
-    padding: 2px 4px;
-    border-radius: 3px;
-    font-family: monospace;
-  }
-  
-  .quill-editor-container .ql-editor pre {
-    background-color: #f3f4f6;
-    padding: 1em;
-    border-radius: 4px;
-    overflow-x: auto;
-  }
-  
-  .quill-editor-container .ql-editor .ad-placeholder {
+  .toastui-editor-contents .ad-placeholder {
     background: #f3f4f6;
     border: 2px dashed #d1d5db;
     padding: 20px;
@@ -76,17 +43,13 @@ const quillStyles = `
     color: #6b7280;
   }
   
-  .dark .quill-editor-container .ql-toolbar {
+  .dark .toastui-editor-container {
+    border-color: #4b5563;
+  }
+  
+  .dark .toastui-editor-defaultUI-toolbar {
     background: #374151;
     border-color: #4b5563;
-  }
-  
-  .dark .quill-editor-container .ql-container {
-    border-color: #4b5563;
-  }
-  
-  .dark .quill-editor-container .ql-editor {
-    color: #f3f4f6;
   }
 `;
 
@@ -301,9 +264,11 @@ export default function NewPostPage() {
     }
   };
 
+  const editorRef = useRef<any>(null);
+
   return (
     <div className="space-y-6">
-      <style dangerouslySetInnerHTML={{ __html: quillStyles }} />
+      <style dangerouslySetInnerHTML={{ __html: editorStyles }} />
       {/* 헤더 */}
       <div className="flex justify-between items-center">
         <div>
@@ -482,73 +447,66 @@ export default function NewPostPage() {
                   <div dangerouslySetInnerHTML={{ __html: formData.content }} />
                 </div>
               ) : (
-                <div className="quill-editor-container">
-                  <div className="mb-2 flex justify-end">
+                <div className="toastui-editor-container">
+                  <Editor
+                    initialValue={formData.content}
+                    height="400px"
+                    initialEditType="wysiwyg"
+                    useCommandShortcut={true}
+                    language="ko"
+                    toolbarItems={[
+                      ['heading', 'bold', 'italic', 'strike'],
+                      ['hr', 'quote'],
+                      ['ul', 'ol', 'task', 'indent', 'outdent'],
+                      ['table', 'image', 'link'],
+                      ['code', 'codeblock']
+                    ]}
+                    onLoad={(editor) => {
+                      editorRef.current = editor;
+                    }}
+                    onChange={() => {
+                      if (editorRef.current) {
+                        const content = editorRef.current.getHTML();
+                        handleContentChange(content);
+                      }
+                    }}
+                  />
+                  <div className="mt-2 flex justify-end">
                     <button
                       type="button"
                       onClick={() => {
-                        const adHtml = '<div class="ad-placeholder" style="background: #f3f4f6; border: 2px dashed #d1d5db; padding: 20px; text-align: center; margin: 20px 0; color: #6b7280;">광고 위치</div>';
-                        const newContent = formData.content + adHtml;
-                        setFormData(prev => ({ ...prev, content: newContent }));
+                        if (editorRef.current) {
+                          const adHtml = '<div class="ad-placeholder" style="background: #f3f4f6; border: 2px dashed #d1d5db; padding: 20px; text-align: center; margin: 20px 0; color: #6b7280;">광고 위치</div>';
+                          editorRef.current.insertText(adHtml);
+                        }
                       }}
                       className="px-3 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                     >
                       광고 삽입
                     </button>
                   </div>
-                  <ReactQuill
-                    value={formData.content}
-                    onChange={handleContentChange}
-                    modules={{
-                      toolbar: [
-                        [{ 'header': [1, 2, 3, false] }],
-                        ['bold', 'italic', 'underline', 'strike'],
-                        [{ 'color': [] }, { 'background': [] }],
-                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-                        [{ 'align': [] }],
-                        ['link', 'image', 'code-block'],
-                        ['clean']
-                      ],
-                      clipboard: {
-                        matchVisual: false,
-                      }
-                    }}
-                    formats={[
-                      'header',
-                      'bold', 'italic', 'underline', 'strike',
-                      'color', 'background',
-                      'list', 'bullet',
-                      'align',
-                      'link', 'image', 'code-block'
-                    ]}
-                    placeholder="포스트 내용을 입력하세요..."
-                    style={{ height: '400px' }}
-                  />
                 </div>
               )}
               
-
-            </div>
-
-            {/* 발행 설정 */}
-            <div>
-              <div className="flex items-center">
-                <input
-                  id="published"
-                  name="published"
-                  type="checkbox"
-                  checked={formData.published}
-                  onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded"
-                />
-                <label htmlFor="published" className="ml-2 block text-sm text-gray-900 dark:text-white">
-                  즉시 발행
-                </label>
+              {/* 발행 설정 - 에디터 밖으로 이동 */}
+              <div className="mt-4 flex justify-end">
+                <div className="flex items-center">
+                  <input
+                    id="published"
+                    name="published"
+                    type="checkbox"
+                    checked={formData.published}
+                    onChange={(e) => setFormData({ ...formData, published: e.target.checked })}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded"
+                  />
+                  <label htmlFor="published" className="ml-2 block text-sm text-gray-900 dark:text-white">
+                    즉시 발행
+                  </label>
+                </div>
               </div>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                체크하지 않으면 초안으로 저장됩니다.
-              </p>
             </div>
+
+
           </div>
 
           {/* 액션 버튼 */}
