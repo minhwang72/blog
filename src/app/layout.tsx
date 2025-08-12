@@ -85,7 +85,38 @@ export default function RootLayout({
         <link rel="preload" href="/fonts/Pretendard-SemiBold.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <link rel="preload" href="/fonts/Pretendard-Bold.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
       </head>
-      <body className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 font-sans">
+      <body 
+        className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 font-sans"
+        onContextMenu={(e) => e.preventDefault()}
+        onDragStart={(e) => e.preventDefault()}
+        onKeyDown={(e) => {
+          // F12 키 차단
+          if (e.key === 'F12') {
+            e.preventDefault();
+            return false;
+          }
+          // Ctrl+Shift+I (개발자도구) 차단
+          if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+            e.preventDefault();
+            return false;
+          }
+          // Ctrl+Shift+J (콘솔) 차단
+          if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+            e.preventDefault();
+            return false;
+          }
+          // Ctrl+U (소스보기) 차단
+          if (e.ctrlKey && e.key === 'u') {
+            e.preventDefault();
+            return false;
+          }
+          // Ctrl+Shift+C (요소 검사) 차단
+          if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+            e.preventDefault();
+            return false;
+          }
+        }}
+      >
         <Providers>
           <div className="flex min-h-screen flex-col">
             <Header />
@@ -105,6 +136,85 @@ export default function RootLayout({
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID}`}
           />
         )}
+
+        {/* 보안 스크립트 */}
+        <Script
+          id="security-script"
+          dangerouslySetInnerHTML={{
+            __html: `
+              // 오른쪽 클릭 차단
+              document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+              });
+
+              // 드래그 차단
+              document.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+                return false;
+              });
+
+              // 텍스트 선택 차단
+              document.addEventListener('selectstart', function(e) {
+                e.preventDefault();
+                return false;
+              });
+
+              // 키보드 단축키 차단
+              document.addEventListener('keydown', function(e) {
+                // F12 키 차단
+                if (e.key === 'F12') {
+                  e.preventDefault();
+                  return false;
+                }
+                // Ctrl+Shift+I (개발자도구) 차단
+                if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+                  e.preventDefault();
+                  return false;
+                }
+                // Ctrl+Shift+J (콘솔) 차단
+                if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+                  e.preventDefault();
+                  return false;
+                }
+                // Ctrl+U (소스보기) 차단
+                if (e.ctrlKey && e.key === 'u') {
+                  e.preventDefault();
+                  return false;
+                }
+                // Ctrl+Shift+C (요소 검사) 차단
+                if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+                  e.preventDefault();
+                  return false;
+                }
+                // Ctrl+Shift+K (콘솔) 차단 (Firefox)
+                if (e.ctrlKey && e.shiftKey && e.key === 'K') {
+                  e.preventDefault();
+                  return false;
+                }
+              });
+
+              // 개발자도구 감지 및 차단
+              function detectDevTools() {
+                const threshold = 160;
+                const widthThreshold = window.outerWidth - window.innerWidth > threshold;
+                const heightThreshold = window.outerHeight - window.innerHeight > threshold;
+                
+                if (widthThreshold || heightThreshold) {
+                  document.body.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial, sans-serif; font-size: 18px; color: #333;">개발자도구 사용이 제한되었습니다.</div>';
+                }
+              }
+
+              // 주기적으로 개발자도구 감지
+              setInterval(detectDevTools, 1000);
+
+              // 콘솔 경고 메시지
+              console.log('%c경고!', 'color: red; font-size: 30px; font-weight: bold;');
+              console.log('%c이 브라우저 기능은 개발자만을 위한 것입니다.', 'color: red; font-size: 16px;');
+              console.log('%c누군가가 당신에게 이곳에 무언가를 입력하라고 했다면, 이는 사기입니다.', 'color: red; font-size: 16px;');
+            `
+          }}
+        />
       </body>
     </html>
   );
