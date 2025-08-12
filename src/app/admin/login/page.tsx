@@ -52,8 +52,10 @@ export default function AdminLoginPage() {
         // 성공 메시지 표시
         alert('로그인 성공! 관리자 페이지로 이동합니다.');
         
-        // 즉시 관리자 페이지로 이동
-        window.location.href = '/admin';
+        // 1초 후 관리자 페이지로 이동
+        setTimeout(() => {
+          window.location.replace('/admin');
+        }, 1000);
       } else {
         const errorData = await response.json();
         setError(errorData.message || '로그인에 실패했습니다.');
