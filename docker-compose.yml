@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  min-blog:
+    build: .
+    container_name: min-blog
+    ports:
+      - "3002:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - NEXT_TELEMETRY_DISABLED=1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - min-blog-network
+
+networks:
+  min-blog-network:
+    driver: bridge

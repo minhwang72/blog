@@ -9,12 +9,17 @@ import SecurityWrapper from '@/components/SecurityWrapper';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: '은명의 블로그',
+  title: 'min.log',
   description: '개발과 일상에 대한 이야기를 담은 블로그입니다.',
   keywords: ['블로그', '개발', '프로그래밍', '일상'],
-  authors: [{ name: '은명' }],
-  creator: '은명',
-  publisher: '은명',
+  authors: [{ name: 'hwnagmin' }],
+  creator: 'hwnagmin',
+  publisher: 'hwnagmin',
+  icons: {
+    icon: '/favicon.svg',
+    shortcut: '/favicon.svg',
+    apple: '/favicon.svg',
+  },
   formatDetection: {
     email: false,
     address: false,
@@ -25,16 +30,16 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: '은명의 블로그',
+    title: 'min.log',
     description: '개발과 일상에 대한 이야기를 담은 블로그입니다.',
     url: 'https://www.eungming.com',
-    siteName: '은명의 블로그',
+    siteName: 'min.log',
     images: [
       {
         url: '/logo.svg',
         width: 1200,
         height: 630,
-        alt: '은명의 블로그',
+        alt: 'min.log',
       },
     ],
     locale: 'ko_KR',
@@ -42,7 +47,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: '은명의 블로그',
+    title: 'min.log',
     description: '개발과 일상에 대한 이야기를 담은 블로그입니다.',
     images: ['/logo.svg'],
   },
