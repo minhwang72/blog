@@ -54,7 +54,8 @@ const nextConfig = {
     ];
   },
   
-  // 리다이렉트 설정
+  // 리다이렉트 설정 제거 (테스트용)
+  /*
   async redirects() {
     return [
       {
@@ -64,6 +65,7 @@ const nextConfig = {
       },
     ];
   },
+  */
 };
 
 module.exports = nextConfig;

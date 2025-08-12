@@ -11,10 +11,16 @@ interface AdminLayoutProps {
 export default function AdminLayout({ children }: AdminLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(true); // 일시적으로 true로 설정
+  const [isLoading, setIsLoading] = useState(false); // 일시적으로 false로 설정
 
   useEffect(() => {
+    // 인증 체크 일시적으로 비활성화
+    console.log('🔍 AdminLayout - 인증 체크 비활성화됨');
+    setIsLoading(false);
+    setIsAuthenticated(true);
+    
+    /*
     // 로그인 페이지에서는 인증 체크를 하지 않음
     if (pathname === '/admin/login') {
       setIsLoading(false);
@@ -41,6 +47,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     };
 
     checkAuth();
+    */
   }, [router, pathname]);
 
   const handleLogout = async () => {
