@@ -59,30 +59,26 @@ export default function AdminLoginPage() {
         // 성공 메시지 표시
         alert('로그인 성공! 관리자 페이지로 이동합니다.');
         
-        // 강제 페이지 이동
+        // 쿠키 설정을 기다린 후 페이지 이동
         setTimeout(() => {
-          console.log('강제 페이지 이동 시도...');
-          try {
-            // 방법 1: window.location.href로 강제 이동
+          console.log('쿠키 설정 대기 후 페이지 이동...');
+          
+          // 현재 페이지를 새로고침하여 쿠키가 적용되도록 함
+          window.location.reload();
+          
+          // 새로고침 후 1초 뒤에 관리자 페이지로 이동
+          setTimeout(() => {
+            console.log('관리자 페이지로 이동...');
             window.location.href = '/admin';
-            console.log('window.location.href 호출 완료');
-            
-            // 2초 후에도 이동이 안 되면 새로고침과 함께 이동
-            setTimeout(() => {
-              console.log('새로고침과 함께 이동 시도...');
-              window.location.replace('/admin');
-            }, 2000);
-            
-            // 4초 후에도 안 되면 수동 링크 표시
-            setTimeout(() => {
-              console.log('수동 링크 표시');
-              setShowManualLink(true);
-            }, 4000);
-          } catch (error) {
-            console.error('페이지 이동 에러:', error);
-            setShowManualLink(true);
-          }
-        }, 1000);
+          }, 1000);
+          
+        }, 2000); // 2초 대기
+        
+        // 6초 후에도 안 되면 수동 링크 표시
+        setTimeout(() => {
+          console.log('수동 링크 표시');
+          setShowManualLink(true);
+        }, 6000);
       } else {
         const errorData = await response.json();
         console.error('로그인 실패:', errorData);
