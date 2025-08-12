@@ -2,8 +2,18 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  // 미들웨어 완전 비활성화 - 모든 요청 통과
-  console.log('🔍 미들웨어 - 요청 경로:', request.nextUrl.pathname, '(모든 요청 통과)');
+  const { pathname } = request.nextUrl;
+
+  // 관리자 페이지 접근 시에만 인증 확인
+  if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
+    const adminSession = request.cookies.get('adminSession');
+    
+    // 세션이 없으면 로그인 페이지로 리다이렉트
+    if (!adminSession || !adminSession.value) {
+      return NextResponse.redirect(new URL('/admin/login', request.url));
+    }
+  }
+
   return NextResponse.next();
 }
 
