@@ -19,7 +19,7 @@ export default function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-sm">
       <div className="w-full flex h-16 items-center px-4 sm:px-6 lg:px-8">
         {/* 로고 */}
-        <Link href="/" className="logo text-2xl font-bold tracking-tight hover:opacity-80 transition-opacity bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
+        <Link href="/" className="logo text-2xl font-bold tracking-tight hover:opacity-80 transition-opacity bg-gradient-to-r from-slate-600 via-gray-500 to-slate-700 bg-clip-text text-transparent">
           min.log
         </Link>
 
