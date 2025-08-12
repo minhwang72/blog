@@ -55,6 +55,12 @@ jobs:
         echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
         # Cloudinary Configuration
         echo "CLOUDINARY_URL=${{ secrets.CLOUDINARY_URL }}" >> $GITHUB_ENV
+        # Google AdSense Configuration
+        echo "NEXT_PUBLIC_ADSENSE_PUBLISHER_ID=${{ secrets.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID }}" >> $GITHUB_ENV
+        echo "NEXT_PUBLIC_ADSENSE_TOP_SLOT=${{ secrets.NEXT_PUBLIC_ADSENSE_TOP_SLOT }}" >> $GITHUB_ENV
+        echo "NEXT_PUBLIC_ADSENSE_MIDDLE_SLOT=${{ secrets.NEXT_PUBLIC_ADSENSE_MIDDLE_SLOT }}" >> $GITHUB_ENV
+        echo "NEXT_PUBLIC_ADSENSE_BOTTOM_SLOT=${{ secrets.NEXT_PUBLIC_ADSENSE_BOTTOM_SLOT }}" >> $GITHUB_ENV
+        echo "NEXT_PUBLIC_ADSENSE_DEFAULT_SLOT=${{ secrets.NEXT_PUBLIC_ADSENSE_DEFAULT_SLOT }}" >> $GITHUB_ENV
 
 
     - name: Setup SSH
@@ -131,6 +137,11 @@ jobs:
             -e GOOGLE_CLIENT_SECRET=${{ env.GOOGLE_CLIENT_SECRET }} \
             -e OPENAI_API_KEY=${{ env.OPENAI_API_KEY }} \
             -e CLOUDINARY_URL=${{ env.CLOUDINARY_URL }} \
+            -e NEXT_PUBLIC_ADSENSE_PUBLISHER_ID=${{ env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID }} \
+            -e NEXT_PUBLIC_ADSENSE_TOP_SLOT=${{ env.NEXT_PUBLIC_ADSENSE_TOP_SLOT }} \
+            -e NEXT_PUBLIC_ADSENSE_MIDDLE_SLOT=${{ env.NEXT_PUBLIC_ADSENSE_MIDDLE_SLOT }} \
+            -e NEXT_PUBLIC_ADSENSE_BOTTOM_SLOT=${{ env.NEXT_PUBLIC_ADSENSE_BOTTOM_SLOT }} \
+            -e NEXT_PUBLIC_ADSENSE_DEFAULT_SLOT=${{ env.NEXT_PUBLIC_ADSENSE_DEFAULT_SLOT }} \
             ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
           
           # Check container status
