@@ -598,8 +598,12 @@ export default async function BlogPostPage({
 
           <MarkdownRenderer content={post.content} />
 
-          {/* 하단 광고 - 게시글 바로 아래 */}
-          <ArticleAd position="bottom" />
+          {/* 하단 광고 - 게시글 바로 아래 (애드센스 정책 준수) */}
+          <ArticleAd 
+            position="bottom" 
+            postId={post.id}
+            contentLength={post.content.length}
+          />
 
           {/* 관련 포스트 - 부드러운 스타일 */}
           <RelatedPosts 

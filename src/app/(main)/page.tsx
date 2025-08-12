@@ -72,6 +72,25 @@ async function getPosts(categorySlug?: string) {
   }
 }
 
+async function getCategories() {
+  try {
+    const allCategories = await db
+      .select({
+        id: categories.id,
+        name: categories.name,
+        slug: categories.slug,
+        description: categories.description,
+      })
+      .from(categories)
+      .orderBy(categories.name);
+    
+    return Array.isArray(allCategories) ? allCategories : [];
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return [];
+  }
+}
+
 interface PageProps {
   searchParams: { category?: string };
 }
@@ -79,99 +98,113 @@ interface PageProps {
 export default async function Home({ searchParams }: PageProps) {
   const categorySlug = searchParams.category || 'all';
   const posts = await getPosts(categorySlug);
+  const categories = await getCategories();
 
   return (
-    <div className="flex-1 flex flex-col bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-1">
-        <div className="space-y-16">
-          {/* Hero Section */}
-          <section className="text-center space-y-12 py-16">
-            <div className="space-y-8">
-              <div className="relative">
-                <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-sky-400 via-slate-500 to-gray-600 bg-clip-text text-transparent leading-tight tracking-tight">
-                  개발자의 기록 공간
-                </h1>
-                <div className="absolute -inset-x-8 -inset-y-4 bg-gradient-to-r from-sky-100/50 via-slate-100/50 to-gray-100/50 dark:from-sky-900/20 dark:via-slate-900/20 dark:to-gray-900/20 rounded-3xl blur-3xl -z-10 opacity-40"></div>
-              </div>
-              <div className="space-y-4">
-                <p className="text-xl md:text-2xl text-slate-700 dark:text-slate-200 max-w-3xl mx-auto leading-relaxed font-medium">
-                  기술과 배움, 그리고 일상의 순간들을 기록하는 블로그입니다.
-                </p>
-                <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-                  새로운 기술을 탐구하고, 경험을 공유하며, 함께 성장하는 지식의 공간입니다.
-                </p>
-              </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Hero Section - 더 간결하고 임팩트 있게 */}
+        <section className="py-16 md:py-24">
+          <div className="text-center space-y-8">
+            <div className="relative">
+              <h1 className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent leading-tight tracking-tight">
+                min.log
+              </h1>
+              <div className="absolute -inset-x-8 -inset-y-4 bg-gradient-to-r from-sky-100/50 via-blue-100/50 to-indigo-100/50 dark:from-sky-900/20 dark:via-blue-900/20 dark:to-indigo-900/20 rounded-3xl blur-3xl -z-10 opacity-40"></div>
+            </div>
+            <div className="space-y-4 max-w-3xl mx-auto">
+              <p className="text-xl md:text-2xl text-slate-700 dark:text-slate-200 font-medium">
+                개발자의 기술과 배움을 기록하는 공간
+              </p>
+              <p className="text-lg text-slate-600 dark:text-slate-400">
+                새로운 기술을 탐구하고, 경험을 공유하며, 함께 성장하는 지식의 공간입니다.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* 카테고리 네비게이션 */}
+        <section className="mb-12">
+          <div className="flex flex-wrap justify-center gap-3">
+            <Link
+              href="/"
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                categorySlug === 'all'
+                  ? 'bg-sky-600 text-white shadow-lg'
+                  : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
+              }`}
+            >
+              전체
+            </Link>
+            {categories.map((category) => (
+              <Link
+                key={category.id}
+                href={`/?category=${category.slug}`}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  categorySlug === category.slug
+                    ? 'bg-sky-600 text-white shadow-lg'
+                    : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-sky-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
+                }`}
+              >
+                {category.name}
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* 통계 카드 - 더 컴팩트하게 */}
+        <section className="mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 text-center">
+              <div className="text-3xl font-bold text-sky-600 dark:text-sky-400 mb-1">{posts.length}</div>
+              <div className="text-sm text-slate-600 dark:text-slate-400">총 포스트</div>
             </div>
             
-            {/* 통계 카드 */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-              <div className="group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800 p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700 hover:border-sky-300 dark:hover:border-sky-600">
-                <div className="text-4xl font-bold text-sky-600 dark:text-sky-400 mb-2">{posts.length}</div>
-                <div className="text-sm font-medium text-slate-600 dark:text-slate-300">총 포스트</div>
-                <div className="absolute top-4 right-4 text-sky-200 dark:text-sky-800 group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 text-center">
+              <div className="text-3xl font-bold text-slate-600 dark:text-slate-400 mb-1">
+                {posts.reduce((sum, post: any) => sum + (post.viewCount || 0), 0).toLocaleString()}
               </div>
-              
-              <div className="group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800 p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600">
-                <div className="text-4xl font-bold text-slate-600 dark:text-slate-400 mb-2">
-                  {posts.reduce((sum, post: any) => sum + (post.viewCount || 0), 0)}
-                </div>
-                <div className="text-sm font-medium text-slate-600 dark:text-slate-300">총 조회수</div>
-                <div className="absolute top-4 right-4 text-slate-200 dark:text-slate-800 group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                    <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
-                  </svg>
-                </div>
-              </div>
-              
-              <div className="group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800 p-8 shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200 dark:border-slate-700 hover:border-gray-300 dark:hover:border-gray-600">
-                <div className="text-4xl font-bold text-gray-600 dark:text-gray-400 mb-2">
-                  {new Set(posts.map((post: any) => post.categoryName)).size}
-                </div>
-                <div className="text-sm font-medium text-slate-600 dark:text-slate-300">카테고리</div>
-                <div className="absolute top-4 right-4 text-gray-200 dark:text-gray-800 group-hover:scale-110 transition-transform duration-300">
-                  <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z" />
-                  </svg>
-                </div>
-              </div>
+              <div className="text-sm text-slate-600 dark:text-slate-400">총 조회수</div>
             </div>
-          </section>
-
-          {/* Posts Grid */}
-          <section className="space-y-8">
-            <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-4">
-              <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
-                {categorySlug === 'all' ? '최근 포스트' : `${posts[0]?.categoryName || '카테고리'} 포스트`}
-              </h2>
-              <span className="text-sm text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-3 py-1 rounded-full">
-                {posts.length}개의 포스트
-              </span>
+            
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 text-center">
+              <div className="text-3xl font-bold text-slate-600 dark:text-slate-400 mb-1">
+                {new Set(posts.map((post: any) => post.categoryName)).size}
+              </div>
+              <div className="text-sm text-slate-600 dark:text-slate-400">카테고리</div>
             </div>
+          </div>
+        </section>
 
-            {posts.length === 0 ? (
-              <div className="text-center py-20">
-                <div className="text-6xl mb-6">📝</div>
-                <h3 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-4">
-                  아직 포스트가 없습니다
-                </h3>
-                <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto">
-                  첫 번째 포스트를 기다리고 있습니다.
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {posts.map((post: any) => (
-                  <PostCard key={post.id} post={post} />
-                ))}
-              </div>
-            )}
-          </section>
-        </div>
+        {/* Posts Grid - 더 풍성한 레이아웃 */}
+        <section className="pb-16">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+              {categorySlug === 'all' ? '최근 포스트' : `${posts[0]?.categoryName || '카테고리'} 포스트`}
+            </h2>
+            <span className="text-sm text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 px-3 py-1 rounded-full">
+              {posts.length}개의 포스트
+            </span>
+          </div>
+
+          {posts.length === 0 ? (
+            <div className="text-center py-20">
+              <div className="text-6xl mb-6">📝</div>
+              <h3 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 mb-4">
+                아직 포스트가 없습니다
+              </h3>
+              <p className="text-slate-600 dark:text-slate-400 max-w-md mx-auto">
+                첫 번째 포스트를 기다리고 있습니다.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {posts.map((post: any) => (
+                <PostCard key={post.id} post={post} />
+              ))}
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );

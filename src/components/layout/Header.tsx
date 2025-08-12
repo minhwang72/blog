@@ -16,15 +16,15 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md">
-      <div className="w-full flex h-16 items-center px-6">
+    <header className="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-700 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-sm">
+      <div className="w-full flex h-16 items-center px-4 sm:px-6 lg:px-8">
         {/* 로고 */}
-        <Link href="/" className="logo text-2xl font-bold tracking-tight hover:opacity-80 transition-opacity bg-gradient-to-r from-sky-400 via-slate-500 to-gray-600 bg-clip-text text-transparent">
+        <Link href="/" className="logo text-2xl font-bold tracking-tight hover:opacity-80 transition-opacity bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 bg-clip-text text-transparent">
           min.log
         </Link>
 
         {/* 데스크탑 네비게이션 */}
-        <nav className="hidden md:flex items-center gap-8 ml-auto">
+        <nav className="hidden md:flex items-center gap-6 ml-auto">
           {navigation.map((item) => (
             <Link
               key={item.name}
@@ -32,13 +32,13 @@ export default function Header() {
               className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all duration-200 relative group py-2"
             >
               {item.name}
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-sky-400 to-gray-500 transition-all duration-300 group-hover:w-full"></span>
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-sky-400 to-blue-500 transition-all duration-300 group-hover:w-full"></span>
             </Link>
           ))}
           <ThemeToggle />
           <Link
             href="/admin/login"
-            className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors opacity-70 hover:opacity-100"
+            className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors opacity-70 hover:opacity-100 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
             title="관리자 설정"
           >
             <Settings className="h-4 w-4" />
@@ -50,7 +50,7 @@ export default function Header() {
           <ThemeToggle />
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors p-2"
+            className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-colors p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
           >
             {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -60,7 +60,7 @@ export default function Header() {
       {/* 모바일 메뉴 - 드롭다운 박스 */}
       {isMenuOpen && (
         <div className="md:hidden absolute top-16 left-0 right-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 shadow-lg">
-          <nav className="px-6 py-4 space-y-2">
+          <nav className="px-4 py-4 space-y-2">
             {navigation.map((item) => (
               <Link
                 key={item.name}
