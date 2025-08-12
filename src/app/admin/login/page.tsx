@@ -12,7 +12,6 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
-  const [checkingAuth, setCheckingAuth] = useState(true);
   const [isDark, setIsDark] = useState(false);
   const router = useRouter();
 
@@ -32,26 +31,6 @@ export default function AdminLoginPage() {
     
     return () => mediaQuery.removeListener(checkDarkMode);
   }, []);
-
-  // 이미 로그인된 상태인지 확인
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await fetch('/api/admin/me');
-        if (response.ok) {
-          // 이미 로그인된 상태면 관리자 페이지로 이동
-          router.push('/admin');
-        }
-      } catch (error) {
-        // 에러가 발생하면 로그인되지 않은 상태로 간주
-        console.log('로그인되지 않은 상태');
-      } finally {
-        setCheckingAuth(false);
-      }
-    };
-
-    checkAuth();
-  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,10 +53,10 @@ export default function AdminLoginPage() {
         setSuccess(true);
         setFormData({ username: '', password: '' });
         
-        // 2초 후 자동으로 관리자 페이지로 이동
+        // 1초 후 자동으로 관리자 페이지로 이동
         setTimeout(() => {
           window.location.href = '/admin';
-        }, 2000);
+        }, 1000);
       } else {
         const errorData = await response.json();
         setError(errorData.message || '로그인에 실패했습니다.');
@@ -88,18 +67,6 @@ export default function AdminLoginPage() {
       setLoading(false);
     }
   };
-
-  // 인증 확인 중일 때 로딩 표시
-  if (checkingAuth) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: isDark ? '#111827' : '#ffffff' }}>
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: isDark ? '#ffffff' : '#111827' }}></div>
-          <p className="mt-4 text-sm" style={{ color: isDark ? '#9ca3af' : '#6b7280' }}>확인 중...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: isDark ? '#111827' : '#ffffff' }}>

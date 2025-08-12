@@ -14,8 +14,14 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  // 로그인 페이지에서는 리다이렉션 로직 제거 (클라이언트에서 처리)
-  // 무한 리다이렉션 방지를 위해 미들웨어에서는 단순히 통과시킴
+  // 로그인된 상태에서 로그인 페이지 접근 시 관리자 페이지로 리다이렉트
+  if (pathname === '/admin/login') {
+    const adminSession = request.cookies.get('adminSession');
+    
+    if (adminSession && adminSession.value) {
+      return NextResponse.redirect(new URL('/admin', request.url));
+    }
+  }
 
   return NextResponse.next();
 }

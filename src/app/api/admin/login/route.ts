@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     response.cookies.set('adminSession', sessionId, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false, // 개발 환경에서도 작동하도록 false로 설정
       sameSite: 'lax',
       maxAge: 24 * 60 * 60, // 24시간
     });
