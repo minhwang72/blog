@@ -2,37 +2,39 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 텍스트 선택 방지 */
+/* 기본적으로 텍스트 선택 허용 */
 * {
+  -webkit-user-select: auto;
+  -moz-user-select: auto;
+  -ms-user-select: auto;
+  user-select: auto;
+}
+
+/* 이미지 드래그 허용 */
+img {
+  -webkit-user-drag: auto;
+  -khtml-user-drag: auto;
+  -moz-user-drag: auto;
+  -o-user-drag: auto;
+  user-drag: auto;
+  pointer-events: auto;
+}
+
+/* 특정 요소에서만 텍스트 선택 방지 (보안이 필요한 경우) */
+.no-select {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
 }
 
-/* 이미지 드래그 방지 */
-img {
+/* 특정 이미지에서만 드래그 방지 (보안이 필요한 경우) */
+.no-drag {
   -webkit-user-drag: none;
   -khtml-user-drag: none;
   -moz-user-drag: none;
   -o-user-drag: none;
   user-drag: none;
   pointer-events: none;
-}
-
-/* 링크는 텍스트 선택 허용 */
-a {
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
-  user-select: text;
-}
-
-/* 입력 필드는 텍스트 선택 허용 */
-input, textarea, select {
-  -webkit-user-select: text;
-  -moz-user-select: text;
-  -ms-user-select: text;
-  user-select: text;
 }
 

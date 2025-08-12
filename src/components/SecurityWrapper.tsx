@@ -4,19 +4,7 @@ import { useEffect } from 'react';
 
 export default function SecurityWrapper({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    // 오른쪽 클릭 차단
-    const handleContextMenu = (e: MouseEvent) => {
-      e.preventDefault();
-      return false;
-    };
-
-    // 드래그 차단
-    const handleDragStart = (e: DragEvent) => {
-      e.preventDefault();
-      return false;
-    };
-
-    // 키보드 단축키 차단
+    // 키보드 단축키 차단 (개발자도구 관련)
     const handleKeyDown = (e: KeyboardEvent) => {
       // F12 키 차단
       if (e.key === 'F12') {
@@ -50,23 +38,22 @@ export default function SecurityWrapper({ children }: { children: React.ReactNod
       }
     };
 
-    // 개발자도구 감지 및 차단
+    // 개발자도구 감지 및 차단 (선택적)
     const detectDevTools = () => {
       const threshold = 160;
       const widthThreshold = window.outerWidth - window.innerWidth > threshold;
       const heightThreshold = window.outerHeight - window.innerHeight > threshold;
       if (widthThreshold || heightThreshold) {
-        document.body.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial, sans-serif; font-size: 18px; color: #333;">개발자도구 사용이 제한되었습니다.</div>';
+        console.warn('개발자도구 사용이 감지되었습니다.');
+        // 개발자도구 감지 시 콘솔에만 경고 (페이지 변경하지 않음)
       }
     };
 
     // 이벤트 리스너 등록
-    document.addEventListener('contextmenu', handleContextMenu);
-    document.addEventListener('dragstart', handleDragStart);
     document.addEventListener('keydown', handleKeyDown);
 
-    // 개발자도구 감지 시작
-    const devToolsInterval = setInterval(detectDevTools, 1000);
+    // 개발자도구 감지 시작 (선택적)
+    const devToolsInterval = setInterval(detectDevTools, 5000); // 5초마다 체크
 
     // 콘솔 경고 메시지
     console.log('%c경고!', 'color: red; font-size: 30px; font-weight: bold;');
@@ -75,8 +62,6 @@ export default function SecurityWrapper({ children }: { children: React.ReactNod
 
     // 클린업 함수
     return () => {
-      document.removeEventListener('contextmenu', handleContextMenu);
-      document.removeEventListener('dragstart', handleDragStart);
       document.removeEventListener('keydown', handleKeyDown);
       clearInterval(devToolsInterval);
     };
