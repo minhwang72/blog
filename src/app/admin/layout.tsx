@@ -29,12 +29,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         } else {
           // 세션이 만료되었거나 유효하지 않음
           localStorage.removeItem('adminSession');
-          router.push('/admin/login');
+          window.location.href = '/admin/login';
         }
       } catch (error) {
         console.error('Auth check error:', error);
         localStorage.removeItem('adminSession');
-        router.push('/admin/login');
+        window.location.href = '/admin/login';
       } finally {
         setIsLoading(false);
       }
@@ -50,7 +50,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       console.error('Logout error:', error);
     } finally {
       localStorage.removeItem('adminSession');
-      router.push('/admin/login');
+      window.location.href = '/admin/login';
     }
   };
 
