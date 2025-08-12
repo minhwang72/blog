@@ -1,6 +1,10 @@
 import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
 import * as schema from './db/schema';
+import dotenv from 'dotenv';
+
+// 환경변수 로드
+dotenv.config({ path: '.env.local' });
 
 // DB 호스트 자동 감지
 const isProduction = process.env.NODE_ENV === 'production';

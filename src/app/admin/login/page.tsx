@@ -52,9 +52,33 @@ export default function AdminLoginPage() {
         // 성공 메시지 표시
         alert('로그인 성공! 관리자 페이지로 이동합니다.');
         
-        // 1초 후 관리자 페이지로 이동
+        // 여러 방법으로 페이지 이동 시도
         setTimeout(() => {
-          window.location.replace('/admin');
+          // 방법 1: window.location.replace
+          try {
+            window.location.replace('/admin');
+          } catch (error) {
+            console.error('replace 실패:', error);
+            
+            // 방법 2: window.location.href
+            try {
+              window.location.href = '/admin';
+            } catch (error) {
+              console.error('href 실패:', error);
+              
+              // 방법 3: window.location.assign
+              try {
+                window.location.assign('/admin');
+              } catch (error) {
+                console.error('assign 실패:', error);
+                
+                // 방법 4: 직접 링크 클릭
+                const link = document.createElement('a');
+                link.href = '/admin';
+                link.click();
+              }
+            }
+          }
         }, 1000);
       } else {
         const errorData = await response.json();
