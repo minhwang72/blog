@@ -12,21 +12,23 @@ const MCP_TOKEN = process.env.MCP_TOKEN || '0a295dd2818cb5eb5cfcae08b94b39b96202
 function getAdPositions(contentLength: number) {
   const positions: Array<{ position: 'top' | 'middle' | 'bottom', priority: number }> = [];
   
-  if (contentLength >= 1000) {
-    // 최소 1000자 이상이어야 광고 표시
-    if (contentLength >= 5000) {
-      // 긴 글: 상단, 중간, 하단
-      positions.push({ position: 'top', priority: 1 });
-      positions.push({ position: 'middle', priority: 2 });
-      positions.push({ position: 'bottom', priority: 3 });
-    } else if (contentLength >= 2000) {
-      // 중간 길이: 중간, 하단
-      positions.push({ position: 'middle', priority: 1 });
-      positions.push({ position: 'bottom', priority: 2 });
-    } else {
-      // 짧은 글: 하단만
-      positions.push({ position: 'bottom', priority: 1 });
-    }
+  if (contentLength >= 5000) {
+    // 긴 글: 상단, 중간, 하단 (3개)
+    positions.push({ position: 'top', priority: 1 });
+    positions.push({ position: 'middle', priority: 2 });
+    positions.push({ position: 'bottom', priority: 3 });
+  } else if (contentLength >= 2000) {
+    // 중간 글: 상단, 중간, 하단 (3개)
+    positions.push({ position: 'top', priority: 1 });
+    positions.push({ position: 'middle', priority: 2 });
+    positions.push({ position: 'bottom', priority: 3 });
+  } else if (contentLength >= 1000) {
+    // 짧은 글: 상단, 하단 (2개)
+    positions.push({ position: 'top', priority: 1 });
+    positions.push({ position: 'bottom', priority: 2 });
+  } else {
+    // 매우 짧은 글: 하단만 (1개)
+    positions.push({ position: 'bottom', priority: 1 });
   }
   
   return positions;
