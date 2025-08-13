@@ -9,11 +9,16 @@ const nextConfig = {
   images: {
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 60,
+    domains: ['images.unsplash.com', 'via.placeholder.com'],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   
   // 실험적 기능
   experimental: {
     optimizePackageImports: ['@heroicons/react', 'lucide-react'],
+    optimizeCss: true,
+    scrollRestoration: true,
   },
   
   // 컴파일러 최적화
@@ -48,6 +53,10 @@ const nextConfig = {
           {
             key: 'X-XSS-Protection',
             value: '1; mode=block',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
           },
         ],
       },

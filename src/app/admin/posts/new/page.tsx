@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { KeywordExtractorService } from '@/lib/services/keyword-extractor.service';
 
 // Toast UI Editor를 동적으로 import (SSR 문제 방지)
 const Editor = dynamic(() => import('@toast-ui/react-editor').then(mod => mod.Editor), {
@@ -65,6 +66,7 @@ export default function NewPostPage() {
     content: '',
     excerpt: '',
     featuredImage: '', // 썸네일 이미지 URL
+    tags: [] as string[], // 자동 추출된 태그
     categoryId: '',
     published: true,
   });
@@ -162,11 +164,15 @@ export default function NewPostPage() {
   const handleContentChange = (content: string) => {
     setFormData({ ...formData, content });
     
-    // 요약이 비어있거나 사용자가 수동으로 입력하지 않은 경우에만 자동 생성
-    if (!formData.excerpt || formData.excerpt === generateExcerpt(formData.content)) {
-      setFormData(prev => ({ ...prev, content, excerpt: generateExcerpt(content) }));
-    } else {
-      setFormData(prev => ({ ...prev, content }));
+    // 자동 요약 생성
+    const plainText = content.replace(/<[^>]*>/g, '');
+    const newExcerpt = plainText.length > 150 ? plainText.substring(0, 150) + '...' : plainText;
+    setFormData(prev => ({ ...prev, excerpt: newExcerpt }));
+
+    // 자동 키워드 추출
+    if (content.length > 50 && formData.title.length > 5) {
+      const extractedTags = KeywordExtractorService.generateTags(content, formData.title);
+      setFormData(prev => ({ ...prev, tags: extractedTags }));
     }
   };
 
@@ -430,6 +436,28 @@ export default function NewPostPage() {
                 </div>
               )}
             </div>
+
+            {/* 자동 추출된 태그 */}
+            {formData.tags.length > 0 && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  자동 추출된 태그
+                </label>
+                <div className="flex flex-wrap gap-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                  {formData.tags.map((tag, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  제목과 내용을 기반으로 자동 추출된 태그입니다.
+                </div>
+              </div>
+            )}
 
             {/* 요약 */}
             <div>
