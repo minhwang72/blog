@@ -64,6 +64,7 @@ export default function NewPostPage() {
     title: '',
     content: '',
     excerpt: '',
+    featuredImage: '', // 썸네일 이미지 URL
     categoryId: '',
     published: true,
   });
@@ -397,10 +398,37 @@ export default function NewPostPage() {
                   <option value="" disabled>카테고리 로딩 중...</option>
                 )}
               </select>
-              {/* 디버깅 정보 */}
-              <div className="mt-1 text-xs text-gray-500">
-                카테고리 개수: {categories.length}개
+            </div>
+
+            {/* 썸네일 이미지 */}
+            <div>
+              <label htmlFor="featuredImage" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                썸네일 이미지 (선택사항)
+              </label>
+              <input
+                type="url"
+                id="featuredImage"
+                name="featuredImage"
+                value={formData.featuredImage}
+                onChange={(e) => setFormData({ ...formData, featuredImage: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                placeholder="https://example.com/image.jpg"
+              />
+              <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                외부 이미지 URL을 입력하세요. 입력하지 않으면 기본 이미지가 사용됩니다.
               </div>
+              {formData.featuredImage && (
+                <div className="mt-2">
+                  <img 
+                    src={formData.featuredImage} 
+                    alt="썸네일 미리보기" 
+                    className="w-32 h-20 object-cover rounded border"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
             </div>
 
             {/* 요약 */}

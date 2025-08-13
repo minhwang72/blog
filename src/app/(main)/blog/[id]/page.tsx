@@ -11,6 +11,7 @@ import Comments from '@/components/blog/Comments';
 import ArticleAd from '@/components/ads/ArticleAd';
 import RelatedPosts from '@/components/blog/RelatedPosts';
 import MarkdownRenderer from '@/components/MarkdownRenderer';
+import Breadcrumb from '@/components/Breadcrumb';
 
 interface Props {
   params: {
@@ -35,6 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         slug: posts.slug,
         excerpt: posts.excerpt,
         content: posts.content,
+        featuredImage: posts.featuredImage,
         createdAt: posts.createdAt,
         updatedAt: posts.updatedAt,
         authorId: posts.authorId,
@@ -439,7 +441,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         tags: [postData.categoryName, '개발', '블로그'].filter(Boolean) as string[],
         images: [
           {
-            url: 'https://eungming.com/og-image.jpg',
+            url: postData.featuredImage || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&h=630&fit=crop&crop=center',
             width: 1200,
             height: 630,
             alt: postData.title,
@@ -479,6 +481,7 @@ async function getPost(id: string) {
         slug: posts.slug,
         excerpt: posts.excerpt,
         content: posts.content,
+        featuredImage: posts.featuredImage,
         createdAt: posts.createdAt,
         updatedAt: posts.updatedAt,
         authorId: posts.authorId,
@@ -557,7 +560,7 @@ export default async function BlogPostPage({
       "@id": `https://eungming.com/blog/${post.id}`
     },
     "url": `https://eungming.com/blog/${post.id}`,
-    "image": "https://eungming.com/og-image.jpg",
+    "image": post.featuredImage || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=1200&h=630&fit=crop&crop=center",
     "articleSection": post.categoryName,
     "keywords": [
       post.title,
@@ -567,6 +570,38 @@ export default async function BlogPostPage({
       "개발",
       "프로그래밍"
     ].filter(Boolean)
+  };
+
+  // BreadcrumbList 스키마
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "홈",
+        "item": "https://eungming.com"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "블로그",
+        "item": "https://eungming.com/blog"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": post.categoryName || "기본",
+        "item": post.categorySlug ? `https://eungming.com/categories/${post.categorySlug}` : "https://eungming.com/blog"
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": post.title,
+        "item": `https://eungming.com/blog/${post.id}`
+      }
+    ]
   };
 
   // 글 길이에 따른 광고 배치 결정
@@ -582,6 +617,22 @@ export default async function BlogPostPage({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(structuredData),
           }}
+        />
+        <Script
+          id="breadcrumb-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(breadcrumbSchema),
+          }}
+        />
+        
+        {/* Breadcrumb 네비게이션 */}
+        <Breadcrumb
+          items={[
+            { label: '블로그', href: '/blog' },
+            { label: post.categoryName || '기본', href: post.categorySlug ? `/categories/${post.categorySlug}` : '/blog' },
+            { label: post.title }
+          ]}
         />
         
         <article className="prose prose-lg dark:prose-invert max-w-none min-w-0">

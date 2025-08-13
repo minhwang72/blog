@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, content, excerpt, categoryId, published = false } = body;
+    const { title, content, excerpt, featuredImage, categoryId, published = false } = body;
 
     if (!title || !content) {
       return NextResponse.json(
@@ -93,6 +93,7 @@ export async function POST(request: NextRequest) {
       slug,
       content,
       excerpt: excerpt || content.substring(0, 200) + '...',
+      featuredImage: featuredImage || null,
       authorId: adminId,
       categoryId: categoryId || null,
       published,

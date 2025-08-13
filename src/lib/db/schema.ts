@@ -89,6 +89,7 @@ export const posts = mysqlTable('posts', {
   slug: varchar('slug', { length: 255 }).notNull().unique(),
   content: longtext('content').notNull(),
   excerpt: text('excerpt'),
+  featuredImage: varchar('featured_image', { length: 500 }), // 썸네일 이미지 URL
   published: boolean('published').default(false).notNull(),
   authorId: int('author_id').notNull(),
   categoryId: int('category_id'),

@@ -5,6 +5,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import SecurityWrapper from '@/components/SecurityWrapper';
+import Script from 'next/script';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -74,8 +75,64 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // WebSite 스키마
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "min.log",
+    "url": "https://www.eungming.com",
+    "description": "개발과 일상에 대한 이야기를 담은 블로그입니다.",
+    "author": {
+      "@type": "Person",
+      "name": "황민"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "min.log",
+      "url": "https://www.eungming.com"
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://www.eungming.com/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
+
+  // Organization 스키마
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "min.log",
+    "url": "https://www.eungming.com",
+    "logo": "https://www.eungming.com/logo.svg",
+    "description": "개발과 일상에 대한 이야기를 담은 블로그입니다.",
+    "founder": {
+      "@type": "Person",
+      "name": "황민"
+    },
+    "sameAs": [
+      "https://github.com/minhwang72"
+    ]
+  };
+
   return (
     <html lang="ko" suppressHydrationWarning>
+      <head>
+        <Script
+          id="website-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteSchema),
+          }}
+        />
+        <Script
+          id="organization-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema),
+          }}
+        />
+      </head>
       <body
         className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 font-sans"
       >
