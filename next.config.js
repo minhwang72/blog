@@ -17,7 +17,6 @@ const nextConfig = {
   // 실험적 기능
   experimental: {
     optimizePackageImports: ['@heroicons/react', 'lucide-react'],
-    optimizeCss: true,
     scrollRestoration: true,
   },
   
