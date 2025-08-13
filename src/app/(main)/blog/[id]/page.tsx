@@ -436,7 +436,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         publishedTime: postData.createdAt.toISOString(),
         modifiedTime: postData.updatedAt?.toISOString() || postData.createdAt.toISOString(),
         authors: [postData.authorName || '황민'],
-        tags: [postData.categoryName, '개발', '블로그'].filter(Boolean),
+        tags: [postData.categoryName, '개발', '블로그'].filter(Boolean) as string[],
+        images: [
+          {
+            url: 'https://eungming.com/og-image.jpg',
+            width: 1200,
+            height: 630,
+            alt: postData.title,
+          }
+        ],
       },
       twitter: {
         card: 'summary_large_image',
