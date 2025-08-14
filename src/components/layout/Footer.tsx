@@ -75,7 +75,7 @@ export default function Footer() {
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-center sm:text-left">
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  © 2025 min.log. All rights reserved.
+                  © 2025 hwangmin. All rights reserved.
                 </p>
               </div>
               <div className="flex items-center space-x-6 text-xs text-slate-500 dark:text-slate-400">
