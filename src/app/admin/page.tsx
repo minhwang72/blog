@@ -37,11 +37,21 @@ interface DashboardStats {
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
-  const fetchStats = async () => {
+  const fetchStats = async (isManualRefresh = false) => {
+    if (isManualRefresh) {
+      setRefreshing(true);
+    }
+    
     try {
-      const response = await fetch('/api/admin/dashboard');
+      const response = await fetch('/api/admin/dashboard', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache'
+        }
+      });
       if (response.ok) {
         const data = await response.json();
         setStats(data);
@@ -51,6 +61,9 @@ export default function AdminDashboard() {
       console.error('Failed to fetch stats:', error);
     } finally {
       setLoading(false);
+      if (isManualRefresh) {
+        setRefreshing(false);
+      }
     }
   };
 
@@ -59,11 +72,11 @@ export default function AdminDashboard() {
     fetchStats();
   }, []);
 
-  // 30초마다 자동 새로고침
+  // 60초마다 자동 새로고침
   useEffect(() => {
     const interval = setInterval(() => {
       fetchStats();
-    }, 30000); // 30초
+    }, 60000); // 60초
 
     return () => clearInterval(interval);
   }, []);

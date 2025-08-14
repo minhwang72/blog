@@ -31,12 +31,8 @@ export async function GET() {
       })
     );
 
-    // 게시물 수가 0보다 큰 카테고리만 반환
-    const activeCategories = categoriesWithCount.filter(
-      (category) => category.postCount > 0
-    );
-
-    return NextResponse.json(activeCategories);
+    // 모든 카테고리 반환 (게시물 수와 함께)
+    return NextResponse.json(categoriesWithCount);
   } catch (error) {
     console.error('Error fetching categories:', error);
     return NextResponse.json([], { status: 500 });

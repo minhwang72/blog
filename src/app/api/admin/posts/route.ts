@@ -11,12 +11,18 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status'); // 상태 필터 추가
     const offset = (page - 1) * limit;
 
+    console.log('API 호출 - status:', status, 'page:', page, 'limit:', limit);
+
     // 상태 필터 조건 생성
     let whereConditions = [];
     if (status === 'published') {
       whereConditions.push(eq(posts.published, true));
+      console.log('필터: published 포스트만');
     } else if (status === 'draft') {
       whereConditions.push(eq(posts.published, false));
+      console.log('필터: draft 포스트만');
+    } else {
+      console.log('필터: 모든 포스트');
     }
 
     // 포스트 목록 조회 (관리자용 - 모든 포스트 포함)
