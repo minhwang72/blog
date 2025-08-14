@@ -10,7 +10,8 @@ import {
   ArrowTrendingUpIcon,
   CalendarIcon,
   UserIcon,
-  ClockIcon
+  ClockIcon,
+  ArrowPathIcon
 } from '@heroicons/react/24/outline';
 
 interface DashboardStats {
@@ -36,10 +37,7 @@ interface DashboardStats {
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchStats();
-  }, []);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
   const fetchStats = async () => {
     try {
@@ -47,6 +45,7 @@ export default function AdminDashboard() {
       if (response.ok) {
         const data = await response.json();
         setStats(data);
+        setLastUpdated(new Date());
       }
     } catch (error) {
       console.error('Failed to fetch stats:', error);
@@ -54,6 +53,20 @@ export default function AdminDashboard() {
       setLoading(false);
     }
   };
+
+  // 초기 로드
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  // 30초마다 자동 새로고침
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchStats();
+    }, 30000); // 30초
+
+    return () => clearInterval(interval);
+  }, []);
 
   if (loading) {
     return (
@@ -129,8 +142,18 @@ export default function AdminDashboard() {
             <p className="text-gray-700 dark:text-blue-100 text-lg">
               블로그 현황을 한눈에 확인하고 효율적으로 관리하세요
             </p>
+            <p className="text-sm text-gray-600 dark:text-blue-200 mt-2">
+              마지막 업데이트: {lastUpdated.toLocaleTimeString('ko-KR')}
+            </p>
           </div>
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center space-x-4">
+            <button
+              onClick={fetchStats}
+              className="flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors duration-200"
+            >
+              <ArrowPathIcon className="w-4 h-4 mr-2" />
+              새로고침
+            </button>
             <div className="w-16 h-16 bg-gray-300 dark:bg-white/20 rounded-full flex items-center justify-center">
               <ArrowTrendingUpIcon className="w-8 h-8 text-gray-700 dark:text-white" />
             </div>
