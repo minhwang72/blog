@@ -173,14 +173,23 @@ export async function POST(request: NextRequest) {
         })
       }
 
-      // 기본 카테고리 확인/생성
-      let defaultCategory = await db.select().from(categories).where(eq(categories.id, 1)).limit(1)
-      if (defaultCategory.length === 0) {
-        await db.insert(categories).values({
-          name: '기본',
-          slug: 'default',
-          description: '기본 카테고리'
-        })
+      // 카테고리 처리
+      let categoryId = 1; // 기본값
+      
+      if (category) {
+        // 제공된 카테고리로 기존 카테고리 찾기
+        const existingCategory = await db.select().from(categories).where(eq(categories.name, category)).limit(1);
+        if (existingCategory.length > 0) {
+          categoryId = existingCategory[0].id;
+        } else {
+          // 새 카테고리 생성
+          const newCategoryResult = await db.insert(categories).values({
+            name: category,
+            slug: category.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-'),
+            description: `${category} 관련 포스트`
+          });
+          categoryId = newCategoryResult.insertId || 1;
+        }
       }
 
       // 기존 포스트 확인
@@ -193,6 +202,7 @@ export async function POST(request: NextRequest) {
             title,
             content,
             excerpt: summary || '',
+            categoryId: categoryId, // 카테고리 업데이트
             updatedAt: new Date()
           })
           .where(eq(posts.slug, slug))
@@ -204,6 +214,7 @@ export async function POST(request: NextRequest) {
           success: true,
           message: 'Draft updated successfully',
           slug,
+          categoryId,
           adPositions,
           contentLength: content.length,
           adStrategy: {
@@ -228,7 +239,7 @@ export async function POST(request: NextRequest) {
           excerpt: summary || '',
           published: false,
           authorId: 1,
-          categoryId: 1,
+          categoryId: categoryId, // 동적으로 결정된 카테고리 ID
           viewCount: 0,
           createdAt: new Date(),
           updatedAt: new Date()
@@ -343,15 +354,27 @@ async function handleToolCall(name: string, args: any) {
         })
       }
 
-      // 기본 카테고리 확인/생성
-      let defaultCategory = await db.select().from(categories).where(eq(categories.id, 1)).limit(1)
-      if (defaultCategory.length === 0) {
-        console.log('기본 카테고리 생성 중...')
-        await db.insert(categories).values({
-          name: '기본',
-          slug: 'default',
-          description: '기본 카테고리'
-        })
+      // 카테고리 처리
+      let categoryId = 1; // 기본값
+      
+      if (category) {
+        // 제공된 카테고리로 기존 카테고리 찾기
+        const existingCategory = await db.select().from(categories).where(eq(categories.name, category)).limit(1);
+        if (existingCategory.length > 0) {
+          categoryId = existingCategory[0].id;
+          console.log(`기존 카테고리 사용: ${category} (ID: ${categoryId})`);
+        } else {
+          // 새 카테고리 생성
+          const newCategoryResult = await db.insert(categories).values({
+            name: category,
+            slug: category.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-'),
+            description: `${category} 관련 포스트`
+          });
+          categoryId = newCategoryResult.insertId || 1;
+          console.log(`새 카테고리 생성: ${category} (ID: ${categoryId})`);
+        }
+      } else {
+        console.log('카테고리가 제공되지 않아 기본 카테고리 사용');
       }
 
       // 블로그 데이터베이스에 포스트 저장
@@ -362,7 +385,7 @@ async function handleToolCall(name: string, args: any) {
         excerpt: summary || '',
         published: true,
         authorId: 1, // 기본 작성자 ID
-        categoryId: 1, // 기본 카테고리 ID
+        categoryId: categoryId, // 동적으로 결정된 카테고리 ID
         viewCount: 0,
         createdAt: new Date(),
         updatedAt: new Date()
