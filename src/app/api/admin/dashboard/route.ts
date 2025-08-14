@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { posts, comments, users, categories } from '@/lib/db/schema';
-import { sql, desc } from 'drizzle-orm';
+import { sql, desc, eq } from 'drizzle-orm';
 
 export async function GET(request: NextRequest) {
   try {
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       // 총 조회수
       db.select({ totalViews: sql<number>`sum(view_count)` }).from(posts),
       
-      // 최근 포스트 5개
+      // 최근 포스트 5개 (게시된 것만)
       db.select({
         id: posts.id,
         title: posts.title,
@@ -32,6 +32,7 @@ export async function GET(request: NextRequest) {
         viewCount: posts.viewCount,
       })
       .from(posts)
+      .where(eq(posts.published, true))
       .orderBy(desc(posts.createdAt))
       .limit(5),
       

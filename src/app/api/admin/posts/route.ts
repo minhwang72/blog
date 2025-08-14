@@ -8,7 +8,16 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
+    const status = searchParams.get('status'); // 상태 필터 추가
     const offset = (page - 1) * limit;
+
+    // 상태 필터 조건 생성
+    let whereConditions = [];
+    if (status === 'published') {
+      whereConditions.push(eq(posts.published, true));
+    } else if (status === 'draft') {
+      whereConditions.push(eq(posts.published, false));
+    }
 
     // 포스트 목록 조회 (관리자용 - 모든 포스트 포함)
     const postsData = await db
@@ -27,14 +36,16 @@ export async function GET(request: NextRequest) {
       .from(posts)
       .leftJoin(users, eq(posts.authorId, users.id))
       .leftJoin(categories, eq(posts.categoryId, categories.id))
+      .where(whereConditions.length > 0 ? whereConditions[0] : undefined)
       .orderBy(desc(posts.createdAt))
       .limit(limit)
       .offset(offset);
 
-    // 전체 포스트 수 조회
+    // 전체 포스트 수 조회 (필터 적용)
     const totalCountResult = await db
       .select({ count: sql<number>`count(*)` })
-      .from(posts);
+      .from(posts)
+      .where(whereConditions.length > 0 ? whereConditions[0] : undefined);
 
     const totalCount = totalCountResult[0]?.count || 0;
     const totalPages = Math.ceil(totalCount / limit);
