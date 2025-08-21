@@ -3,23 +3,23 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import SecurityWrapper from '@/components/SecurityWrapper';
 import Script from 'next/script';
+import { Providers } from './providers';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: '응명 로그',
-  description: '바이브코딩과 MCP를 활용한 개발 블로그 - React, Next.js, TypeScript, AI 자동화 등 최신 개발 기술과 경험을 공유합니다.',
+  title: 'min.log',
+  description: '개발자를 위한 기술 블로그 min.log - React, Next.js, TypeScript, AI 자동화, MCP 등 최신 개발 기술과 경험을 공유합니다.',
   keywords: [
-    '바이브코딩', 'MCP', '블로그 시스템', '개발', '프로그래밍', 
+    'min.log', '개발 블로그', 'MCP', '개발', '프로그래밍', 
     'React', 'Next.js', 'TypeScript', 'JavaScript', 'AI', '자동화',
-    '웹개발', '풀스택', '프론트엔드', '백엔드', '황민', '응명'
+    '웹개발', '풀스택', '프론트엔드', '백엔드', '황민', '기술 블로그'
   ],
   authors: [{ name: '황민' }],
   creator: '황민',
-  publisher: '황민',
+  publisher: 'min.log',
   icons: {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',
@@ -35,16 +35,16 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: '응명 로그',
-    description: '바이브코딩과 MCP를 활용한 개발 블로그 - React, Next.js, TypeScript, AI 자동화 등 최신 개발 기술과 경험을 공유합니다.',
+    title: 'min.log',
+    description: '개발자를 위한 기술 블로그 min.log - React, Next.js, TypeScript, AI 자동화, MCP 등 최신 개발 기술과 경험을 공유합니다.',
     url: 'https://www.eungming.com',
-    siteName: '응명 로그',
+    siteName: 'min.log',
     images: [
       {
         url: '/logo.svg',
         width: 1200,
         height: 630,
-        alt: '응명 로그',
+        alt: 'min.log',
       },
     ],
     locale: 'ko_KR',
@@ -52,8 +52,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: '응명 로그',
-    description: '바이브코딩과 MCP를 활용한 개발 블로그 - React, Next.js, TypeScript, AI 자동화 등 최신 개발 기술과 경험을 공유합니다.',
+    title: 'min.log',
+    description: '개발자를 위한 기술 블로그 min.log - React, Next.js, TypeScript, AI 자동화, MCP 등 최신 개발 기술과 경험을 공유합니다.',
     images: ['/logo.svg'],
   },
   robots: {
@@ -83,16 +83,16 @@ export default function RootLayout({
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "응명 로그",
+    "name": "min.log",
     "url": "https://www.eungming.com",
-    "description": "바이브코딩과 MCP를 활용한 개발 블로그 - React, Next.js, TypeScript, AI 자동화 등 최신 개발 기술과 경험을 공유합니다.",
+    "description": "개발자를 위한 기술 블로그 min.log - React, Next.js, TypeScript, AI 자동화, MCP 등 최신 개발 기술과 경험을 공유합니다.",
     "author": {
       "@type": "Person",
       "name": "황민"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "응명 로그",
+      "name": "min.log",
       "url": "https://www.eungming.com"
     },
     "potentialAction": {
@@ -106,10 +106,10 @@ export default function RootLayout({
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "응명 로그",
+    "name": "min.log",
     "url": "https://www.eungming.com",
     "logo": "https://www.eungming.com/logo.svg",
-    "description": "바이브코딩과 MCP를 활용한 개발 블로그 - React, Next.js, TypeScript, AI 자동화 등 최신 개발 기술과 경험을 공유합니다.",
+    "description": "개발자를 위한 기술 블로그 min.log - React, Next.js, TypeScript, AI 자동화, MCP 등 최신 개발 기술과 경험을 공유합니다.",
     "founder": {
       "@type": "Person",
       "name": "황민"
@@ -140,16 +140,17 @@ export default function RootLayout({
       <body
         className="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300 font-sans"
       >
-        <SecurityWrapper>
-          <div className="min-h-screen flex flex-col">
-            <Header />
-            <main className="flex-1">
-              {children}
-            </main>
-            <Footer />
-          </div>
-          <ThemeToggle />
-        </SecurityWrapper>
+        <Providers>
+          <SecurityWrapper>
+            <div className="min-h-screen flex flex-col">
+              <Header />
+              <main className="flex-1">
+                {children}
+              </main>
+              <Footer />
+            </div>
+          </SecurityWrapper>
+        </Providers>
       </body>
     </html>
   );

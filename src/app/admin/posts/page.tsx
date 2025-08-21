@@ -32,18 +32,24 @@ export default function AdminPostsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [filterStatus, setFilterStatus] = useState<'all' | 'published' | 'draft'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'createdAt' | 'title' | 'viewCount'>('createdAt');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const postsPerPage = 10;
 
   useEffect(() => {
     fetchPosts();
-  }, [currentPage, filterStatus]);
+  }, [currentPage, filterStatus, searchQuery, sortBy, sortOrder]);
 
   const fetchPosts = async () => {
     try {
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: postsPerPage.toString(),
-        ...(filterStatus !== 'all' && { status: filterStatus })
+        ...(filterStatus !== 'all' && { status: filterStatus }),
+        ...(searchQuery && { search: searchQuery }),
+        sortBy,
+        sortOrder
       });
       
       const response = await fetch(`/api/admin/posts?${params}`);
@@ -153,39 +159,71 @@ export default function AdminPostsPage() {
 
       {/* 필터 및 검색 */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-        <div className="flex flex-col sm:flex-row gap-4">
-          {/* 상태 필터 */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => setFilterStatus('all')}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                filterStatus === 'all'
-                  ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
-            >
-              전체
-            </button>
-            <button
-              onClick={() => setFilterStatus('published')}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                filterStatus === 'published'
-                  ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
-            >
-              발행됨
-            </button>
-            <button
-              onClick={() => setFilterStatus('draft')}
-              className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                filterStatus === 'draft'
-                  ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
-                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-              }`}
-            >
-              초안
-            </button>
+        <div className="flex flex-col lg:flex-row gap-4 justify-between">
+          {/* 검색 */}
+          <div className="flex-1 max-w-md">
+            <input
+              type="text"
+              placeholder="제목이나 내용으로 검색..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+            />
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* 정렬 */}
+            <div className="flex gap-2">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'createdAt' | 'title' | 'viewCount')}
+                className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="createdAt">생성일</option>
+                <option value="title">제목</option>
+                <option value="viewCount">조회수</option>
+              </select>
+              <button
+                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                className="px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+              >
+                {sortOrder === 'asc' ? '↑' : '↓'}
+              </button>
+            </div>
+
+            {/* 상태 필터 */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setFilterStatus('all')}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                  filterStatus === 'all'
+                    ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                전체
+              </button>
+              <button
+                onClick={() => setFilterStatus('published')}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                  filterStatus === 'published'
+                    ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                발행됨
+              </button>
+              <button
+                onClick={() => setFilterStatus('draft')}
+                className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                  filterStatus === 'draft'
+                    ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
+                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                }`}
+              >
+                초안
+              </button>
+            </div>
           </div>
         </div>
       </div>
