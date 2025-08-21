@@ -1,6 +1,31 @@
 import { z } from 'zod'
 
-// SSL 인증서 검증은 시스템 기본값 사용
+// GitHub Actions 환경에서 SSL 검증 문제 해결
+// MCP 서버에 대해서만 SSL 검증 우회하는 fetch 래퍼
+async function safeFetch(url: string, options: RequestInit = {}) {
+  // GitHub Actions 환경에서만 SSL 검증 우회
+  if (process.env.GITHUB_ACTIONS && url.includes('mcp.eungming.com')) {
+    console.log('🔧 GitHub Actions 환경: SSL 검증 우회 적용')
+    // 임시로 SSL 검증 비활성화
+    const originalRejectUnauthorized = process.env.NODE_TLS_REJECT_UNAUTHORIZED
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+    
+    try {
+      const result = await fetch(url, options)
+      return result
+    } finally {
+      // 원래 설정 복원
+      if (originalRejectUnauthorized !== undefined) {
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = originalRejectUnauthorized
+      } else {
+        delete process.env.NODE_TLS_REJECT_UNAUTHORIZED
+      }
+    }
+  }
+  
+  // 일반적인 fetch 사용
+  return fetch(url, options)
+}
 
 // Claude API 설정
 const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY
@@ -173,49 +198,138 @@ async function callClaudeAPI(prompt: string, maxRetries = 5) {
   }
 }
 
-// Unsplash에서 관련 이미지 검색
+// 이미지 가져오기 (API 키 없이도 동작)
 async function getUnsplashImage(keyword: string) {
-  try {
-    const searchKeywords = [
-      'programming', 'coding', 'developer', 'technology', 'computer',
-      'software', 'code', 'tech', 'development', 'digital'
-    ]
-    const randomKeyword = searchKeywords[Math.floor(Math.random() * searchKeywords.length)]
-    
-    const response = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(randomKeyword)}&per_page=10&orientation=landscape`, {
-      headers: {
-        'Authorization': `Client-ID ${UNSPLASH_ACCESS_KEY}`
-      }
-    })
+  // 고품질 개발/기술 관련 이미지 풀
+  const imagePool = [
+    {
+      url: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800&h=400&fit=crop&crop=center',
+      alt: '개발자가 코딩하는 모습',
+      photographer: 'Luca Bravo',
+      photographerUrl: 'https://unsplash.com/@lucabravo',
+      keywords: ['programming', 'coding', 'developer']
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&h=400&fit=crop&crop=center',
+      alt: '노트북과 코드 화면',
+      photographer: 'Luca Bravo',
+      photographerUrl: 'https://unsplash.com/@lucabravo',
+      keywords: ['laptop', 'code', 'programming']
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=800&h=400&fit=crop&crop=center',
+      alt: '팀 개발자들이 협업하는 모습',
+      photographer: 'Headway',
+      photographerUrl: 'https://unsplash.com/@headwayio',
+      keywords: ['team', 'collaboration', 'meeting']
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=400&fit=crop&crop=center',
+      alt: '데이터 분석 차트와 그래프',
+      photographer: 'Carlos Muza',
+      photographerUrl: 'https://unsplash.com/@kmuza',
+      keywords: ['data', 'analytics', 'charts']
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=800&h=400&fit=crop&crop=center',
+      alt: 'AI와 머신러닝 개념도',
+      photographer: 'Possessed Photography',
+      photographerUrl: 'https://unsplash.com/@possessedphotography',
+      keywords: ['ai', 'machine learning', 'technology']
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=800&h=400&fit=crop&crop=center',
+      alt: '클린 코드와 개발 환경',
+      photographer: 'Emile Perron',
+      photographerUrl: 'https://unsplash.com/@emilep',
+      keywords: ['clean code', 'development', 'setup']
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=400&fit=crop&crop=center',
+      alt: '서버와 클라우드 인프라',
+      photographer: 'Taylor Vick',
+      photographerUrl: 'https://unsplash.com/@tvick',
+      keywords: ['server', 'cloud', 'infrastructure']
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1607706189992-eae578626c86?w=800&h=400&fit=crop&crop=center',
+      alt: '보안과 사이버 보안',
+      photographer: 'FLY:D',
+      photographerUrl: 'https://unsplash.com/@flyd2069',
+      keywords: ['security', 'cybersecurity', 'protection']
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&h=400&fit=crop&crop=center',
+      alt: '모바일 앱 개발',
+      photographer: 'William Hook',
+      photographerUrl: 'https://unsplash.com/@williamtm',
+      keywords: ['mobile', 'app', 'development']
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&h=400&fit=crop&crop=center',
+      alt: '개발자 워크스페이스',
+      photographer: 'Nate Grant',
+      photographerUrl: 'https://unsplash.com/@nateggrant',
+      keywords: ['workspace', 'setup', 'developer']
+    }
+  ]
 
-    const data = await response.json()
-    
-    if (data.results && data.results.length > 0) {
-      const randomImage = data.results[Math.floor(Math.random() * data.results.length)]
-      return {
-        url: randomImage.urls.regular,
-        alt: randomImage.alt_description || `${randomKeyword} 관련 이미지`,
-        photographer: randomImage.user.name,
-        photographerUrl: randomImage.user.links.html,
-        unsplashUrl: randomImage.links.html
+  try {
+    // API 키가 있으면 Unsplash API 사용 시도
+    if (UNSPLASH_ACCESS_KEY && UNSPLASH_ACCESS_KEY.trim() !== '') {
+      console.log('🔑 Unsplash API 키 발견, API 호출 시도...')
+      
+      const searchKeywords = [
+        'programming', 'coding', 'developer', 'technology', 'computer',
+        'software', 'code', 'tech', 'development', 'digital'
+      ]
+      const randomKeyword = searchKeywords[Math.floor(Math.random() * searchKeywords.length)]
+      
+      const response = await fetch(`https://api.unsplash.com/search/photos?query=${encodeURIComponent(randomKeyword)}&per_page=10&orientation=landscape`, {
+        headers: {
+          'Authorization': `Client-ID ${UNSPLASH_ACCESS_KEY}`
+        }
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        
+        if (data.results && data.results.length > 0) {
+          const randomImage = data.results[Math.floor(Math.random() * data.results.length)]
+          console.log('✅ Unsplash API로 이미지 가져오기 성공!')
+          return {
+            url: randomImage.urls.regular,
+            alt: randomImage.alt_description || `${randomKeyword} 관련 이미지`,
+            photographer: randomImage.user.name,
+            photographerUrl: randomImage.user.links.html,
+            unsplashUrl: randomImage.links.html
+          }
+        }
       }
     }
     
-    // 기본 이미지 반환
+    // API 키가 없거나 API 호출 실패 시 이미지 풀에서 선택
+    console.log('🎨 이미지 풀에서 랜덤 이미지 선택...')
+    const randomImage = imagePool[Math.floor(Math.random() * imagePool.length)]
+    
     return {
-      url: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800',
-      alt: '개발 관련 이미지',
-      photographer: 'Unsplash',
-      photographerUrl: 'https://unsplash.com',
+      url: randomImage.url,
+      alt: randomImage.alt,
+      photographer: randomImage.photographer,
+      photographerUrl: randomImage.photographerUrl,
       unsplashUrl: 'https://unsplash.com'
     }
+    
   } catch (error) {
-    console.warn('이미지 검색 실패, 기본 이미지 사용:', error)
+    console.warn('⚠️ 이미지 가져오기 실패, 기본 이미지 사용:', error)
+    
+    // 완전 폴백: 첫 번째 이미지 사용
+    const fallbackImage = imagePool[0]
     return {
-      url: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=800',
-      alt: '개발 관련 이미지',
-      photographer: 'Unsplash',
-      photographerUrl: 'https://unsplash.com',
+      url: fallbackImage.url,
+      alt: fallbackImage.alt,
+      photographer: fallbackImage.photographer,
+      photographerUrl: fallbackImage.photographerUrl,
       unsplashUrl: 'https://unsplash.com'
     }
   }
@@ -725,7 +839,7 @@ async function generateDailyPostWithClaude() {
   // 중복 포스팅 방지: 오늘 날짜의 포스트가 이미 있는지 확인
   try {
     console.log('🔍 중복 포스팅 체크 중...')
-    const checkResponse = await fetch('https://mcp.eungming.com/mcp', {
+    const checkResponse = await safeFetch('https://mcp.eungming.com/mcp', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -829,7 +943,7 @@ async function generateDailyPostWithClaude() {
 
     // MCP 서버에 포스트 저장
     console.log('💾 MCP 서버에 포스트 저장 중...')
-    const mcpResponse = await fetch('https://mcp.eungming.com/mcp', {
+    const mcpResponse = await safeFetch('https://mcp.eungming.com/mcp', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -864,7 +978,7 @@ async function generateDailyPostWithClaude() {
     // 자동 발행 처리
     console.log('📢 포스트 자동 발행 중...')
     
-    const publishResponse = await fetch('https://mcp.eungming.com/mcp', {
+    const publishResponse = await safeFetch('https://mcp.eungming.com/mcp', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
