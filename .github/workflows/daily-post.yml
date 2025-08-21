@@ -1,0 +1,38 @@
+name: Daily Auto Post
+
+on:
+  schedule:
+    # 매일 오전 9시 (한국 시간) - UTC 0시
+    - cron: '0 0 * * *'
+  workflow_dispatch: # 수동 실행 가능
+
+jobs:
+  generate-daily-post:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'yarn'
+        
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+      
+    - name: Generate daily post
+      run: yarn tsx scripts/claude-auto-post.ts
+      env:
+        CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+        NODE_ENV: production
+        
+    - name: Notify completion
+      if: success()
+      run: echo "✅ Daily post generated successfully!"
+      
+    - name: Notify failure
+      if: failure()
+      run: echo "❌ Daily post generation failed!"

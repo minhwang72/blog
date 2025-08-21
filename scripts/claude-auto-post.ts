@@ -1,5 +1,8 @@
 import { z } from 'zod'
 
+// SSL 인증서 검증 비활성화 (로컬 개발용)
+process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0"
+
 // Claude API 설정
 const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY
 const CLAUDE_MODEL = 'claude-3-5-sonnet-20241022'
