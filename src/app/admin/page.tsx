@@ -81,6 +81,23 @@ export default function AdminDashboard() {
     return () => clearInterval(interval);
   }, []);
 
+  // 다른 탭에서의 업데이트 감지
+  useEffect(() => {
+    const channel = new BroadcastChannel('admin-updates');
+    
+    channel.onmessage = (event) => {
+      const { type } = event.data;
+      if (type === 'POST_DELETED' || type === 'POST_CREATED' || type === 'POST_UPDATED') {
+        // 즉시 통계 새로고침
+        fetchStats();
+      }
+    };
+
+    return () => {
+      channel.close();
+    };
+  }, []);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">

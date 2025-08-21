@@ -252,6 +252,12 @@ export default function NewPostPage() {
       if (response.ok) {
         const data = await response.json();
         alert('포스트가 생성되었습니다!');
+        
+        // 대시보드에 업데이트 알림
+        const channel = new BroadcastChannel('admin-updates');
+        channel.postMessage({ type: 'POST_CREATED', timestamp: Date.now() });
+        channel.close();
+        
         router.push('/admin/posts');
       } else {
         const errorData = await response.json();

@@ -76,6 +76,11 @@ export default function AdminPostsPage() {
       if (response.ok) {
         alert('포스트가 삭제되었습니다.');
         fetchPosts();
+        
+        // 대시보드에 업데이트 알림
+        const channel = new BroadcastChannel('admin-updates');
+        channel.postMessage({ type: 'POST_DELETED', timestamp: Date.now() });
+        channel.close();
       } else {
         alert('포스트 삭제에 실패했습니다.');
       }
@@ -97,6 +102,11 @@ export default function AdminPostsPage() {
 
       if (response.ok) {
         fetchPosts();
+        
+        // 대시보드에 업데이트 알림
+        const channel = new BroadcastChannel('admin-updates');
+        channel.postMessage({ type: 'POST_UPDATED', timestamp: Date.now() });
+        channel.close();
       } else {
         alert('발행 상태 변경에 실패했습니다.');
       }
