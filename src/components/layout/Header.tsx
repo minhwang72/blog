@@ -20,7 +20,7 @@ export default function Header() {
       <div className="w-full flex h-16 items-center px-4 sm:px-6 lg:px-8">
         {/* 로고 */}
         <Link href="/" className="logo text-2xl font-bold tracking-tight hover:opacity-80 transition-opacity bg-gradient-to-r from-slate-600 via-gray-500 to-slate-700 bg-clip-text text-transparent">
-          min.log
+          응명 로그
         </Link>
 
         {/* 데스크탑 네비게이션 */}

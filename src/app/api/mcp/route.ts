@@ -2,11 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { posts, users, categories } from '@/lib/db/schema'
 import { eq, like, desc, and } from 'drizzle-orm'
+import { CategoryClassifier } from '@/lib/services/category-classifier.service'
 
 const MCP_SERVER_URL = process.env.NODE_ENV === 'production' 
   ? 'https://mcp.eungming.com/mcp'
   : 'http://localhost:8787/mcp'
 const MCP_TOKEN = process.env.MCP_TOKEN || '0a295dd2818cb5eb5cfcae08b94b39b9620221b35bd2379294f9cf12fcae9e92'
+
+// 카테고리 분류기 인스턴스
+const categoryClassifier = new CategoryClassifier()
 
 // 글 길이에 따른 광고 배치 전략
 function getAdPositions(contentLength: number) {
@@ -173,23 +177,62 @@ export async function POST(request: NextRequest) {
         })
       }
 
-      // 카테고리 처리
+      // 자동 카테고리 분류
+      let finalCategory = category;
       let categoryId = 1; // 기본값
+      let classificationResult = null;
       
-      if (category) {
-        // 제공된 카테고리로 기존 카테고리 찾기
-        const existingCategory = await db.select().from(categories).where(eq(categories.name, category)).limit(1);
-        if (existingCategory.length > 0) {
-          categoryId = existingCategory[0].id;
-        } else {
-          // 새 카테고리 생성
-          const newCategoryResult = await db.insert(categories).values({
-            name: category,
-            slug: category.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-'),
-            description: `${category} 관련 포스트`
-          });
-          categoryId = newCategoryResult.insertId || 1;
+      if (!category) {
+        // 카테고리가 제공되지 않은 경우 자동 분류
+        try {
+          finalCategory = await categoryClassifier.classify(title, content);
+          const confidence = await categoryClassifier.getConfidence(title, content);
+          const detailedScores = await categoryClassifier.getDetailedScores(title, content);
+          
+          classificationResult = {
+            autoClassified: true,
+            category: finalCategory,
+            confidence: confidence,
+            scores: detailedScores,
+            message: `포스트 내용을 분석하여 "${finalCategory}" 카테고리로 자동 분류했습니다. (신뢰도: ${(confidence * 100).toFixed(1)}%)`
+          };
+          
+          console.log('자동 카테고리 분류 결과:', classificationResult);
+        } catch (error) {
+          console.error('카테고리 분류 오류:', error);
+          finalCategory = '일상'; // 오류 시 기본값
+          classificationResult = {
+            autoClassified: true,
+            category: finalCategory,
+            confidence: 0,
+            scores: {},
+            message: '카테고리 분류 중 오류가 발생하여 "일상" 카테고리로 설정했습니다.'
+          };
         }
+      } else {
+        classificationResult = {
+          autoClassified: false,
+          category: finalCategory,
+          confidence: 1,
+          scores: {},
+          message: '사용자가 지정한 카테고리를 사용합니다.'
+        };
+      }
+      
+      // 카테고리 ID 찾기 또는 생성
+      const existingCategory = await db.select().from(categories).where(eq(categories.name, finalCategory)).limit(1);
+      if (existingCategory.length > 0) {
+        categoryId = existingCategory[0].id;
+        console.log(`기존 카테고리 사용: ${finalCategory} (ID: ${categoryId})`);
+      } else {
+        // 새 카테고리 생성
+        const newCategoryResult = await db.insert(categories).values({
+          name: finalCategory,
+          slug: finalCategory.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-'),
+          description: `${finalCategory} 관련 포스트`
+        });
+        categoryId = newCategoryResult.insertId || 1;
+        console.log(`새 카테고리 생성: ${finalCategory} (ID: ${categoryId})`);
       }
 
       // 기존 포스트 확인
@@ -215,6 +258,8 @@ export async function POST(request: NextRequest) {
           message: 'Draft updated successfully',
           slug,
           categoryId,
+          category: finalCategory,
+          classification: classificationResult,
           adPositions,
           contentLength: content.length,
           adStrategy: {
@@ -256,6 +301,9 @@ export async function POST(request: NextRequest) {
           message: 'Draft created successfully',
           slug,
           postId: createdPost?.id,
+          categoryId,
+          category: finalCategory,
+          classification: classificationResult,
           adPositions,
           contentLength: content.length,
           adStrategy: {
@@ -354,27 +402,62 @@ async function handleToolCall(name: string, args: any) {
         })
       }
 
-      // 카테고리 처리
+      // 자동 카테고리 분류
+      let finalCategory = category;
       let categoryId = 1; // 기본값
+      let classificationResult = null;
       
-      if (category) {
-        // 제공된 카테고리로 기존 카테고리 찾기
-        const existingCategory = await db.select().from(categories).where(eq(categories.name, category)).limit(1);
-        if (existingCategory.length > 0) {
-          categoryId = existingCategory[0].id;
-          console.log(`기존 카테고리 사용: ${category} (ID: ${categoryId})`);
-        } else {
-          // 새 카테고리 생성
-          const newCategoryResult = await db.insert(categories).values({
-            name: category,
-            slug: category.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-'),
-            description: `${category} 관련 포스트`
-          });
-          categoryId = newCategoryResult.insertId || 1;
-          console.log(`새 카테고리 생성: ${category} (ID: ${categoryId})`);
+      if (!category) {
+        // 카테고리가 제공되지 않은 경우 자동 분류
+        try {
+          finalCategory = await categoryClassifier.classify(title, content);
+          const confidence = await categoryClassifier.getConfidence(title, content);
+          const detailedScores = await categoryClassifier.getDetailedScores(title, content);
+          
+          classificationResult = {
+            autoClassified: true,
+            category: finalCategory,
+            confidence: confidence,
+            scores: detailedScores,
+            message: `포스트 내용을 분석하여 "${finalCategory}" 카테고리로 자동 분류했습니다. (신뢰도: ${(confidence * 100).toFixed(1)}%)`
+          };
+          
+          console.log('자동 카테고리 분류 결과:', classificationResult);
+        } catch (error) {
+          console.error('카테고리 분류 오류:', error);
+          finalCategory = '일상'; // 오류 시 기본값
+          classificationResult = {
+            autoClassified: true,
+            category: finalCategory,
+            confidence: 0,
+            scores: {},
+            message: '카테고리 분류 중 오류가 발생하여 "일상" 카테고리로 설정했습니다.'
+          };
         }
       } else {
-        console.log('카테고리가 제공되지 않아 기본 카테고리 사용');
+        classificationResult = {
+          autoClassified: false,
+          category: finalCategory,
+          confidence: 1,
+          scores: {},
+          message: '사용자가 지정한 카테고리를 사용합니다.'
+        };
+      }
+      
+      // 카테고리 ID 찾기 또는 생성
+      const existingCategory = await db.select().from(categories).where(eq(categories.name, finalCategory)).limit(1);
+      if (existingCategory.length > 0) {
+        categoryId = existingCategory[0].id;
+        console.log(`기존 카테고리 사용: ${finalCategory} (ID: ${categoryId})`);
+      } else {
+        // 새 카테고리 생성
+        const newCategoryResult = await db.insert(categories).values({
+          name: finalCategory,
+          slug: finalCategory.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-'),
+          description: `${finalCategory} 관련 포스트`
+        });
+        categoryId = newCategoryResult.insertId || 1;
+        console.log(`새 카테고리 생성: ${finalCategory} (ID: ${categoryId})`);
       }
 
       // 블로그 데이터베이스에 포스트 저장
@@ -394,6 +477,8 @@ async function handleToolCall(name: string, args: any) {
       return {
         success: true,
         post,
+        category: finalCategory,
+        classification: classificationResult,
         message: '블로그 포스트가 성공적으로 생성되었습니다.'
       }
 

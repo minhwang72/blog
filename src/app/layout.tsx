@@ -10,12 +10,16 @@ import Script from 'next/script';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'min.log',
-  description: '개발과 일상에 대한 이야기를 담은 블로그입니다.',
-  keywords: ['블로그', '개발', '프로그래밍', '일상'],
-  authors: [{ name: 'hwnagmin' }],
-  creator: 'hwnagmin',
-  publisher: 'hwnagmin',
+  title: '응명 로그',
+  description: '바이브코딩과 MCP를 활용한 개발 블로그 - React, Next.js, TypeScript, AI 자동화 등 최신 개발 기술과 경험을 공유합니다.',
+  keywords: [
+    '바이브코딩', 'MCP', '블로그 시스템', '개발', '프로그래밍', 
+    'React', 'Next.js', 'TypeScript', 'JavaScript', 'AI', '자동화',
+    '웹개발', '풀스택', '프론트엔드', '백엔드', '황민', '응명'
+  ],
+  authors: [{ name: '황민' }],
+  creator: '황민',
+  publisher: '황민',
   icons: {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',
@@ -31,16 +35,16 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: 'min.log',
-    description: '개발과 일상에 대한 이야기를 담은 블로그입니다.',
+    title: '응명 로그',
+    description: '바이브코딩과 MCP를 활용한 개발 블로그 - React, Next.js, TypeScript, AI 자동화 등 최신 개발 기술과 경험을 공유합니다.',
     url: 'https://www.eungming.com',
-    siteName: 'min.log',
+    siteName: '응명 로그',
     images: [
       {
         url: '/logo.svg',
         width: 1200,
         height: 630,
-        alt: 'min.log',
+        alt: '응명 로그',
       },
     ],
     locale: 'ko_KR',
@@ -48,8 +52,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'min.log',
-    description: '개발과 일상에 대한 이야기를 담은 블로그입니다.',
+    title: '응명 로그',
+    description: '바이브코딩과 MCP를 활용한 개발 블로그 - React, Next.js, TypeScript, AI 자동화 등 최신 개발 기술과 경험을 공유합니다.',
     images: ['/logo.svg'],
   },
   robots: {
@@ -79,16 +83,16 @@ export default function RootLayout({
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "min.log",
+    "name": "응명 로그",
     "url": "https://www.eungming.com",
-    "description": "개발과 일상에 대한 이야기를 담은 블로그입니다.",
+    "description": "바이브코딩과 MCP를 활용한 개발 블로그 - React, Next.js, TypeScript, AI 자동화 등 최신 개발 기술과 경험을 공유합니다.",
     "author": {
       "@type": "Person",
       "name": "황민"
     },
     "publisher": {
       "@type": "Organization",
-      "name": "min.log",
+      "name": "응명 로그",
       "url": "https://www.eungming.com"
     },
     "potentialAction": {
@@ -102,10 +106,10 @@ export default function RootLayout({
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "min.log",
+    "name": "응명 로그",
     "url": "https://www.eungming.com",
     "logo": "https://www.eungming.com/logo.svg",
-    "description": "개발과 일상에 대한 이야기를 담은 블로그입니다.",
+    "description": "바이브코딩과 MCP를 활용한 개발 블로그 - React, Next.js, TypeScript, AI 자동화 등 최신 개발 기술과 경험을 공유합니다.",
     "founder": {
       "@type": "Person",
       "name": "황민"
