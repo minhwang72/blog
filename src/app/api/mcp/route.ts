@@ -165,6 +165,7 @@ export async function POST(request: NextRequest) {
     // /api/mcp/draft - 초안 저장
     if (path === '/api/mcp/draft') {
       const { slug, title, content, summary, tags, category } = body
+      console.log('📝 Draft 요청 받음:', { slug, title, category: category || '자동분류' });
       
       // 기본 사용자 확인/생성
       let defaultUser = await db.select().from(users).where(eq(users.id, 1)).limit(1)
@@ -184,6 +185,7 @@ export async function POST(request: NextRequest) {
       
       if (!category) {
         // 카테고리가 제공되지 않은 경우 자동 분류
+        console.log('🔍 카테고리 자동 분류 시작:', { title, contentLength: content.length });
         try {
           finalCategory = await categoryClassifier.classify(title, content);
           const confidence = await categoryClassifier.getConfidence(title, content);
@@ -197,9 +199,9 @@ export async function POST(request: NextRequest) {
             message: `포스트 내용을 분석하여 "${finalCategory}" 카테고리로 자동 분류했습니다. (신뢰도: ${(confidence * 100).toFixed(1)}%)`
           };
           
-          console.log('자동 카테고리 분류 결과:', classificationResult);
+          console.log('✅ 자동 카테고리 분류 결과:', classificationResult);
         } catch (error) {
-          console.error('카테고리 분류 오류:', error);
+          console.error('❌ 카테고리 분류 오류:', error);
           finalCategory = '일상'; // 오류 시 기본값
           classificationResult = {
             autoClassified: true,
@@ -210,6 +212,7 @@ export async function POST(request: NextRequest) {
           };
         }
       } else {
+        console.log('📝 사용자 지정 카테고리 사용:', category);
         classificationResult = {
           autoClassified: false,
           category: finalCategory,
@@ -277,7 +280,8 @@ export async function POST(request: NextRequest) {
         })
       } else {
         // 새 포스트 생성 (초안 상태)
-        await db.insert(posts).values({
+        console.log('🆕 새 포스트 생성 시작');
+        const insertResult = await db.insert(posts).values({
           title,
           slug,
           content,
@@ -290,13 +294,15 @@ export async function POST(request: NextRequest) {
           updatedAt: new Date()
         })
 
+        console.log('📝 포스트 생성 완료:', insertResult);
+
         // 생성된 포스트 조회
         const [createdPost] = await db.select().from(posts).where(eq(posts.slug, slug))
 
         // 광고 배치 정보 추가
         const adPositions = getAdPositions(content.length)
         
-        return NextResponse.json({
+        const response = {
           success: true,
           message: 'Draft created successfully',
           slug,
@@ -318,7 +324,10 @@ export async function POST(request: NextRequest) {
               '더 많은 광고를 표시하려면 글을 길게 작성하세요.'
             ]
           }
-        })
+        };
+
+        console.log('📤 응답 전송:', response);
+        return NextResponse.json(response)
       }
     }
 
