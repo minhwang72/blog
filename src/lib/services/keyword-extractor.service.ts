@@ -34,7 +34,7 @@ export class KeywordExtractorService {
     keywords.push(...titleWords.slice(0, 3));
 
     // 중복 제거 및 정렬
-    return [...new Set(keywords)].slice(0, 10);
+    return Array.from(new Set(keywords)).slice(0, 10);
   }
 
   static generateTags(content: string, title: string): string[] {
@@ -58,6 +58,6 @@ export class KeywordExtractorService {
       tags.push('Cloud');
     }
 
-    return [...new Set([...keywords.slice(0, 5), ...tags])];
+    return Array.from(new Set([...keywords.slice(0, 5), ...tags]));
   }
 }

@@ -234,7 +234,7 @@ export async function POST(request: NextRequest) {
           slug: finalCategory.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-'),
           description: `${finalCategory} 관련 포스트`
         });
-        categoryId = newCategoryResult.insertId || 1;
+        categoryId = (newCategoryResult as any).insertId || 1;
         console.log(`새 카테고리 생성: ${finalCategory} (ID: ${categoryId})`);
       }
 
@@ -465,7 +465,7 @@ async function handleToolCall(name: string, args: any) {
           slug: finalCategory.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-'),
           description: `${finalCategory} 관련 포스트`
         });
-        categoryId = newCategoryResult.insertId || 1;
+        categoryId = (newCategoryResult as any).insertId || 1;
         console.log(`새 카테고리 생성: ${finalCategory} (ID: ${categoryId})`);
       }
 

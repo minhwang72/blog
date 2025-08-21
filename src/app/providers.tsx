@@ -10,7 +10,6 @@ export function Providers({ children }: { children: React.ReactNode }) {
       enableSystem
       disableTransitionOnChange={true}
       storageKey="theme"
-      suppressHydrationWarning
     >
       {children}
     </ThemeProvider>

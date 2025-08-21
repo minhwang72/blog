@@ -1,5 +1,4 @@
-// SSL 인증서 검증 비활성화 (로컬 개발용)
-process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0"
+// SSL 인증서 검증은 시스템 기본값 사용
 
 // MCP 서버에 포스트 발행 요청
 async function publishPost(slug: string) {

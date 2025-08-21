@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ 
       success: true, 
-      postId: result.insertId,
+      postId: (result as any).insertId,
       message: '포스트가 생성되었습니다.'
     });
   } catch (error) {

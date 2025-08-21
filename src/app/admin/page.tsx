@@ -161,7 +161,7 @@ export default function AdminDashboard() {
           </div>
           <div className="hidden md:flex items-center space-x-4">
             <button
-              onClick={fetchStats}
+              onClick={() => fetchStats(true)}
               className="flex items-center px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors duration-200"
             >
               <ArrowPathIcon className="w-4 h-4 mr-2" />

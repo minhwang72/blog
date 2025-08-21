@@ -15,7 +15,7 @@ export default function GoogleAdsense({
   className = '',
   format = 'auto'
 }: GoogleAdsenseProps) {
-  const adRef = useRef<HTMLElement>(null);
+  const adRef = useRef<HTMLModElement>(null);
   
   // 애드센스 Publisher ID가 설정되지 않으면 광고를 표시하지 않음
   const publisherId = process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID;

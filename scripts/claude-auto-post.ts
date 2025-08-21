@@ -1,14 +1,13 @@
 import { z } from 'zod'
 
-// SSL 인증서 검증 비활성화 (로컬 개발용)
-process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0"
+// SSL 인증서 검증은 시스템 기본값 사용
 
 // Claude API 설정
 const CLAUDE_API_KEY = process.env.CLAUDE_API_KEY
 const CLAUDE_MODEL = 'claude-3-5-sonnet-20241022'
 
 // Unsplash API 설정 (무료 이미지 제공)
-const UNSPLASH_ACCESS_KEY = 'X3w-YEQi7QJsxHWt8J4xvb6F_zQsdfWBzY7WG8V5GEI' // 공개 API 키
+const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY || '' // 환경변수에서 가져오기
 
 // 포스트 주제 카테고리 (유입률 높은 트렌드 주제들)
 const postCategories = [

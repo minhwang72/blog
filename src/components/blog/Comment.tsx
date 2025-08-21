@@ -33,7 +33,7 @@ export default function Comment({ comment, onReply }: CommentProps) {
         <div className="flex items-center">
           <span className="font-semibold mr-2">{comment.author.name}</span>
           <span className="text-sm text-gray-500 dark:text-gray-400">
-            {formatDate(comment.createdAt)}
+            {comment.createdAt ? formatDate(comment.createdAt) : '날짜 없음'}
           </span>
         </div>
         <button

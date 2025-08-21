@@ -17,7 +17,7 @@ export async function PATCH(
     const sessionId = authHeader.replace('Bearer ', '');
     
     // 세션 유효성 검사
-    const sessionResponse = await fetch(`${request.nextUrl.origin}/api/admin/me`, {
+    const sessionResponse = await fetch(`${new URL(request.url).origin}/api/admin/me`, {
       headers: {
         'Authorization': `Bearer ${sessionId}`
       }
@@ -64,7 +64,7 @@ export async function DELETE(
     const sessionId = authHeader.replace('Bearer ', '');
     
     // 세션 유효성 검사
-    const sessionResponse = await fetch(`${request.nextUrl.origin}/api/admin/me`, {
+    const sessionResponse = await fetch(`${new URL(request.url).origin}/api/admin/me`, {
       headers: {
         'Authorization': `Bearer ${sessionId}`
       }

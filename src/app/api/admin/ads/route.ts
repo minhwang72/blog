@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ 
       success: true, 
-      adId: result.insertId,
+      adId: (result as any).insertId,
       message: '광고 설정이 생성되었습니다.'
     });
   } catch (error) {

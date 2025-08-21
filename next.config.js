@@ -25,14 +25,14 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   
-  // ESLint 비활성화 (빌드 시간 단축)
+  // ESLint 활성화 (코드 품질 유지)
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   
-  // TypeScript 오류 무시 (빌드 시간 단축)
+  // TypeScript 오류 처리 (코드 품질 유지)
   typescript: {
-    ignoreBuildErrors: true,
+    ignoreBuildErrors: false,
   },
   
   // 헤더 설정

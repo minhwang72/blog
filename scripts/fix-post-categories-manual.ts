@@ -1,6 +1,6 @@
 import { db } from '../src/lib/db'
 import { posts, categories } from '../src/lib/db/schema'
-import { eq } from 'drizzle-orm'
+import { eq, or } from 'drizzle-orm'
 
 // 포스트 ID별 카테고리 매핑
 const postCategoryMapping = {
@@ -45,7 +45,14 @@ async function fixPostCategoriesManual() {
       id: posts.id,
       title: posts.title,
       categoryId: posts.categoryId
-    }).from(posts).where(eq(posts.id, 16)).or(eq(posts.id, 17)).or(eq(posts.id, 27)).or(eq(posts.id, 28))
+    }).from(posts).where(
+      or(
+        eq(posts.id, 16),
+        eq(posts.id, 17),
+        eq(posts.id, 27),
+        eq(posts.id, 28)
+      )
+    )
 
     for (const post of updatedPosts) {
       const category = allCategories.find(c => c.id === post.categoryId)

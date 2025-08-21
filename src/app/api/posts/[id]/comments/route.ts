@@ -82,7 +82,7 @@ export async function POST(
 
     return NextResponse.json({ 
       success: true, 
-      id: newComment.insertId,
+      id: (newComment as any).insertId,
       message: '댓글이 성공적으로 작성되었습니다.'
     });
   } catch (error) {

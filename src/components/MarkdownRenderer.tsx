@@ -13,7 +13,8 @@ export default function MarkdownRenderer({ content, className = '' }: MarkdownRe
         remarkPlugins={[remarkGfm]}
         components={{
           // 코드 블록 스타일링
-          code({ node, inline, className, children, ...props }) {
+          code({ node, className, children, ...props }: any) {
+            const inline = !(props as any).inline;
             const match = /language-(\w+)/.exec(className || '')
             return !inline && match ? (
               <pre className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto">

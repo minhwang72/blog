@@ -32,7 +32,7 @@ export class BlogPostService {
     });
 
     // insertId 추출
-    const postId = postResult.insertId || postResult.lastInsertRowid || postResult[0]?.insertId;
+    const postId = (postResult as any).insertId || (postResult as any).lastInsertRowid || (postResult as any)[0]?.insertId;
     
     if (!postId) {
       throw new Error(`Failed to get post ID after insert`);
@@ -72,7 +72,7 @@ export class BlogPostService {
     });
 
     return {
-      id: newCategoryResult.insertId,
+      id: (newCategoryResult as any).insertId,
       name,
       slug,
     };
@@ -98,7 +98,7 @@ export class BlogPostService {
           // createdAt은 DB에서 자동으로 처리됨
         });
         
-        tagId = newTagResult.insertId || newTagResult.lastInsertRowid || newTagResult[0]?.insertId;
+        tagId = (newTagResult as any).insertId || (newTagResult as any).lastInsertRowid || (newTagResult as any)[0]?.insertId;
         
         if (!tagId) {
           throw new Error(`Failed to get tag ID after insert`);
