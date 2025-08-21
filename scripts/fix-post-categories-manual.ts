@@ -6,8 +6,8 @@ import { eq } from 'drizzle-orm'
 const postCategoryMapping = {
   28: 'MCP·에이전트', // "MCP로 만든 AI 에이전트가 실제로 돈을 벌어준 이야기"
   27: 'MCP·에이전트', // "AI 에이전트 시대의 개발자: 2025년 필수 스킬셋"
-  17: '개발',         // "바이브코딩으로 MCP 블로그 시스템 구축하기"
-  16: '개발'          // "MCP로 자동화하는 나의 블로그"
+  17: 'MCP·에이전트', // "바이브코딩으로 MCP 블로그 시스템 구축하기"
+  16: 'MCP·에이전트'  // "MCP로 자동화하는 나의 블로그"
 }
 
 async function fixPostCategoriesManual() {
