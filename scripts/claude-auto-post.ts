@@ -825,6 +825,39 @@ async function generateDailyPostWithClaude() {
 
     console.log('✅ MCP 저장 성공!')
     console.log('   결과:', JSON.stringify(mcpResult, null, 2))
+    
+    // 자동 발행 처리
+    console.log('📢 포스트 자동 발행 중...')
+    
+    const publishResponse = await fetch('https://mcp.eungming.com/mcp', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: `publish-${dateStr}`,
+        method: 'tools/call',
+        params: {
+          name: 'post_publish',
+          arguments: {
+            slug,
+            publishedAt: new Date().toISOString()
+          }
+        }
+      })
+    })
+
+    const publishResult = await publishResponse.json()
+    
+    if (publishResult.error) {
+      console.error('❌ 자동 발행 실패:', publishResult.error)
+      console.log('⚠️  포스트는 초안 상태로 저장되었습니다.')
+      return true // 저장은 성공했으므로 true 반환
+    }
+
+    console.log('🎉 포스트 자동 발행 완료!')
+    console.log('   발행 결과:', JSON.stringify(publishResult, null, 2))
     return true
 
   } catch (error) {
@@ -838,7 +871,7 @@ if (require.main === module) {
   generateDailyPostWithClaude()
     .then(success => {
       if (success) {
-        console.log('🎉 Claude 기반 자동 포스트 생성 완료!')
+        console.log('🎉 Claude 기반 자동 포스트 생성 및 발행 완료!')
         process.exit(0)
       } else {
         console.log('💥 Claude 기반 자동 포스트 생성 실패!')
