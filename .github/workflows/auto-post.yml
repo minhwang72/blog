@@ -1,0 +1,46 @@
+name: Claude Auto Post Generator
+
+on:
+  schedule:
+    # 매일 오전 9시에 실행 (UTC 기준)
+    - cron: '0 9 * * *'
+  workflow_dispatch: # 수동 실행 가능
+
+jobs:
+  generate-post:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      run: npm install
+      
+    - name: Generate daily post with Claude
+      env:
+        CLAUDE_API_KEY: ${{ secrets.CLAUDE_API_KEY }}
+        MCP_SERVER_URL: https://mcp.eungming.com
+        BLOG_API_URL: https://www.eungming.com/api/mcp
+      run: |
+        # Claude API 키 확인
+        if [ -z "$CLAUDE_API_KEY" ]; then
+          echo "❌ CLAUDE_API_KEY가 설정되지 않았습니다."
+          exit 1
+        fi
+        
+        # TypeScript 스크립트 실행
+        npx tsx scripts/claude-auto-post.ts
+        
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add .
+        git commit -m "🤖 Claude 기반 자동 포스트 생성 $(date +%Y-%m-%d)" || echo "No changes to commit"
+        git push
