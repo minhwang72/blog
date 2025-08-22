@@ -2,8 +2,14 @@ name: Claude Auto Post Generator
 
 on:
   schedule:
-    # 매일 오전 9시에 실행 (UTC 기준)
+    # 매일 오후 6시 (한국시간 18:00, UTC 09:00)
     - cron: '0 9 * * *'
+    # 백업 1: 매일 오후 8시 (한국시간 20:00, UTC 11:00)
+    - cron: '0 11 * * *'
+    # 백업 2: 매일 오후 10시 (한국시간 22:00, UTC 13:00)
+    - cron: '0 13 * * *'
+    # 백업 3: 매일 밤 12시 (한국시간 24:00, UTC 15:00)
+    - cron: '0 15 * * *'
   workflow_dispatch: # 수동 실행 가능
 
 jobs:
