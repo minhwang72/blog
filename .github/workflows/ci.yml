@@ -1,0 +1,192 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # 코드 품질 검사
+  quality-check:
+    name: Code Quality Check
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Type checking
+        run: yarn type-check
+
+      - name: Lint check
+        run: yarn lint
+
+      - name: Run tests
+        run: yarn test:ci
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+
+  # 빌드 테스트
+  build-test:
+    name: Build Test
+    runs-on: ubuntu-latest
+    needs: quality-check
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build application
+        run: yarn build
+        env:
+          NODE_ENV: production
+          NEXT_PUBLIC_SITE_URL: https://www.eungming.com
+
+      - name: Check build output
+        run: |
+          if [ ! -d ".next" ]; then
+            echo "Build failed: .next directory not found"
+            exit 1
+          fi
+          echo "Build successful"
+
+  # 보안 검사
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run npm audit
+        run: |
+          yarn audit --level moderate || true
+
+      - name: Run Snyk security scan
+        uses: snyk/actions/node@master
+        continue-on-error: true
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+
+  # E2E 테스트 (선택사항)
+  e2e-test:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    needs: build-test
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build application
+        run: yarn build
+        env:
+          NODE_ENV: production
+
+      - name: Start application
+        run: |
+          yarn start &
+          sleep 10
+        env:
+          PORT: 3000
+
+      - name: Basic health check
+        run: |
+          curl -f http://localhost:3000 || exit 1
+          echo "Health check passed"
+
+  # 배포 (main 브랜치만)
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [quality-check, build-test, security-scan]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+
+  # 성능 모니터링
+  performance-check:
+    name: Performance Check
+    runs-on: ubuntu-latest
+    needs: deploy
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        with:
+          urls: |
+            https://www.eungming.com
+            https://www.eungming.com/blog
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+  # 알림
+  notify:
+    name: Notify
+    runs-on: ubuntu-latest
+    needs: [quality-check, build-test, security-scan, deploy]
+    if: always()
+    
+    steps:
+      - name: Notify success
+        if: ${{ needs.deploy.result == 'success' }}
+        run: |
+          echo "🎉 Deployment successful!"
+          # 여기에 Slack, Discord 등 알림 추가 가능
+
+      - name: Notify failure
+        if: ${{ contains(needs.*.result, 'failure') }}
+        run: |
+          echo "❌ Pipeline failed!"
+          # 여기에 실패 알림 추가 가능

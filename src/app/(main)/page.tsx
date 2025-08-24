@@ -1,66 +1,12 @@
 import Link from 'next/link';
-import { db } from '@/lib/db';
-import { posts, categories, users } from '@/lib/db/schema';
-import { eq, desc, and } from 'drizzle-orm';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import PostCard from '@/components/blog/PostCard';
+import { BlogPost } from '@/types/blog';
+import { blogService } from '@/lib/services/blog.service';
 
-async function getPosts(categorySlug: string = 'all') {
-  try {
-    let whereConditions = [eq(posts.published, true)];
-    
-    if (categorySlug !== 'all') {
-      whereConditions.push(eq(categories.slug, categorySlug));
-    }
-
-    const allPosts = await db
-      .select({
-        id: posts.id,
-        title: posts.title,
-        slug: posts.slug,
-        excerpt: posts.excerpt,
-        content: posts.content,
-        createdAt: posts.createdAt,
-        updatedAt: posts.updatedAt,
-        authorId: posts.authorId,
-        authorName: users.name,
-        categoryId: posts.categoryId,
-        categoryName: categories.name,
-        categorySlug: categories.slug,
-        viewCount: posts.viewCount,
-      })
-      .from(posts)
-      .leftJoin(users, eq(posts.authorId, users.id))
-      .leftJoin(categories, eq(posts.categoryId, categories.id))
-      .where(and(...whereConditions))
-      .orderBy(desc(posts.createdAt));
-    
-    return Array.isArray(allPosts) ? allPosts : [];
-  } catch (error) {
-    console.error('Error fetching posts:', error);
-    return [];
-  }
-}
-
-async function getCategories() {
-  try {
-    const allCategories = await db
-      .select({
-        id: categories.id,
-        name: categories.name,
-        slug: categories.slug,
-        description: categories.description,
-      })
-      .from(categories)
-      .orderBy(categories.name);
-    
-    return Array.isArray(allCategories) ? allCategories : [];
-  } catch (error) {
-    console.error('Error fetching categories:', error);
-    return [];
-  }
-}
+// ISR을 위한 revalidate 설정
+export const revalidate = 900 // 15분마다 재생성
 
 interface PageProps {
   searchParams: { category?: string };
@@ -68,15 +14,16 @@ interface PageProps {
 
 export default async function Home({ searchParams }: PageProps) {
   const categorySlug = searchParams.category || 'all';
-  const posts = await getPosts(categorySlug);
-  const categories = await getCategories();
+  
+  // 캐시된 서비스 사용
+  const [postsResponse, categories, popularPosts, stats] = await Promise.all([
+    blogService.getPosts(categorySlug, 1, 6),
+    blogService.getCategories(),
+    blogService.getPopularPosts(4),
+    blogService.getStats(),
+  ]);
 
-  // 최신 포스트 6개
-  const recentPosts = posts.slice(0, 6);
-  // 인기 포스트 (조회수 기준) 4개
-  const popularPosts = [...posts]
-    .sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))
-    .slice(0, 4);
+  const recentPosts = postsResponse.posts;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-100 via-gray-50 to-slate-200 dark:from-slate-800 dark:via-slate-900 dark:to-slate-800">
@@ -123,25 +70,25 @@ export default async function Home({ searchParams }: PageProps) {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="text-center">
               <div className="text-4xl md:text-5xl font-black text-slate-600 dark:text-slate-300 mb-2">
-                {posts.length}
+                {stats.totalPosts.toLocaleString()}
               </div>
               <div className="text-lg font-semibold text-slate-700 dark:text-slate-300">총 포스트</div>
             </div>
             <div className="text-center">
               <div className="text-4xl md:text-5xl font-black text-gray-600 dark:text-gray-300 mb-2">
-                {posts.reduce((sum, post: any) => sum + (post.viewCount || 0), 0).toLocaleString()}
+                {stats.totalViews.toLocaleString()}
               </div>
               <div className="text-lg font-semibold text-slate-700 dark:text-slate-300">총 조회수</div>
             </div>
             <div className="text-center">
               <div className="text-4xl md:text-5xl font-black text-slate-500 dark:text-slate-400 mb-2">
-                {new Set(posts.map((post: any) => post.categoryName)).size}
+                {stats.totalCategories}
               </div>
               <div className="text-lg font-semibold text-slate-700 dark:text-slate-300">카테고리</div>
             </div>
             <div className="text-center">
               <div className="text-4xl md:text-5xl font-black text-gray-500 dark:text-gray-400 mb-2">
-                {Math.floor(posts.reduce((sum, post: any) => sum + (post.content?.length || 0), 0) / 1000)}
+                {Math.floor(recentPosts.reduce((sum, post) => sum + (post.content?.length || 0), 0) / 1000)}
               </div>
               <div className="text-lg font-semibold text-slate-700 dark:text-slate-300">총 글자수(K)</div>
             </div>
@@ -169,7 +116,7 @@ export default async function Home({ searchParams }: PageProps) {
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {recentPosts.map((post: any) => (
+            {recentPosts.map((post) => (
               <PostCard key={post.id} post={post} />
             ))}
           </div>
@@ -189,7 +136,7 @@ export default async function Home({ searchParams }: PageProps) {
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {popularPosts.map((post: any) => (
+              {popularPosts.map((post) => (
                 <div key={post.id} className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-slate-200 dark:border-slate-700">
                   <div className="p-8">
                     <div className="flex items-center gap-3 mb-4">

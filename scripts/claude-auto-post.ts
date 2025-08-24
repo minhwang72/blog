@@ -1,30 +1,29 @@
 import { z } from 'zod'
 
-// GitHub Actions 환경에서 SSL 검증 문제 해결
-// MCP 서버에 대해서만 SSL 검증 우회하는 fetch 래퍼
+// 보안 강화된 fetch 래퍼
 async function safeFetch(url: string, options: RequestInit = {}) {
-  // GitHub Actions 환경에서만 SSL 검증 우회
-  if (process.env.GITHUB_ACTIONS && url.includes('mcp.eungming.com')) {
-    console.log('🔧 GitHub Actions 환경: SSL 검증 우회 적용')
-    // 임시로 SSL 검증 비활성화
-    const originalRejectUnauthorized = process.env.NODE_TLS_REJECT_UNAUTHORIZED
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+  // 개발 환경에서만 제한적 SSL 우회 허용
+  if (process.env.NODE_ENV === 'development' && url.includes('localhost')) {
+    console.log('🔧 개발 환경: 로컬 SSL 설정 적용')
+    const https = await import('https')
+    const agent = new https.Agent({ rejectUnauthorized: false })
     
-    try {
-      const result = await fetch(url, options)
-      return result
-    } finally {
-      // 원래 설정 복원
-      if (originalRejectUnauthorized !== undefined) {
-        process.env.NODE_TLS_REJECT_UNAUTHORIZED = originalRejectUnauthorized
-      } else {
-        delete process.env.NODE_TLS_REJECT_UNAUTHORIZED
-      }
-    }
+    return fetch(url, {
+      ...options,
+      // @ts-ignore
+      agent: url.startsWith('https:') ? agent : undefined
+    })
   }
   
-  // 일반적인 fetch 사용
-  return fetch(url, options)
+  // 프로덕션에서는 항상 안전한 연결 사용
+  return fetch(url, {
+    ...options,
+    // 추가 보안 헤더
+    headers: {
+      ...options.headers,
+      'User-Agent': 'min-blog-automation/1.0',
+    },
+  })
 }
 
 // Claude API 설정
