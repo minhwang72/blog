@@ -30,9 +30,18 @@ const nextConfig = {
     ignoreDuringBuilds: false,
   },
   
-  // TypeScript 오류 처리 (코드 품질 유지)
+  // TypeScript 오류 처리 (코드 품질 유지) - scripts 폴더 제외
   typescript: {
     ignoreBuildErrors: false,
+  },
+  
+  // 빌드에서 scripts 폴더 제외
+  webpack: (config) => {
+    config.watchOptions = {
+      ...config.watchOptions,
+      ignored: ['**/scripts/**', '**/node_modules/**']
+    }
+    return config
   },
   
   // 헤더 설정

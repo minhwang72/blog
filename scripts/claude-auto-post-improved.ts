@@ -200,7 +200,7 @@ function generateAdvancedPrompt(
     : ''
 
   const overlappingTopics = recentPosts
-    .filter(post => post.keywords.some(k => topic.includes(k)))
+    .filter(post => post.keywords.some((k: string) => topic.includes(k)))
     .map(post => post.title)
 
   const contextInstruction = overlappingTopics.length > 0
@@ -426,7 +426,7 @@ async function generateDailyPost() {
     console.log(`🎯 선택된 주제: "${topic}" (${category})`)
     
     // 3. 중복 체크 (최근 글들과 주제 겹침 확인)
-    const duplicateCheck = recentPosts.find(post => 
+    const duplicateCheck = recentPosts.find((post: any) => 
       post.title.includes(topic.split(' ')[0]) || 
       calculateOverlapRate(topic, post.title) > 0.3
     )
@@ -470,8 +470,8 @@ async function generateDailyPost() {
     // 5. 중복률 최종 검증
     if (recentPosts.length > 0) {
       const avgOverlap = recentPosts
-        .map(post => calculateOverlapRate(content, post.title + ' ' + post.summary))
-        .reduce((a, b) => a + b, 0) / recentPosts.length
+        .map((post: any) => calculateOverlapRate(content, post.title + ' ' + post.summary))
+        .reduce((a: number, b: number) => a + b, 0) / recentPosts.length
       
       console.log(`🔍 중복률 검사: ${(avgOverlap * 100).toFixed(1)}%`)
       
