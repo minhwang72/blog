@@ -2,13 +2,14 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Suspense } from 'react';
 
 interface PaginationProps {
   totalPages: number;
   currentPage: number;
 }
 
-export default function Pagination({
+function PaginationInner({
   totalPages,
   currentPage,
 }: PaginationProps) {
@@ -72,5 +73,13 @@ export default function Pagination({
         <ChevronRight className="w-5 h-5" />
       </button>
     </div>
+  );
+}
+
+export default function Pagination(props: PaginationProps) {
+  return (
+    <Suspense fallback={<div className="flex justify-center mt-8">Loading...</div>}>
+      <PaginationInner {...props} />
+    </Suspense>
   );
 } 
