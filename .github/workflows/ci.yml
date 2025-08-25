@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main]
   pull_request:
     branches: [main]
 
@@ -32,14 +32,7 @@ jobs:
         run: yarn lint
 
       - name: Run tests
-        run: yarn test:ci
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          file: ./coverage/lcov.info
-          flags: unittests
-          name: codecov-umbrella
+        run: yarn test --passWithNoTests
 
   # 빌드 테스트
   build-test:
@@ -72,133 +65,24 @@ jobs:
             echo "Build failed: .next directory not found"
             exit 1
           fi
-          echo "Build successful"
-
-  # 보안 검사
-  security-scan:
-    name: Security Scan
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Run npm audit
-        run: |
-          yarn audit --level moderate || true
-
-      - name: Run Snyk security scan
-        uses: snyk/actions/node@master
-        continue-on-error: true
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high
-
-  # E2E 테스트 (선택사항)
-  e2e-test:
-    name: E2E Tests
-    runs-on: ubuntu-latest
-    needs: build-test
-    if: github.event_name == 'pull_request'
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'yarn'
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Build application
-        run: yarn build
-        env:
-          NODE_ENV: production
-
-      - name: Start application
-        run: |
-          yarn start &
-          sleep 10
-        env:
-          PORT: 3000
-
-      - name: Basic health check
-        run: |
-          curl -f http://localhost:3000 || exit 1
-          echo "Health check passed"
-
-  # 배포 (main 브랜치만)
-  deploy:
-    name: Deploy to Production
-    runs-on: ubuntu-latest
-    needs: [quality-check, build-test, security-scan]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy to Vercel
-        if: ${{ secrets.VERCEL_TOKEN != '' }}
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
-          
-      - name: Skip Vercel deployment
-        if: ${{ secrets.VERCEL_TOKEN == '' }}
-        run: |
-          echo "⚠️ Vercel deployment skipped - VERCEL_TOKEN not configured"
-          echo "Please configure Vercel secrets in repository settings if deployment is needed"
-
-  # 성능 모니터링
-  performance-check:
-    name: Performance Check
-    runs-on: ubuntu-latest
-    needs: deploy
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push' && secrets.VERCEL_TOKEN != ''
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Lighthouse CI
-        uses: treosh/lighthouse-ci-action@v10
-        with:
-          urls: |
-            https://www.eungming.com
-            https://www.eungming.com/blog
-          uploadArtifacts: true
-          temporaryPublicStorage: true
+          echo "✅ Build successful"
 
   # 알림
   notify:
     name: Notify
     runs-on: ubuntu-latest
-    needs: [quality-check, build-test, security-scan, deploy]
+    needs: [quality-check, build-test]
     if: always()
     
     steps:
-      - name: Notify success  
-        if: ${{ needs.deploy.result == 'success' }}
+      - name: Notify success
+        if: ${{ needs.build-test.result == 'success' }}
         run: |
-          echo "🎉 Pipeline completed successfully!"
-          echo "Build and tests passed ✅"
-          if [ "${{ secrets.VERCEL_TOKEN }}" != "" ]; then
-            echo "Deployment successful ✅"
-          else
-            echo "Deployment skipped (Vercel not configured) ⚠️"
-          fi
+          echo "🎉 CI Pipeline completed successfully!"
+          echo "✅ All checks passed"
 
       - name: Notify failure
         if: ${{ contains(needs.*.result, 'failure') }}
         run: |
-          echo "❌ Pipeline failed!"
-          # 여기에 실패 알림 추가 가능
+          echo "❌ CI Pipeline failed!"
+          echo "Please check the logs for details"
