@@ -566,6 +566,32 @@ async function generateDailyPost() {
       throw new Error(`MCP 서버 오류: ${mcpResult.error.message}`)
     }
     
+    // 10. 초안을 바로 발행
+    console.log('📤 포스트 발행 중...')
+    const publishResponse = await safeFetch('https://mcp.eungming.com/mcp', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: `publish-${dateStr}-${Date.now()}`,
+        method: 'tools/call',
+        params: {
+          name: 'post_publish',
+          arguments: {
+            slug
+          }
+        }
+      })
+    })
+    
+    const publishResult = await publishResponse.json()
+    
+    if (publishResult.error) {
+      throw new Error(`발행 오류: ${publishResult.error.message}`)
+    }
+    
     console.log('✅ 포스트 생성 및 발행 완료!')
     console.log('📊 최종 통계:')
     console.log(`   - 글자 수: ${content.length.toLocaleString()}자`)
