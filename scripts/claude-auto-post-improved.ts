@@ -407,6 +407,22 @@ async function generateDailyPost() {
   console.log(`📅 ${dateStr} 자동 포스트 생성 시작...`)
   
   try {
+    // 0. 오늘 이미 게시글이 있는지 먼저 확인
+    console.log('🔍 오늘 게시글 존재 여부 확인 중...')
+    const todayPosts = await getRecentPostsMeta(10) // 최근 10개 확인
+    
+    const todayPostExists = todayPosts.some((post: any) => {
+      const postDate = new Date(post.createdAt).toISOString().split('T')[0]
+      return postDate === dateStr
+    })
+    
+    if (todayPostExists) {
+      console.log(`✅ 오늘(${dateStr}) 이미 포스트가 작성되어 있습니다. 중지합니다.`)
+      console.log('🎯 하루 1개 제한으로 인해 자동 포스팅을 건너뜁니다.')
+      return
+    }
+    
+    console.log(`📝 오늘(${dateStr}) 포스트가 없습니다. 새 포스트 생성을 진행합니다.`)
     // 1. 최근 포스트 컨텍스트 가져오기
     console.log('🔍 최근 포스트 컨텍스트 수집 중...')
     const recentPosts = await getRecentPostsMeta(6)
