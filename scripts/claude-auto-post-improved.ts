@@ -9,14 +9,29 @@ async function safeFetch(url: string, options: RequestInit = {}) {
   
   if ((isGitHubActions || isDev) && needsSSLWorkaround) {
     console.log('🔧 SSL 인증서 우회 설정 적용 (GitHub Actions/Dev 환경)')
-    const https = await import('https')
-    const agent = new https.Agent({ rejectUnauthorized: false })
     
-    return fetch(url, {
-      ...options,
-      // @ts-ignore
-      agent: url.startsWith('https:') ? agent : undefined
-    })
+    // Node.js 환경변수로 SSL 검증 비활성화
+    const oldRejectUnauthorized = process.env.NODE_TLS_REJECT_UNAUTHORIZED
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'
+    
+    try {
+      const result = await fetch(url, {
+        ...options,
+        headers: {
+          ...options.headers,
+          'User-Agent': 'min-blog-automation/1.0',
+        },
+      })
+      
+      return result
+    } finally {
+      // 원래 설정 복원
+      if (oldRejectUnauthorized !== undefined) {
+        process.env.NODE_TLS_REJECT_UNAUTHORIZED = oldRejectUnauthorized
+      } else {
+        delete process.env.NODE_TLS_REJECT_UNAUTHORIZED
+      }
+    }
   }
   
   // 일반 환경에서는 표준 연결 사용
