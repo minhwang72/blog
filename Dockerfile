@@ -23,6 +23,9 @@ FROM node:20-alpine AS runner
 
 WORKDIR /app
 
+# Install curl for health check
+RUN apk add --no-cache curl
+
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
@@ -52,9 +55,9 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # Expose port
 EXPOSE 3001
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:3001/api/health || exit 1
+# Health check - 간단한 포트 체크로 변경
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:3001 || exit 1
 
 # Start the application - 더 안전한 방법으로 수정
 CMD ["node", "server.js"]
