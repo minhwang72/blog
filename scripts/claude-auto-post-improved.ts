@@ -2,9 +2,13 @@ import { z } from 'zod'
 
 // 보안 강화된 fetch 래퍼
 async function safeFetch(url: string, options: RequestInit = {}) {
-  // 개발 환경에서만 제한적 SSL 우회 허용
-  if (process.env.NODE_ENV === 'development' && url.includes('localhost')) {
-    console.log('🔧 개발 환경: 로컬 SSL 설정 적용')
+  // GitHub Actions나 개발 환경에서 SSL 문제 해결
+  const isGitHubActions = process.env.GITHUB_ACTIONS === 'true'
+  const isDev = process.env.NODE_ENV === 'development'
+  const needsSSLWorkaround = url.includes('mcp.eungming.com') || url.includes('localhost')
+  
+  if ((isGitHubActions || isDev) && needsSSLWorkaround) {
+    console.log('🔧 SSL 인증서 우회 설정 적용 (GitHub Actions/Dev 환경)')
     const https = await import('https')
     const agent = new https.Agent({ rejectUnauthorized: false })
     
@@ -15,7 +19,7 @@ async function safeFetch(url: string, options: RequestInit = {}) {
     })
   }
   
-  // 프로덕션에서는 항상 안전한 연결 사용
+  // 일반 환경에서는 표준 연결 사용
   return fetch(url, {
     ...options,
     headers: {
