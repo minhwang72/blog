@@ -2,8 +2,9 @@ name: Daily Auto Post
 
 on:
   schedule:
-    # 5분마다 실행 (하루 1개 제한으로 실제로는 첫 성공 후 중지)
-    - cron: '*/5 * * * *'
+    # 하루 2번 점검: 오전 9시(KST), 오후 6시(KST) = UTC 0시, 9시
+    - cron: '0 0 * * *'  # 매일 오전 9시 (KST)
+    - cron: '0 9 * * *'  # 매일 오후 6시 (KST) 
   workflow_dispatch: # 수동 실행 가능
 
 jobs:

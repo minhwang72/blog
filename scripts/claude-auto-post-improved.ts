@@ -147,14 +147,14 @@ function insertAdsSmart(content: string): string {
   }
   
   const adCode = `
+
+**광고**
+
 <div style="min-height:280px;margin:3rem 0;padding:1rem;text-align:center;border-radius:8px;background:linear-gradient(135deg,#f8fafc 0%,#f1f5f9 100%);">
-  <ins class="adsbygoogle"
-       style="display:block;width:100%;height:250px;"
-       data-ad-client="ca-pub-4467822003966307"
-       data-ad-slot="AUTO"
-       data-ad-format="auto"
-       data-full-width-responsive="true"></ins>
-</div>`
+<ins class="adsbygoogle" style="display:block;width:100%;height:250px;" data-ad-client="ca-pub-4467822003966307" data-ad-slot="AUTO" data-ad-format="auto" data-full-width-responsive="true"></ins>
+</div>
+
+`
 
   let adPositions: number[] = []
   
