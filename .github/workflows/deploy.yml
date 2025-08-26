@@ -8,152 +8,164 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'yarn'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "yarn"
 
-    - name: Install dependencies
-      run: yarn install --frozen-lockfile --production=false
+      - name: Install dependencies with retry
+        run: |
+          # Configure yarn with better timeout and retry settings
+          yarn config set network-timeout 300000
+          yarn config set registry https://registry.npmjs.org/
+          # Try install with retries
+          yarn install --frozen-lockfile --production=false --network-timeout 300000 || \
+          (echo "Retrying with backoff..." && sleep 30 && yarn install --frozen-lockfile --production=false --network-timeout 300000) || \
+          (echo "Final retry..." && sleep 60 && yarn install --frozen-lockfile --production=false --network-timeout 300000)
 
-    - name: Build application
-      run: yarn build
+      - name: Build application
+        run: yarn build
 
-    - name: Set environment variables
-      run: |
-        echo "DOCKER_IMAGE=${{ secrets.DOCKER_IMAGE }}" >> $GITHUB_ENV
-        echo "DOCKER_TAG=${{ github.sha }}" >> $GITHUB_ENV
-        echo "SERVER_HOST=${{ secrets.SERVER_HOST }}" >> $GITHUB_ENV
-        echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> $GITHUB_ENV
-        echo "SERVER_USER=${{ secrets.SERVER_USER }}" >> $GITHUB_ENV
-        echo "CONTAINER_NAME=blog" >> $GITHUB_ENV
-        echo "CONTAINER_PORT=3001" >> $GITHUB_ENV
-        echo "HOST_PORT=3001" >> $GITHUB_ENV
-        echo "HOST=0.0.0.0" >> $GITHUB_ENV
-        echo "NODE_ENV=production" >> $GITHUB_ENV
-        echo "NEXT_TELEMETRY_DISABLED=1" >> $GITHUB_ENV
-        echo "SKIP_DATABASE_CONNECTION=false" >> $GITHUB_ENV
-        # Database Configuration
-        echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
-        echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
-        echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
-        echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
-        echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
-        # Next Auth Configuration
-        echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> $GITHUB_ENV
-        echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> $GITHUB_ENV
-        # Google OAuth Configuration
-        echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> $GITHUB_ENV
-        echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> $GITHUB_ENV
-        # OpenAI Configuration
-        echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
-        # Cloudinary Configuration
-        echo "CLOUDINARY_URL=${{ secrets.CLOUDINARY_URL }}" >> $GITHUB_ENV
-        # Google AdSense Configuration
-        echo "NEXT_PUBLIC_ADSENSE_PUBLISHER_ID=${{ secrets.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID }}" >> $GITHUB_ENV
-        echo "NEXT_PUBLIC_ADSENSE_TOP_SLOT=${{ secrets.NEXT_PUBLIC_ADSENSE_TOP_SLOT }}" >> $GITHUB_ENV
-        echo "NEXT_PUBLIC_ADSENSE_MIDDLE_SLOT=${{ secrets.NEXT_PUBLIC_ADSENSE_MIDDLE_SLOT }}" >> $GITHUB_ENV
-        echo "NEXT_PUBLIC_ADSENSE_BOTTOM_SLOT=${{ secrets.NEXT_PUBLIC_ADSENSE_BOTTOM_SLOT }}" >> $GITHUB_ENV
-        echo "NEXT_PUBLIC_ADSENSE_DEFAULT_SLOT=${{ secrets.NEXT_PUBLIC_ADSENSE_DEFAULT_SLOT }}" >> $GITHUB_ENV
+      - name: Set environment variables
+        run: |
+          echo "DOCKER_IMAGE=${{ secrets.DOCKER_IMAGE }}" >> $GITHUB_ENV
+          echo "DOCKER_TAG=${{ github.sha }}" >> $GITHUB_ENV
+          echo "SERVER_HOST=${{ secrets.SERVER_HOST }}" >> $GITHUB_ENV
+          echo "SERVER_PORT=${{ secrets.SERVER_PORT }}" >> $GITHUB_ENV
+          echo "SERVER_USER=${{ secrets.SERVER_USER }}" >> $GITHUB_ENV
+          echo "CONTAINER_NAME=blog" >> $GITHUB_ENV
+          echo "CONTAINER_PORT=3001" >> $GITHUB_ENV
+          echo "HOST_PORT=3001" >> $GITHUB_ENV
+          echo "HOST=0.0.0.0" >> $GITHUB_ENV
+          echo "NODE_ENV=production" >> $GITHUB_ENV
+          echo "NEXT_TELEMETRY_DISABLED=1" >> $GITHUB_ENV
+          echo "SKIP_DATABASE_CONNECTION=false" >> $GITHUB_ENV
+          # Database Configuration
+          echo "DB_HOST=${{ secrets.DB_HOST }}" >> $GITHUB_ENV
+          echo "DB_PORT=${{ secrets.DB_PORT }}" >> $GITHUB_ENV
+          echo "DB_NAME=${{ secrets.DB_NAME }}" >> $GITHUB_ENV
+          echo "DB_USER=${{ secrets.DB_USER }}" >> $GITHUB_ENV
+          echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> $GITHUB_ENV
+          # Next Auth Configuration
+          echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> $GITHUB_ENV
+          echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> $GITHUB_ENV
+          # Google OAuth Configuration
+          echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> $GITHUB_ENV
+          # OpenAI Configuration
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
+          # Cloudinary Configuration
+          echo "CLOUDINARY_URL=${{ secrets.CLOUDINARY_URL }}" >> $GITHUB_ENV
+          # Google AdSense Configuration
+          echo "NEXT_PUBLIC_ADSENSE_PUBLISHER_ID=${{ secrets.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_ADSENSE_TOP_SLOT=${{ secrets.NEXT_PUBLIC_ADSENSE_TOP_SLOT }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_ADSENSE_MIDDLE_SLOT=${{ secrets.NEXT_PUBLIC_ADSENSE_MIDDLE_SLOT }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_ADSENSE_BOTTOM_SLOT=${{ secrets.NEXT_PUBLIC_ADSENSE_BOTTOM_SLOT }}" >> $GITHUB_ENV
+          echo "NEXT_PUBLIC_ADSENSE_DEFAULT_SLOT=${{ secrets.NEXT_PUBLIC_ADSENSE_DEFAULT_SLOT }}" >> $GITHUB_ENV
 
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Setup SSH
-      uses: webfactory/ssh-agent@v0.8.0
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Login to Docker Hub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    - name: Build and push Docker image
-      run: |
-        echo "Building Docker image..."
-        docker build -t ${{ env.DOCKER_IMAGE }}:${{ github.sha }} .
-        echo "Pushing Docker image..."
-        docker push ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
-        echo "✅ Docker image built and pushed successfully!"
-        echo "Image: ${{ env.DOCKER_IMAGE }}:${{ github.sha }}"
+      - name: Build and push Docker image
+        run: |
+          echo "Building Docker image with BuildKit cache..."
+          # Enable BuildKit for better caching and parallel builds
+          export DOCKER_BUILDKIT=1
+          docker buildx build \
+            --cache-from=type=gha \
+            --cache-to=type=gha,mode=max \
+            --platform=linux/amd64 \
+            -t ${{ env.DOCKER_IMAGE }}:${{ github.sha }} \
+            --push .
+          echo "✅ Docker image built and pushed successfully!"
+          echo "Image: ${{ env.DOCKER_IMAGE }}:${{ github.sha }}"
 
-    - name: Test SSH connection
-      run: |
-        echo "Testing SSH connection to ${{ env.SERVER_HOST }}:${{ env.SERVER_PORT }}"
-        timeout 30 ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} -p ${{ env.SERVER_PORT }} "echo 'SSH connection successful'" || {
-          echo "⚠️ SSH connection failed. Manual deployment required."
-          echo "Please run the following commands on your server:"
-          echo "docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}"
-          echo "docker stop blog || true"
-          echo "docker rm blog || true"
-          echo "docker run -d --name blog --restart unless-stopped -p 3001:3001 -e NODE_ENV=production ${{ env.DOCKER_IMAGE }}:${{ github.sha }}"
-        }
-
-    - name: Deploy to server
-      if: success()
-      run: |
-        echo "Starting deployment..."
-        echo "Connecting to: ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:${{ env.SERVER_PORT }}"
-        ssh -o ConnectTimeout=30 -o StrictHostKeyChecking=no ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} -p ${{ env.SERVER_PORT }} << 'EOF'
-          echo "Starting deployment..."
-          
-          # Check if container exists and stop it
-          echo "Checking existing container..."
-          if docker ps -a --format "table {{.Names}}" | grep -q "blog"; then
-            echo "Stopping existing container..."
-            docker stop blog || echo "Failed to stop container"
-            echo "Removing existing container..."
-            docker rm blog || echo "Failed to remove container"
-          else
-            echo "No existing container found"
-          fi
-          
-          # Pull latest image
-          echo "Pulling latest image..."
-          docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
-          
-          # Run new container with minimal configuration
-          echo "Starting new container..."
-          docker run -d \
-            --name blog \
-            --restart unless-stopped \
-            -p 3001:3001 \
-            -e NODE_ENV=production \
-            ${{ env.DOCKER_IMAGE }}:${{ github.sha }} || {
-            echo "❌ Container start failed! Trying with simplified approach..."
-            docker run -d --name blog --restart unless-stopped -p 3001:3001 -e NODE_ENV=production ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+      - name: Test SSH connection
+        run: |
+          echo "Testing SSH connection to ${{ env.SERVER_HOST }}:${{ env.SERVER_PORT }}"
+          timeout 30 ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} -p ${{ env.SERVER_PORT }} "echo 'SSH connection successful'" || {
+            echo "⚠️ SSH connection failed. Manual deployment required."
+            echo "Please run the following commands on your server:"
+            echo "docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}"
+            echo "docker stop blog || true"
+            echo "docker rm blog || true"
+            echo "docker run -d --name blog --restart unless-stopped -p 3001:3001 -e NODE_ENV=production ${{ env.DOCKER_IMAGE }}:${{ github.sha }}"
           }
-          
-          # Check container status
-          echo "Checking container status..."
-          docker ps -a | grep blog
-          
-          # Wait a moment for container to start
-          sleep 5
-          
-          # Check container logs
-          echo "Container logs:"
-          docker logs blog --tail 50
-          
-          # Check if container is running
-          if docker ps | grep -q blog; then
-            echo "✅ Container is running successfully!"
-          else
-            echo "❌ Container failed to start!"
-            echo "Container status:"
-            docker ps -a | grep blog
-            echo "Container logs:"
-            docker logs blog
-            exit 1
-          fi
-          
-          echo "Deployment completed!"
-        EOF
 
- 
+      - name: Deploy to server
+        if: success()
+        run: |
+          echo "Starting deployment..."
+          echo "Connecting to: ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }}:${{ env.SERVER_PORT }}"
+          ssh -o ConnectTimeout=30 -o StrictHostKeyChecking=no ${{ env.SERVER_USER }}@${{ env.SERVER_HOST }} -p ${{ env.SERVER_PORT }} << 'EOF'
+            echo "Starting deployment..."
+            
+            # Check if container exists and stop it
+            echo "Checking existing container..."
+            if docker ps -a --format "table {{.Names}}" | grep -q "blog"; then
+              echo "Stopping existing container..."
+              docker stop blog || echo "Failed to stop container"
+              echo "Removing existing container..."
+              docker rm blog || echo "Failed to remove container"
+            else
+              echo "No existing container found"
+            fi
+            
+            # Pull latest image
+            echo "Pulling latest image..."
+            docker pull ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+            
+            # Run new container with minimal configuration
+            echo "Starting new container..."
+            docker run -d \
+              --name blog \
+              --restart unless-stopped \
+              -p 3001:3001 \
+              -e NODE_ENV=production \
+              ${{ env.DOCKER_IMAGE }}:${{ github.sha }} || {
+              echo "❌ Container start failed! Trying with simplified approach..."
+              docker run -d --name blog --restart unless-stopped -p 3001:3001 -e NODE_ENV=production ${{ env.DOCKER_IMAGE }}:${{ github.sha }}
+            }
+            
+            # Check container status
+            echo "Checking container status..."
+            docker ps -a | grep blog
+            
+            # Wait a moment for container to start
+            sleep 5
+            
+            # Check container logs
+            echo "Container logs:"
+            docker logs blog --tail 50
+            
+            # Check if container is running
+            if docker ps | grep -q blog; then
+              echo "✅ Container is running successfully!"
+            else
+              echo "❌ Container failed to start!"
+              echo "Container status:"
+              docker ps -a | grep blog
+              echo "Container logs:"
+              docker logs blog
+              exit 1
+            fi
+            
+            echo "Deployment completed!"
+          EOF

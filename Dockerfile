@@ -3,9 +3,23 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install dependencies with cache optimization
+# Install yarn globally and configure npm registry with fallback
+RUN apk add --no-cache git && \
+    yarn config set network-timeout 300000 && \
+    yarn config set registry https://registry.npmjs.org/ && \
+    yarn config set strict-ssl false
+
+# Install dependencies with better caching and retry logic
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile --network-timeout 100000
+RUN --mount=type=cache,target=/root/.yarn \
+    --mount=type=cache,target=/root/.cache/yarn \
+    yarn install --frozen-lockfile --network-timeout 300000 --retry 3 || \
+    (echo "Retrying with npm registry..." && \
+     yarn config set registry https://registry.npmjs.org/ && \
+     yarn install --frozen-lockfile --network-timeout 300000 --retry 2) || \
+    (echo "Final retry with yarn registry..." && \
+     yarn config set registry https://registry.yarnpkg.com/ && \
+     yarn install --frozen-lockfile --network-timeout 300000)
 
 # Copy source code
 COPY . .
@@ -38,8 +52,12 @@ COPY --from=builder /app/.next/static ./.next/static
 # Copy package files for production install
 COPY package.json yarn.lock ./
 
-# Install only production dependencies
-RUN yarn install --production --frozen-lockfile --network-timeout 100000
+# Install only production dependencies with retry logic
+RUN --mount=type=cache,target=/root/.yarn \
+    --mount=type=cache,target=/root/.cache/yarn \
+    yarn install --production --frozen-lockfile --network-timeout 300000 --retry 3 || \
+    (echo "Retrying production install..." && \
+     yarn install --production --frozen-lockfile --network-timeout 300000 --retry 2)
 
 # Change ownership of the app directory
 RUN chown -R nextjs:nodejs /app
